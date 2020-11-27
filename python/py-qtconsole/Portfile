@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-qtconsole
-version             4.7.4
+version             4.7.7
 revision            0
 
 categories-append   devel
@@ -12,7 +12,7 @@ platforms           darwin
 license             BSD
 supported_archs     noarch
 
-python.versions     27 35 36 37 38
+python.versions     27 35 36 37 38 39
 
 maintainers         {stromnov @stromnov} openmaintainer
 
@@ -21,9 +21,9 @@ long_description    ${description}
 
 homepage            https://jupyter.org
 
-checksums           rmd160  6986aee63516a64cbbd9aa88cdc53f53ba610fe1 \
-                    sha256  fd48bf1051d6e69cec1f9e2596cfaa94e3c726c70c5d848681ebce10c029f5fd \
-                    size    424884
+checksums           rmd160  d1289312eb91b253a306aaae2644b0f4b3b4037b \
+                    sha256  f236ead8711dba0702507dd8fad473c7216a86eefa6098eff8ec4b54f57d7804 \
+                    size    425068
 
 if {${name} ne ${subport}} {
     depends_lib-append  port:py${python.version}-setuptools \

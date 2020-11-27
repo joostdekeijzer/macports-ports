@@ -4,7 +4,7 @@ PortSystem      1.0
 PortGroup       java 1.0
 
 name            groovy
-version         3.0.4
+version         3.0.6
 revision        0
 
 categories      lang java
@@ -41,9 +41,9 @@ master_sites    https://dl.bintray.com/${name}/maven/
 distname        apache-${name}-binary-${version}
 use_zip         yes
 
-checksums       rmd160  a3e2e45557f9dc1127b5378569d1cd068f436888 \
-                sha256  eba1dc30ed0ceeefe56eba6e79cf43c2ae164eea6e407fd7a79f6c434a667146 \
-                size    43238492
+checksums       rmd160  b3cf2c24ca93f842f17c24d302fc954b2fef7e85 \
+                sha256  6e0cc2d5b8a7b8585f15816c7d5cae1b09b4003ced0002e79abe7b4b1ebb35f2 \
+                size    43587616
 
 worksrcdir      ${name}-${version}
 

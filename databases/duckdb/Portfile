@@ -5,9 +5,9 @@ PortGroup           github 1.0
 PortGroup           cmake 1.1
 PortGroup           legacysupport 1.0
 
-github.setup        cwida duckdb 0.1.8 v
+github.setup        cwida duckdb 0.2.2 v
 
-homepage            https://www.duckdb.org/
+homepage            https://www.duckdb.org
 
 description         DuckDB is an embeddable SQL OLAP Database Management System
 
@@ -25,18 +25,12 @@ categories          databases
 platforms           darwin
 license             MIT
 
-checksums           rmd160  5f67598afe8e5e4fbff8eb7aa7da76a3fb6ddc74 \
-                    sha256  413a8521ada73e37ac8244ef5b403c2c2dab46843c8c84d3bd4a087b466051a6 \
-                    size    17310283
+checksums           rmd160  39df86f2d60b0dd1c921751569e5631a83b0a359 \
+                    sha256  af162a6a55989c28e5297f7b867d9837304c538f748652ee85e4f6de1ea8d43b \
+                    size    19348764
 
 compiler.cxx_standard 2011
 
 depends_build-append \
                     port:pkgconfig \
                     port:zstd
-
-post-destroot {
-    # For some reason, the CLI doesn't get installed by CMake.
-    # So we come in and do so manually.
-    copy ${cmake.build_dir}/duckdb_cli ${destroot}${prefix}/bin/
-}

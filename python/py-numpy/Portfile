@@ -14,10 +14,10 @@ maintainers             {michaelld @michaelld} openmaintainer
 description             The core utilities for the scientific library scipy for Python
 long_description        ${description}
 
-github.setup            numpy numpy 1.19.0 v
-checksums               rmd160  ab8a2b2c7f60776c7dfe463b29e0c155133466a8 \
-                        sha256  2ff34f681c256927d50b238fa2c80d3323b431593b5a54baa519c0cf90576d9b \
-                        size    7022124
+github.setup            numpy numpy 1.19.4 v
+checksums               rmd160 0d5e1ed882b762eec473e49bd734c395b8cf2b59 \
+                        sha256 33e8ad3dca41a517804d795ff03f40707bbc62efe5126f19e3c3cab3c48ecc53 \
+                        size   7036717
 revision                0
 
 if {${name} ne ${subport}} {
@@ -27,7 +27,7 @@ if {${name} ne ${subport}} {
     pre-destroot { set_compilers }
 }
 
-python.versions         27 35 36 37 38
+python.versions         27 35 36 37 38 39
 
 # http://trac.macports.org/ticket/34562
 python.consistent_destroot yes
@@ -53,11 +53,13 @@ if {${name} ne ${subport}} {
         checksums           rmd160  cbb34cf0981ea142ff45722d05a9daad20a134ea \
                             sha256  2dce87065d5de1a83485cfb3de5e4e793787890f5c1dcc3536a9cabf2e1620af \
                             size    4691852
-        revision            1
+        revision            2
+        patchfiles-append   patch-cpu-detection.py.27.patch
         patchfiles-append   patch-numpy_core_setup.py.27.diff \
                             patch-numpy_tests_test_scripts.py.27.diff \
                             patch-fcompiler_g95.27.diff
-        github.livecheck.regex {(1\.16(?:\.\d+)+)}
+        livecheck.url       https://numpy.org/doc/stable/release.html
+        livecheck.regex     {(1\.16(?:\.\d+)+)}
     } else {
         patchfiles-append   patch-numpy_core_setup.py.diff \
                             patch-numpy_tests_test_scripts.py.diff \
@@ -70,7 +72,8 @@ if {${name} ne ${subport}} {
         checksums           rmd160  c14f2725afe0f7420d69a6f9ed5744639a2d2b31 \
                             sha256  4a421fdf82dbb3dce7e62400f69c43722b530db109c3321c6c95452f166560d9 \
                             size    5167349
-        revision            0
+        revision            1
+        patchfiles-append   patch-cpu-detection.py.35.patch
         github.livecheck.regex {(1\.18(?:\.\d+)+)}
     }
 

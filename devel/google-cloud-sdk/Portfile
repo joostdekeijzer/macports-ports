@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                google-cloud-sdk
-version             298.0.0
+version             319.0.0
 categories          devel python
 license             Apache-2
 maintainers         {breun.nl:nils @breun} openmaintainer
@@ -20,14 +20,14 @@ supported_archs     i386 x86_64
 
 if { ${configure.build_arch} eq "i386" } {
     distname        ${name}-${version}-darwin-x86
-    checksums       rmd160  9cf822f86662f29d7d1f32d64d185b93d1a783c9 \
-                    sha256  609452e661d98e918d88a38a5fdc2e10a60991efd7cea06a5a20c509d7a7cfb1 \
-                    size    67136455
+    checksums       rmd160  3123da5e34f2ac1dde6ede18a4e34708cdc44944 \
+                    sha256  cbc88f1ac96504343b6f349b9289c22273f4803c64444d2161b015ff6a5c9fd6 \
+                    size    85701008
 } elseif { ${configure.build_arch} eq "x86_64" } {
     distname        ${name}-${version}-darwin-x86_64
-    checksums       rmd160  ff9c3b876bc2b76740e5e6b22bd68f069dd19b4c \
-                    sha256  6d2e83c7e8bae273647ddc8c88d0eb72a6e24005d2290d90ba2b3505c3b65edc \
-                    size    69100312
+    checksums       rmd160  2bf06c333dbc3fd29c4487128bf42209def4354f \
+                    sha256  5c37fc7199141c63b6e5b1dfc55ed88ae681077fcf2e5fbd9945ad378cdf8d4e \
+                    size    86713228
 }
 
 homepage            https://cloud.google.com/sdk/
@@ -35,7 +35,7 @@ master_sites        https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/
 
 worksrcdir          ${name}
 
-python.default_version 27
+python.default_version 38
 
 post-patch {
     reinplace "s|\"disable_updater\": false|\"disable_updater\": true|" ${worksrcpath}/lib/googlecloudsdk/core/config.json

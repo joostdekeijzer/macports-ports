@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           github 1.0
 
 epoch               1
-github.setup        google re2 2020-06-01
+github.setup        google re2 2020-11-01
 revision            0
 categories          devel textproc
 maintainers         nomaintainer
@@ -18,9 +18,9 @@ long_description    RE2 is a fast, safe, thread-friendly alternative to \
 platforms           darwin
 license             BSD
 
-checksums           rmd160  6d3ed4b73ecd50aec4ff92492ce66191b9d10cef \
-                    sha256  b7b6fef4556166c160c05de83899f6a53f190f8e590eb7f81653b1c96c15bf13 \
-                    size    402938
+checksums           rmd160  2960af20936802bd2bcc92bdca2526f0f1ac5cb0 \
+                    sha256  d47044e1b9547d4bef070d040398814b5bdd6dd4b4c302c611d97f1ccff0c074 \
+                    size    402759
 
 use_configure       no
 

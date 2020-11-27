@@ -4,9 +4,10 @@ PortSystem          1.0
 PortGroup           cmake 1.1
 PortGroup           github 1.0
 
-github.setup        nuspell nuspell 3.1.1 v
+github.setup        nuspell nuspell 4.1.0 v
+revision            0
 
-homepage            https://nuspell.github.io/
+homepage            https://nuspell.github.io
 
 description         Fast and safe spellchecking C++ library
 
@@ -25,9 +26,9 @@ maintainers         {gmail.com:herby.gillot @herbygillot} \
 depends_lib-append  port:boost \
                     port:icu
 
-checksums           rmd160  4cd33cfabecf3a7be52ac2770b60d8a597bf1188 \
-                    sha256  b7172b35bc66ff957a74ca0b2e23ebad6224565430dadddf4e7cda08b1362457 \
-                    size    379686
+checksums           rmd160  d2fe275c29e6f078ffef621973e9ec37e4873418 \
+                    sha256  cb68d4d7254c8ea58783f7ee03e4e126b28e37c146d221d617645a05c20243db \
+                    size    380860
 
 compiler.cxx_standard 2017
 

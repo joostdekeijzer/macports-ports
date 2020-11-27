@@ -6,7 +6,7 @@ PortGroup           xcode_workaround 1.0
 PortGroup           makefile 1.0
 
 name                redis
-version             6.0.4
+version             6.0.9
 categories          databases
 platforms           darwin
 license             BSD
@@ -19,9 +19,9 @@ long_description    {*}${description}
 homepage            https://redis.io/
 master_sites        http://download.redis.io/releases/
 
-checksums           rmd160  1f4a8839a6510f1e6d8fa1e2082ac7024372875d \
-                    sha256  3337005a1e0c3aa293c87c313467ea8ac11984921fab08807998ba765c9943de \
-                    size    2217173
+checksums           rmd160  685cc12eb7d2b14f42dd5fcdabcd18e625e5e4d1 \
+                    sha256  dc2bdcf81c620e9f09cfd12e85d3bc631c897b2db7a55218fd8a65eaa37f86dd \
+                    size    2261418
 
 patchfiles          patch-redis.conf.diff
 

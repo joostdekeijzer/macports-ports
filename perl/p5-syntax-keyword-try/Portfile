@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           perl5 1.0
 
 perl5.branches      5.26 5.28 5.30
-perl5.setup         Syntax-Keyword-Try 0.11
+perl5.setup         Syntax-Keyword-Try 0.20
 license             {Artistic-1 GPL}
 maintainers         {devans @dbevans} openmaintainer
 description         Syntax::Keyword::Try - a try/catch/finally syntax for perl
@@ -12,9 +12,9 @@ long_description    ${description}
 
 platforms           darwin
 
-checksums           rmd160  48be13aefe9d55577d68bbb39b81c33e9378204d \
-                    sha256  262756de7068441260f94e61e378a5a404e7cdcd1cc1fdb0e30d7d1a202577be \
-                    size    28973
+checksums           rmd160  20c4617182b4346fb28b8b19201dc95679c300e0 \
+                    sha256  4e254a4f3c65657db3d658748258d7ef0b5ff74d2ff95956be24307cbc4231cb \
+                    size    36612
 
 if {${perl5.major} != ""} {
     depends_build-append \

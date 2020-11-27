@@ -3,7 +3,7 @@
 PortSystem          1.0
 
 name                npm6
-version             6.14.5
+version             6.14.9
 categories          devel
 platforms           darwin
 supported_archs     noarch
@@ -25,10 +25,10 @@ distname            npm-${version}
 extract.suffix      .tgz
 
 # Please keep the sha1 - users can use it to validate sha values published on npmjs.org for the package
-checksums           sha1    2cc59a3158cdd8461b486d0584c74ab554567219 \
-                    rmd160  f75262d05988a537739fea0c65d16bddaf627e5a \
-                    sha256  968b6309573a6555ce97fab1255a4e7addb035e67026cf98d90b1a38fb9a3b74 \
-                    size    6003880
+checksums           sha1    d2b4237562bfd95689249e2c2874700ed952ed82 \
+                    rmd160  5d8d39b14d5ed0232c0439a29104314c955dc6ae \
+                    sha256  1e0e880ce0d5adf0120fb3f92fc8e5ea5bac73681d37282615d074ff670f7703 \
+                    size    5759936
 
 worksrcdir          "package"
 
@@ -51,7 +51,6 @@ post-patch {
     foreach f [concat ${worksrcpath}/bin/npm-cli.js \
                    ${worksrcpath}/bin/npx-cli.js \
                    ${worksrcpath}/node_modules/JSONStream/bin.js \
-                   ${worksrcpath}/node_modules/ajv/scripts/info \
                    ${worksrcpath}/node_modules/errno/build.js \
                    ${worksrcpath}/node_modules/errno/cli.js \
                    ${worksrcpath}/node_modules/is-ci/bin.js \

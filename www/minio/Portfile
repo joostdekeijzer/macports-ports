@@ -4,8 +4,8 @@ PortSystem          1.0
 PortGroup           github 1.0
 
 # UPDATE THESE IN SYNC!
-set version         2020-04-10T03-34-42Z
-set commit          db4195361876fbe2410236bce55f173da3ef3b2b
+set version         2020-10-18T21-54-12Z
+set commit          4eb45c9a0f7bbff564dcfc811cc1c78655c5e5bf
 
 set relversion      [regsub {(T..)-(..)-(..Z)} $version {\1:\2:\3}]
 # This is not used for fetching, but is compiled into the executable
@@ -25,9 +25,9 @@ long_description \
 license             Apache-2
 
 checksums \
-    rmd160  89a7c1392265880bd4039d087547ca3014ac138a \
-    sha256  b87703dc5524c841b7b344ad9b663ca0f140afbacff21eb46b4e9f87a9dde1ff \
-    size    7255204
+    rmd160  aa4819137243940ccbb71005268b596512ddc321 \
+    sha256  72f512bb2551e4fd53864dd7d93e615f12b079dfb6e6bcaad0b4b6905c1fc48f \
+    size    10258348
 
 set goproj          github.com/${github.author}/${github.project}
 

@@ -3,7 +3,7 @@
 PortSystem 1.0
 
 name			    abcl
-version			    1.7.0
+version			    1.8.0
 revision            0
 categories		    lang java
 PortGroup           java 1.0
@@ -26,11 +26,11 @@ platforms           darwin
 master_sites        https://abcl.org/releases/${version}/
 distname            abcl-src-${version}
 
-checksums           md5     207bdd32461c8645b8bfc4f65c2a979b \
-                    sha1    27ec6a3ffbe2a73766f8ae2fe433b9baed457928 \
-                    rmd160  bf3fdf1ec0e46793a97acdbf5f8f61e5f986d8d4 \
-                    sha256  17524076bb85c53ef1929ea32a32432191ed56d7831ad6895e65e5c50781a832 \
-                    size    2562990
+checksums           md5     9bbdf32caa0ed33f89c065fe60d1a989 \
+                    sha1    c2851f214181a2d3f8a68bd88c18624fd101864f \
+                    rmd160  24076d5f6539dcf759114530966a6d3acfa2a252 \
+                    sha256  1d871ee2f6bcf991d5a6eff7ea5105ef808610db882604d4df0411e971ad257f \
+                    size    2613411
 
 depends_build       port:apache-ant
 

@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           java 1.0
 
 name                gradle
-version             6.5
+version             6.7.1
 revision            0
 categories          devel java groovy
 license             Apache-2
@@ -24,9 +24,9 @@ distname            ${name}-${version}-bin
 master_sites        https://services.gradle.org/distributions
 
 # Update checksums for variant when updating these!
-checksums           rmd160  94b53eccc91ca14f83a05ed2ea9a21f2cbea28f7 \
-                    sha256  23e7d37e9bb4f8dabb8a3ea7fdee9dd0428b9b1a71d298aefd65b11dccea220f \
-                    size    102363463
+checksums           rmd160  fd74004129de128e0ef97f9e839251d15731088b \
+                    sha256  3239b5ed86c3838a37d983ac100573f64c1f3fd8e1eb6c89fa5f9529b5ec091d \
+                    size    102842885
 
 worksrcdir          ${name}-${version}
 
@@ -52,6 +52,7 @@ destroot {
         ${worksrcpath}/lib \
         ${worksrcpath}/LICENSE \
         ${worksrcpath}/NOTICE \
+        ${worksrcpath}/README \
         ${destroot}${prefix}/share/java/${name}
 
     # Symlink gradle into the bin directory
@@ -61,17 +62,14 @@ destroot {
 variant all description {Install supplemental documentation and source code} {
     distname        ${name}-${version}-all
 
-    checksums       rmd160  29c2c1a384854332c3b5e3e04fde1ae2cc74d034 \
-                    sha256  c9910513d0eed63cd8f5c7fec4cb4a05731144770104a0871234a4edc3ba3cef \
-                    size    145767155
+    checksums       rmd160  c6966ab842d3a056242a165523f211da38bab3f8 \
+                    sha256  22449f5231796abd892c98b2a07c9ceebe4688d192cd2d6763f8e3bf8acbedeb \
+                    size    146321962
 
     post-destroot {
         xinstall -m 0755 -d ${destroot}${prefix}/share/doc/${name}
-        copy ${worksrcpath}/getting-started.html \
-            ${worksrcpath}/media \
-            ${worksrcpath}/src \
+        copy ${worksrcpath}/src \
             ${worksrcpath}/docs \
-            ${worksrcpath}/samples \
             ${destroot}${prefix}/share/doc/${name}
     }
 }

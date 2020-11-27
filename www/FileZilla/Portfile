@@ -2,10 +2,11 @@
 
 PortSystem          1.0
 PortGroup           wxWidgets 1.0
+PortGroup           compiler_blacklist_versions 1.0
 
 name                FileZilla
-version             3.48.1
-revision            0
+version             3.51.0
+
 categories          www aqua
 platforms           darwin
 maintainers         {@lhaeger gmx.net:lothar.haeger} openmaintainer
@@ -20,9 +21,9 @@ long_description    FileZilla Client is a fast and reliable cross-platform \
 homepage            https://filezilla-project.org/
 master_sites        https://download.filezilla-project.org/client
 
-checksums           rmd160  7d52dc1c1550f04b129240dd09c6a605b7ff14b4 \
-                    sha256  abffd877ff9006e8e50ce4957393f0a27cc0a7360e626123ef15974eee13ef5d \
-                    size    4774251
+checksums           rmd160  1f7380bd1cec6c17d9b80d3d47214506cb197d14 \
+                    sha256  82be1c4a4f51bb32a599d0b4cc3a24127ba948c0af0f957233cc6a13ea3b6c4c \
+                    size    4808717
 
 # wxWidgets-3.0 with support for C++11 on < 10.9
 wxWidgets.use       wxWidgets-3.0-cxx11
@@ -44,9 +45,7 @@ distname            ${name}_${version}_src
 use_bzip2           yes
 worksrcdir          filezilla-${version}
 
-patchfiles          patch-src-interface-buildinfo.cpp.diff \
-                    patch-skip-dylibcopy.diff \
-                    patch-src-interface-mainfrm.h.diff
+patchfiles          patch-src-interface-buildinfo.cpp.diff
 
 # http://trac.filezilla-project.org/ticket/5473
 # http://sourceforge.net/p/tinyxml/patches/51/
@@ -60,6 +59,9 @@ configure.env       WXRC=${wxWidgets.wxrc}
 
 compiler.cxx_standard   2017
 compiler.thread_local_storage   yes
+
+# https://trac.macports.org/ticket/59805
+compiler.blacklist-append {clang < 1000}
 
 destroot {
     copy ${worksrcpath}/FileZilla.app ${destroot}${applications_dir}

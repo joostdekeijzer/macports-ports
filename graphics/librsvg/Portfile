@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           gobject_introspection 1.0
 
 name                librsvg
-version             2.48.7
+version             2.50.2
 revision            0
 license             {GPL-2+ LGPL-2+}
 set branch          [join [lrange [split ${version} .] 0 1] .]
@@ -19,9 +19,9 @@ homepage            https://wiki.gnome.org/Projects/LibRsvg
 master_sites        gnome:sources/${name}/${branch}/
 use_xz              yes
 
-checksums           rmd160  8a913b11cbd550863e924c8fa7ff53b0ed1a10a5 \
-                    sha256  35de5d93e262fcd85fa4529cee147687d21c6e092f223c293921eaaf57e2fec0 \
-                    size    15097208
+checksums           rmd160  728589b18b3244de9c1a484a82c3d103d547b225 \
+                    sha256  6211f271ce4cd44a7318190d36712e9cea384a933d3e3570004edeb210a056d3 \
+                    size    16354004
 
 depends_build       port:pkgconfig
 
@@ -36,7 +36,7 @@ license_noconflict  gobject-introspection \
                     rust \
                     vala
 
-set pyversion 2.7
+set pyversion       3.8
 depends_run         port:python[join [split ${pyversion} "."] ""]
 
 # cargo does not build on 10.7 or earlier

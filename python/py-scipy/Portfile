@@ -5,12 +5,11 @@ PortGroup               python 1.0
 PortGroup               active_variants 1.1
 PortGroup               github 1.0
 PortGroup               compilers 1.0
-PortGroup               compiler_blacklist_versions 1.0
 
-github.setup            scipy scipy 1.5.0 v
-checksums               rmd160  bae805468c0781ea8fff87f25b7c3384dcd0875e \
-                        sha256  b31b616b4571f19a4c1a925b1b19f4eb325d098265692d88ea386537aa3742ab \
-                        size    19831004
+github.setup            scipy scipy 1.5.4 v
+checksums               rmd160  9668f24955efe3e955a462459369162895fff936 \
+                        sha256  91366228947f17c97c422fafac4e5e6cc217e3732716ed2e75757d822c427829 \
+                        size    19838989
 revision                0
 
 name                    py-scipy
@@ -22,7 +21,7 @@ long_description        ${description}
 
 homepage                https://www.scipy.org/
 
-python.versions         27 35 36 37 38
+python.versions         27 35 36 37 38 39
 
 python.add_archflags    no
 universal_variant       no
@@ -46,6 +45,8 @@ if {${name} ne ${subport}} {
         revision    0
         github.livecheck.regex {(1\.2\.[0-9.-]+)}
 
+        # See https://trac.macports.org/ticket/60520#comment:6
+        compilers.allow_arguments_mismatch yes
     } else {
 
         # requires PyBind11 as of 1.4.0
@@ -57,11 +58,7 @@ if {${name} ne ${subport}} {
 
         # require thread_local storage as of 1.4.0
         compiler.thread_local_storage yes
-        # Work around thread local compiler selection bug. Remove after
-        # https://github.com/macports/macports-base/pull/161 is released.
-        compiler.blacklist-append {clang < 800}
 
-        compilers.allow_arguments_mismatch yes
     }
 
     if {${python.version} == 35} {
@@ -71,6 +68,9 @@ if {${name} ne ${subport}} {
                     size    18892400
         revision    0
         github.livecheck.regex {(1\.4\.[0-9.-]+)}
+
+        # See https://trac.macports.org/ticket/60520
+        compilers.allow_arguments_mismatch yes
     }
 
     depends_lib-append      port:py${python.version}-numpy \

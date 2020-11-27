@@ -3,13 +3,14 @@
 PortSystem          1.0
 PortGroup           cmake 1.1
 PortGroup           github 1.0
+PortGroup           compiler_blacklist_versions 1.0
 
 epoch               1
-github.setup        mongodb mongo-cxx-driver 3.5.1 r
+github.setup        mongodb mongo-cxx-driver 3.6.1 r
 revision            0
-checksums           rmd160  2418d0fabfe2e24cd07f8dfd4644aac2d74c1cd1 \
-                    sha256  4092bc5ca41f53aab72c9a5205acd74e1155e49a8c8b3488f546731dff66e5fc \
-                    size    1271810
+checksums           rmd160  2062c0ccf77bcbee7ef969481272a8eb67d06864 \
+                    sha256  aebcf616e56a6a02705163db21b6415986a23f239347cfec67efe289bb7108c1 \
+                    size    1303161
 
 license             Apache-2
 categories          devel databases
@@ -31,6 +32,9 @@ depends_lib-append  port:mnmlstc-core \
 
 compiler.cxx_standard 2011
 
+# Segmentation fault observed during build for Xcode 6.2
+compiler.blacklist-append {clang == 600.0.57}
+
 configure.args      -DBSONCXX_POLY_USE_MNMLSTC=ON \
                     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=ON \
                     -DBUILD_VERSION=${version} \
@@ -45,3 +49,5 @@ if {${os.platform} eq "darwin" && ${os.major} < 10} {
         return -code error "incompatible Mac OS X version"
     }
 }
+
+github.livecheck.regex {([0-9.]+)}

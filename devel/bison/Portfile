@@ -6,7 +6,7 @@ name                bison
 subport             bison-runtime {}
 
 epoch               1
-version             3.6.4
+version             3.7.4
 if {${subport} eq "bison"} {
     revision        0
 } else {
@@ -43,9 +43,10 @@ if {${subport} eq "bison-runtime"} {
                         desk calculators to complex programming \
                         languages.
 
-    depends_lib         port:gettext
-    depends_run         port:bison-runtime \
+    depends_lib         port:gettext \
+                        port:libiconv \
                         port:m4
+    depends_run         port:bison-runtime
     depends_skip_archcheck-append m4
 }
 homepage            https://www.gnu.org/software/bison
@@ -53,9 +54,9 @@ homepage            https://www.gnu.org/software/bison
 master_sites        gnu
 use_xz              yes
 
-checksums           rmd160  beabcfa3b49a7ba301d68405ed9d0e64f192717b \
-                    sha256  8b13473b31ca7fcf65e5e8a74224368ffd5df19275602a9c9567ba393f18577d \
-                    size    2472456
+checksums           rmd160  936dd31b836b4cdf52df3e900ceb6c241804a42c \
+                    sha256  a3b5813f48a11e540ef26f46e4d288c0c25c7907d9879ae50e430ec49f63c010 \
+                    size    2617336
 
 configure.args      --disable-silent-rules \
                     ac_cv_prog_HAVE_GCJ_IN_PATH= \

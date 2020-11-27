@@ -5,7 +5,7 @@ PortSystem 1.0
 name                postgresql12-doc
 conflicts           postgresql93-doc postgresql94-doc postgresql95-doc \
     postgresql96-doc postgresql10-doc postgresql11-doc
-version             12.3
+version             12.5
 categories          databases
 platforms           darwin
 maintainers         {jwa @jyrkiwahlstedt}
@@ -22,9 +22,9 @@ master_sites        postgresql:source/v${version}
 distname            postgresql-${version}
 set rname           postgresql12
 
-checksums           rmd160  9b8bda078877344f15f627b0b099da613f290362 \
-                    sha256  94ed64a6179048190695c86ec707cc25d016056ce10fc9d229267d9a8f1dcf41 \
-                    size    20439892
+checksums           rmd160  d974cdb8fcf8e960fca824786b8121cfffc60c05 \
+                    sha256  bd0d25341d9578b5473c9506300022de26370879581f5fddd243a886ce79ff95 \
+                    size    20729654
 
 use_bzip2           yes
 dist_subdir         ${rname}

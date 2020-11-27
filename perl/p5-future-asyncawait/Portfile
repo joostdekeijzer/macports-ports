@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           perl5 1.0
 
 perl5.branches      5.26 5.28 5.30
-perl5.setup         Future-AsyncAwait 0.41 ../../authors/id/P/PE/PEVANS
+perl5.setup         Future-AsyncAwait 0.46 ../../authors/id/P/PE/PEVANS
 revision            0
 license             {Artistic-1 GPL}
 maintainers         {devans @dbevans} openmaintainer
@@ -13,9 +13,9 @@ long_description    ${description}
 
 platforms           darwin
 
-checksums           rmd160  d9680004064bf5409a8eae15358823ba9f8aa64e \
-                    sha256  2ff6ac00bfdce1cec307cdeb9abb07855936ab946061a30ef3225c57226b236a \
-                    size    67752
+checksums           rmd160  5a1bc7941c8dd87e1b50d4608f22132978e3f776 \
+                    sha256  201b684a0b5476054674191fdadad40c5955ec67118612d5947d8884ecd10bc7 \
+                    size    73849
 
 if {${perl5.major} != ""} {
     depends_build-append \
@@ -26,5 +26,4 @@ if {${perl5.major} != ""} {
                     port:p${perl5.major}-future
 
     perl5.use_module_build
-    supported_archs noarch
 }

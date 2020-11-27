@@ -3,11 +3,11 @@
 PortSystem          1.0
 PortGroup           github 1.0
 
-github.setup        jbruchon jdupes 1.17.0 v
+github.setup        jbruchon jdupes 1.19.0 v
 revision            0
-checksums           rmd160  5139cf4f3bb295a71c8fd2fc0c17415a48d274f1 \
-                    sha256  345baa8dc12fdd6ab9daa36a410a88ae0d5893cc124d885990e3a9e679a2faf9 \
-                    size    107126
+checksums           rmd160  b5af73375a895b96f7bf5246e2ba744427d02243 \
+                    sha256  c2e1046ed16ccffc00a40487f418bd5dbce198bd8fd58b852197ca6e3c44d248 \
+                    size    92646
 
 platforms           darwin
 categories          sysutils
@@ -21,5 +21,10 @@ use_configure       no
 
 build.args          PREFIX=${prefix} \
                     CC="${configure.cc} [get_canonical_archflags cc]"
+
+if {${os.platform} eq "darwin" && ${os.major} > 16} {
+    # dedupe feature requires macOS 10.13 or higher
+    build.args-append   ENABLE_DEDUPE=1
+}
 
 destroot.args       PREFIX=${prefix}

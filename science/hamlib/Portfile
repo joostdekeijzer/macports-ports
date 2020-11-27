@@ -24,11 +24,11 @@ if {[string first "-devel" $subport] > 0} {
     # clock_gettime
     legacysupport.newest_darwin_requires_legacy 15
 
-    github.setup    Hamlib Hamlib 10fce9f4b50a702fe622551429675522c94c812d
-    version         20200622-[string range ${github.version} 0 7]
-    checksums       rmd160  cecf770eef0f073d5c92d6a7fb220a86a4bfdc98 \
-                    sha256  5c5eec3c6dedb3b78a6012a7843d1d1b70a06bde460f36ee0b666b79d420818a \
-                    size    1474719
+    github.setup    Hamlib Hamlib cf3b528ea7f9c4274524f7793b9d9bc0df7d1234
+    version         20201111-[string range ${github.version} 0 7]
+    checksums       rmd160  312bbadd22098e2f7e1e78ef963bbbef5199b746 \
+                    sha256  848d18c7d830bac8237023b6a35d704c74e7d0b1119d29005cd0765291c911f1 \
+                    size    1505361
     revision        0
 
     name            hamlib-devel
