@@ -171,4 +171,4 @@ default_variants            +x11
 
 livecheck.type              regex
 livecheck.url               [lindex ${master_sites} 0]
-livecheck.regex             ${name}-(6(?:\\.\\d+)+(?:-\\d+)?)\.tar
+livecheck.regex             ImageMagick-(6(?:\\.\\d+)+(?:-\\d+)?)\.tar
