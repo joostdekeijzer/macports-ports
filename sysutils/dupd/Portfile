@@ -1,26 +1,28 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
-PortSystem            1.0
+PortSystem          1.0
+PortGroup           github 1.0
 
-name                  dupd
-version               1.6
-description           Convenient and fast CLI to find duplicate files.
-homepage              http://www.virkki.com/dupd
-license               GPL-3
-categories            sysutils
-platforms             darwin
-use_configure         no
-build.target          dupd
-use_parallel_build    no
-test.run              yes
+github.setup        jvirkki dupd 1.7
 
-maintainers           {@jvirkki virkki.com:jyri}
+name                dupd
+description         Convenient and fast CLI to find duplicate files.
+homepage            https://www.virkki.com/dupd
+license             GPL-3
+categories          sysutils
+platforms           darwin
+use_configure       no
+build.target        dupd
+use_parallel_build  no
+test.run            yes
 
-long_description      Convenient and fast CLI to find duplicate files. Supports an interactive style for exploring duplicates in the filesystem.
+maintainers         {@jvirkki virkki.com:jyri}
 
-master_sites          http://www.virkki.com/dupd
-checksums             rmd160 624afff8a1ecf1633a6fea0e49dc99cb37e4efc8 \
-                      sha256 68bce4d5ac0b8a00ac50da65634950eb46fb11a571e546fb543fc6c6bf6b79da
+long_description    Convenient and fast CLI to find duplicate files. Supports an interactive style for exploring duplicates in the filesystem.
 
-destroot.destdir      INSTALL_PREFIX=${destroot}${prefix} \
-                      MAN_BASE=${destroot}${prefix}/share/man
+checksums           rmd160  ffc42648adc26da887f48f9625ffb7ef8a570153 \
+                    sha256  e0d0531e7d201a76e3ccd1ccab298f91fead1ae5aad5ce11129c691c97ce7a6a \
+                    size    983972
+
+destroot.destdir    INSTALL_PREFIX=${destroot}${prefix} \
+                    MAN_BASE=${destroot}${prefix}/share/man
