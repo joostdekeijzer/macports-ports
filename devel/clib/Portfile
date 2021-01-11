@@ -4,11 +4,8 @@ PortSystem          1.0
 PortGroup           github 1.0
 PortGroup           makefile 1.0
 
-github.setup        clibs clib 2.4.1
-
-categories          devel
-license             MIT
-platforms           darwin linux
+github.setup        clibs clib 2.6.0
+revision            0
 
 homepage            https://www.clibs.org
 
@@ -25,11 +22,15 @@ long_description    {*}${description} Basically the lazy-man’s copy/paste \
                     This allows clib(1) to fit into any new or existing C \
                     workflow without friction.
 
+categories          devel
+license             MIT
+platforms           darwin linux
+
 maintainers         {gmail.com:herby.gillot @herbygillot} \
                     openmaintainer
 
-checksums           rmd160  5c6af6cf224500064c62f2834c5ef07d3bbe98fb \
-                    sha256  38b3f110a683b3d8fc8d2fc52b8ebb90bed1b7216624ae372a5ee6aaea6ebfca \
-                    size    172839
+checksums           rmd160  d2c731e5effbce2b13416959b32f7b8c07580154 \
+                    sha256  e6c1db72b5e82192dc38dc169431fad53f0a9e3a9cbf12eb09e8558f54399a56 \
+                    size    173806
 
 makefile.has_destdir no

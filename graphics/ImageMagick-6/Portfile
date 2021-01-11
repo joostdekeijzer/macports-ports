@@ -9,11 +9,11 @@ PortGroup                   conflicts_build 1.0
 # PHP Warning:  Version warning: Imagick was compiled against Image Magick version XXXX but version YYYY is loaded. Imagick will run but may behave surprisingly in Unknown on line 0
 
 name                        ImageMagick-6
-version                     6.9.11-43
+version                     6.9.11-56
 revision                    0
-checksums                   rmd160  071fb3982672fd2a44e71117afe5d3aa70190acd \
-                            sha256  113ea26e77eea33b26e35c122aa43e9178bac7ca79953bbfdf6e57f089ccb31e \
-                            size    9166732
+checksums                   rmd160  8e0b765a31ad02882446e33a8aa1b8ebc8096df5 \
+                            sha256  882c785058378bcadfc14310abebbc7f6a704203a459fb7aeaad22282507adf4 \
+                            size    9163308
 
 categories                  graphics devel
 maintainers                 {ryandesign @ryandesign}
@@ -38,9 +38,9 @@ long_description            ImageMagick is a robust collection of tools and \
                             supported, including GIF, JPEG, JPEG 2000, PNG, PDF, \
                             PhotoCD and TIFF.
 
-homepage                    https://legacy.imagemagick.org
-
 distname                    ImageMagick-${version}
+
+homepage                    https://legacy.imagemagick.org
 master_sites                https://imagemagick.org/download/ \
                             http://mirror.checkdomain.de/imagemagick/ \
                             ftp://ftp.u-aizu.ac.jp/pub/graphics/image/ImageMagick/imagemagick.org/ \

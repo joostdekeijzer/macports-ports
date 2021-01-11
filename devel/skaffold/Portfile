@@ -3,7 +3,7 @@
 PortSystem          1.0
 PortGroup           github 1.0
 
-github.setup        GoogleContainerTools skaffold 1.17.0 v
+github.setup        GoogleContainerTools skaffold 1.17.2 v
 revision            0
 
 categories          devel
@@ -23,9 +23,9 @@ homepage            https://skaffold.dev
 
 github.tarball_from archive
 
-checksums           rmd160  30b3b474e57be35af3ebc38d50069447667b9ba0 \
-                    sha256  ebf059f14f555a99d3fb7f42efe910f6a6adf1153ccd0ff73cb3f252898febe0 \
-                    size    27526424
+checksums           rmd160  e50c36b640318c18116a69a5dd8f6e190d61ffa9 \
+                    sha256  1d23795bc92d77fbfd92ff1068013c35cd0f4fbde24f06f46cff8caa8b7a4972 \
+                    size    27691567
 
 depends_build       port:go
 

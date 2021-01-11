@@ -3,12 +3,12 @@
 PortSystem                  1.0
 PortGroup                   obsolete 1.0
 
-# Remove after 2021-07-01
+# Remove after 2022-01-01
 
 name                        ImageMagick
 
 replaced_by                 ImageMagick-6
-version                     6.9.11-21
+version                     6.9.11-56
 revision                    1
 
 categories                  graphics devel

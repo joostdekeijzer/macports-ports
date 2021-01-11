@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-hypothesis
-version             5.41.3
+version             5.48.0
 revision            0
 categories-append   devel
 platforms           darwin
@@ -25,9 +25,9 @@ homepage            https://pypi.python.org/pypi/hypothesis
 master_sites        pypi:[string index ${python.rootname} 0]/${python.rootname}
 distname            ${python.rootname}-${version}
 
-checksums           rmd160  bdfd85348a4181c62fe50b49f8d75428dc3fa295 \
-                    sha256  6a3471ff74864ab04a0650c75500ef15f2f4a901d49ccbb7cbec668365736688 \
-                    size    278772
+checksums           rmd160  c26be28ea009ff88ac0445681270d092a10ed3b3 \
+                    sha256  c54dcccdca262ac119953510d66fde1c0256d43715c4ddc4eb897f80dd6c2e9f \
+                    size    289344
 
 if {${name} ne ${subport}} {
     depends_build-append  port:py${python.version}-setuptools

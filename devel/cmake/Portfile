@@ -36,12 +36,12 @@ subport cmake-devel {
 
 if {${subport} eq ${name}} {
 
-    gitlab.setup cmake cmake 3.18.5 v
+    gitlab.setup cmake cmake 3.19.2 v
     gitlab.livecheck.regex {([0-9.]+)}
 
-    checksums rmd160 cc7e658d34b65e5889425b33529d35c117e51a22 \
-              sha256 b9fc524aedfefa9043e74431b814f1578be0cefec41778337f7527de002ee10b \
-              size   6946444
+    checksums rmd160 c2452a64c4ca03122ea9d1e6463bd51fcaec1ebc \
+              sha256 3cd852d8287c0b15d46d24b993a8d825f2ad160e67b4be95690bb74a39e287c4 \
+              size   7133168
     revision  0
 
     compiler.cxx_standard 2011
@@ -64,7 +64,6 @@ if {${subport} eq ${name}} {
     long_description ${base_long_description} \
         The ${subport} release port is updated roughly every few months.
 
-    # release-only patches
     patchfiles-append \
         patch-Modules-noArchCheck.diff \
         patch-CMakeFindFrameworks.cmake.diff \
@@ -72,7 +71,8 @@ if {${subport} eq ${name}} {
         patch-fix_cxx14_17_checks.diff \
         patch-fix-system-prefix-path.diff \
         patch-cmake-leopard-tiger.diff \
-        patch-fix-clock_gettime-test.diff
+        patch-fix-clock_gettime-test.diff \
+        patch-qt5gui.diff
 
     depends_lib-append \
         port:curl \
@@ -125,7 +125,7 @@ if {${subport} eq ${name}} {
     platform darwin {
         configure.env-append \
             CMAKE_OSX_DEPLOYMENT_TARGET=${macosx_deployment_target}
-        
+
         if {${configure.sdkroot} eq ""} {
             configure.env-append SDKROOT=/
         }
@@ -194,6 +194,10 @@ if {${subport} eq ${name}} {
         # patch FRAMEWORKS
         reinplace "s|__FRAMEWORKS_DIR__|${frameworks_dir}|g" \
             ${worksrcpath}/Modules/CMakeFindFrameworks.cmake
+
+        # patch APPLICATIONS_DIR
+        reinplace "s|__APPLICATIONS_DIR__|${applications_dir}|g" \
+            ${worksrcpath}/macports.cmake
     }
 
     post-destroot {
@@ -205,23 +209,13 @@ if {${subport} eq ${name}} {
             xinstall -m 0644 -W ${worksrcpath}/Auxiliary/vim/${type} cmake.vim \
                 ${destroot}${prefix}/share/vim/vimfiles/${type}
         }
-        if ([variant_isset gui]) {
-            set app CMake
-            xinstall -d ${destroot}${applications_dir}/${app}.app/Contents/MacOS \
-                ${destroot}${applications_dir}/${app}.app/Contents/Resources
-            xinstall -m 644 ${filespath}/Info.plist.in ${destroot}${applications_dir}/${app}.app/Contents/Info.plist
-            reinplace "s|@VERSION@|${version}|g" ${destroot}${applications_dir}/${app}.app/Contents/Info.plist
-            reinplace "s|@PREFIX@|${prefix}|g" ${destroot}${applications_dir}/${app}.app/Contents/Info.plist
-            ln -s ${prefix}/bin/cmake-gui ${destroot}${applications_dir}/${app}.app/Contents/MacOS/cmake-gui
-            xinstall -m 644 ${worksrcpath}/Source/QtDialog/CMakeSetup.icns ${destroot}${applications_dir}/${app}.app/Contents/Resources/CMakeSetup.icns
-        }
     }
 
     # All the variants create circular dependencies on 10.6 with libc++,
     # due to the default compiler needing cmake to build.
     if {[info exists cmake_bootstrapping]} {
         set some_variant_disabled 0
-        foreach vname {gui qt4 qt5 docs python35 python36 python37 python38} {
+        foreach vname { qt5 docs python35 python36 python37 python38} {
             if {[variant_isset $vname]} {
                 unset ::variations($vname)
                 set some_variant_disabled 1
@@ -235,40 +229,12 @@ if {${subport} eq ${name}} {
         }
     }
 
-    variant gui description {Build Qt-based cmake-gui} {
-        configure.args-append --qt-gui
-    }
-
-    variant qt4 conflicts qt5 requires gui description {Build Qt GUI using Qt4} {
-        PortGroup qt4 1.0
-        if {${subport} eq ${name}} {
-            patchfiles-append patch-qt4gui.diff
-        } else {
-            patchfiles-append patch-qt4gui.devel.diff
-        }
-        configure.args-append --qt-qmake=${qt_qmake_cmd}
-    }
-
-    variant qt5 conflicts qt4 requires gui description {Build Qt GUI using Qt5} {
+    variant qt5 description {Build Qt GUI using Qt5} {
         PortGroup qt5 1.0
-        if {${subport} eq ${name}} {
-            patchfiles-append patch-qt5gui.diff
-        } else {
-            patchfiles-append patch-qt5gui.devel.diff
-        }
-        configure.args-append --qt-qmake=${qt_qmake_cmd}
+        configure.args-append --qt-gui --qt-qmake=${qt_qmake_cmd}
     }
 
-    if {[variant_isset gui]} {
-        if {![variant_isset qt4] && ![variant_isset qt5]} {
-            default_variants +qt4
-        }
-
-        if {![variant_isset qt4] && ![variant_isset qt5]} {
-            ui_error "\n\nYou must select either the +qt4 or +qt5 variant when using variant +gui.\n"
-            return -code error "Invalid variant selection"
-        }
-    } else {
+    if {![variant_isset qt5]} {
         configure.args-append --no-qt-gui
     }
 

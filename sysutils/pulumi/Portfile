@@ -3,12 +3,10 @@
 PortSystem          1.0
 PortGroup           golang 1.0
 
-go.setup            github.com/pulumi/pulumi 2.14.0 v
+go.setup            github.com/pulumi/pulumi 2.17.0 v
+revision            0
 
-categories          sysutils net
-license             Apache-2
-
-homepage            https://www.pulumi.com/
+homepage            https://www.pulumi.com
 
 description         Pulumi - Modern Infrastructure as Code. Any cloud, any \
                     language.
@@ -24,12 +22,15 @@ long_description    Pulumi's Infrastructure as Code SDK is the easiest way to \
                     features like loops, functions, classes, and package \
                     management that you already know and love.
 
+categories          sysutils net
+license             Apache-2
+
 maintainers         {gmail.com:herby.gillot @herbygillot} \
                     openmaintainer
 
-checksums           rmd160  ef29f7295e8d44ba94db348bcb6fe4e98cfd9d05 \
-                    sha256  a022aac744c44d8cbeedaaf1cbb63a4f5279ae2c63b3067cc063794f1fe80fbe \
-                    size    3771551
+checksums           rmd160  3eb9d73e26ab34ede2a2718406906fdf04e240bd \
+                    sha256  4e497c74c1673950b3528a1594319f73cb39aefc7636a1a1bbf52fb86f0b5c62 \
+                    size    3823446
 
 build.cmd           make
 build.pre_args      VERSION="${github.tag_prefix}${version}"

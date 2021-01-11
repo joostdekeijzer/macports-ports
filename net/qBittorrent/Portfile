@@ -5,8 +5,8 @@ PortGroup       github 1.0
 PortGroup       qmake5 1.0
 PortGroup       compiler_blacklist_versions 1.0
 
-github.setup    qbittorrent qBittorrent 4.3.0.1 release-
-revision        1
+github.setup    qbittorrent qBittorrent 4.3.2 release-
+revision        0
 categories      net
 maintainers     {i0ntempest @i0ntempest} openmaintainer
 platforms       darwin
@@ -22,9 +22,9 @@ long_description \
 
 homepage        https://www.qbittorrent.org
 
-checksums       rmd160  0743986998b20e259a1840958baa0d7f8305a5a4 \
-                sha256  27b21d3fa3ae106e4932e41cfccc5056826f275850ad08ce908790f4cd30a5f3 \
-                size    7753999
+checksums       rmd160  543c1a5b59c15912cde31d98bed55810709aef75 \
+                sha256  187b8625e8787384a68a30eff3702b0e5c246512cb20013a38a25553cb18c5e7 \
+                size    7867939
 
 depends_build-append \
                 port:pkgconfig

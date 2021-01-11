@@ -5,7 +5,7 @@ PortGroup           python 1.0
 
 name                py-tpot
 python.rootname     TPOT
-version             0.11.6
+version             0.11.6.post3
 revision            0
 categories-append   devel math science
 platforms           darwin
@@ -23,9 +23,9 @@ long_description    A Python tool that automatically creates and optimizes \
 
 homepage            https://github.com/EpistasisLab/tpot
 
-checksums           rmd160  482402ea5e1b5d2eb1fc2148381c50c8d50a8254 \
-                    sha256  8a00f21307641a37d407bbd2f28d3e28393d54558f94e9e1e694cc998aa0ff7d \
-                    size    907351
+checksums           rmd160  5478e5a2d1de38350827e77dcda5e6b24d4a6ef8 \
+                    sha256  99c47719cd1dce39f3d47bac1b39b66603e1b48a8336c1e1e2648c2427a723c2 \
+                    size    907377
 
 if {${name} ne ${subport}} {
     depends_lib-append  port:py${python.version}-setuptools \

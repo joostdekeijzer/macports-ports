@@ -5,7 +5,7 @@ PortGroup           github 1.0
 PortGroup           gobject_introspection 1.0
 
 github.setup        libvips libvips 8.10.2 v
-revision            0
+revision            1
 name                vips
 distname            vips-${version}
 description         VIPS is an image processing library.
@@ -21,6 +21,10 @@ github.tarball_from releases
 checksums           rmd160  3dad13d495727ab9af737c7df9ebee9420c49c3a \
                     sha256  c1d0d9cb54d75cd4f66dce787fbcac99f834f6621fbf47bce9e02ef65b4ab02a \
                     size    19518825
+
+# minor tweak to allow build with older compilers
+# StandaloneFuzzTargetMain.c:31: error: 'for' loop initial declaration used outside C99 mode
+patchfiles-append   patch-vips-fuzz-forloop.diff
 
 depends_build       port:gtk-doc \
                     port:pkgconfig

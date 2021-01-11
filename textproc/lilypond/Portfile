@@ -56,12 +56,13 @@ if {${subport} eq ${name}} {
         configure.ldflags-append -stdlib=${configure.cxx_stdlib}
     }
 } else {
-    version         2.21.80
+    version         2.21.82
     revision        0
     conflicts       lilypond
-    checksums       rmd160  9c780e07ee1febbbeb2ce6054c871f20243ee02f \
-                    sha256  64296eff097e5c5bd0b27a45ea2261b151099534d886119a414eb8947e34aec4 \
-                    size    18008546
+    checksums       rmd160  68d11ec05f973bc834a09611c18c7ef763d8cccf \
+                    sha256  f0bd17cccee771ed4a2e0db1ec81c98d9f52e47090e5dcc085de65dd8cc4bdd9 \
+                    size    18017911
+
 
     set livecheck_url "development.html"
 }

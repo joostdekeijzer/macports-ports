@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           cmake 1.0
 
 name                wireshark3
-version             3.4.0
+version             3.4.2
 revision            0
 categories          net
 license             {GPL-2 GPL-3}
@@ -27,10 +27,10 @@ distfiles           wireshark-${version}${extract.suffix}
 
 worksrcdir          wireshark-${version}
 
-checksums           sha256  67e4ebbd9153fc589fd67dc21b93176674c73adc3d5a43934c3ac69d8594a8ae \
-                    rmd160  cd79a56fdc433109b104ffacd43ba2825999c864 \
-                    sha1    6fdf4f394c287f1e21b48c5293ec1a6e6b627996 \
-                    size    32502760
+checksums           sha256  de9868729e426a469baabd8d444240d84fa5445020e92c842dd19afd0d47a4c4 \
+                    rmd160  53a02106b0f23e50b1108d93772464974b2b37be \
+                    sha1    b33276e4e6c3d6a057da3b569b58316330a5f3e3 \
+                    size    32465900
 
 conflicts           wireshark-devel wireshark wireshark2 wireshark22 wireshark24 wireshark30
 
@@ -41,6 +41,7 @@ depends_lib         path:lib/pkgconfig/glib-2.0.pc:glib2 \
                     path:lib/libssl.dylib:openssl \
                     port:libgcrypt \
                     port:libpcap \
+                    port:libssh \
                     port:lz4
 
 configure.args-append \
@@ -127,20 +128,20 @@ variant chmodbpf description {Enable Wireshark to acces macOS capture devices} {
     depends_run             port:wireshark-chmodbpf
 }
 
-variant python35 conflicts python36 python37 python38 description {Use python35 during build} {
-    depends_build-append    port:python35
-}
-
-variant python36 conflicts python35 python37 python38 description {Use python36 during build} {
+variant python36 conflicts python37 python38 python39 description {Use python36 during build} {
     depends_build-append    port:python36
 }
 
-variant python37 conflicts python35 python36 python38 description {Use python37 during build} {
+variant python37 conflicts python36 python38 python39 description {Use python37 during build} {
     depends_build-append    port:python37
 }
 
-variant python38 conflicts python35 python36 python37 description {Use python38 during build} {
+variant python38 conflicts python36 python37 python39 description {Use python38 during build} {
     depends_build-append    port:python38
+}
+
+variant python39 conflicts python36 python37 python38 description {Use python39 during build} {
+    depends_build-append    port:python39
 }
 
 default_variants +zlib +libsmi +gnutls +geoip +kerberos5 +chmodbpf
@@ -155,9 +156,9 @@ if {![variant_isset adns] && ![variant_isset cares]} {
 
 ## if no python3* variant is specified, add +python38
 ## XYZZY: it would be better to detect which python3* is already installed and use that...
-if {![variant_isset python35] && ![variant_isset python36] && \
-    ![variant_isset python37] && ![variant_isset python38] } {
-    default_variants-append +python38
+if {![variant_isset python36] && ![variant_isset python37] && \
+    ![variant_isset python38] && ![variant_isset python39] } {
+    default_variants-append +python39
 }
 
 post-destroot {

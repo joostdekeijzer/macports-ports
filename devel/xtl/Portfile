@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           cmake 1.1
 PortGroup           github 1.0
 
-github.setup        xtensor-stack xtl 0.6.21
+github.setup        xtensor-stack xtl 0.6.23
 revision            0
 categories          devel
 license             BSD
@@ -14,6 +14,6 @@ description         Basic tools (containers, algorithms) used by other quantstac
 long_description    ${description}
 platforms           darwin
 
-checksums           rmd160  77e0b933d9d9281befdd95f4b4f4a37abaca258e \
-                    sha256  77c4c7432780773396e3bc2730de7a88a3972646571a22126e973e2f347db0f0 \
-                    size    156875
+checksums           rmd160  7e8b1710eaabbee66e0411042bbda040b272d47e \
+                    sha256  8ce82c6cb0c15086c41526e288be8ed4bc2c4437ab04845667bf11279420ffa7 \
+                    size    159083

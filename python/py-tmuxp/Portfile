@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-tmuxp
-version             1.5.5
+version             1.6.3
 categories-append   devel
 license             MIT
 platforms           darwin
@@ -18,7 +18,7 @@ long_description    ${description}
 homepage            https://github.com/tmux-python/tmuxp/
 master_sites        pypi:t/${python.rootname}/
 distname            ${python.rootname}-${version}
-python.versions     27 36 37 38
+python.versions     27 36 37 38 39
 
 if {${name} ne ${subport}} {
     depends_build-append    port:py${python.version}-setuptools
@@ -28,9 +28,10 @@ if {${name} ne ${subport}} {
                             port:py${python.version}-kaptan \
                             port:py${python.version}-libtmux
 
-    checksums           rmd160  88ec8b28cf74405c3551de49ddb073145fc12fd5 \
-                        sha256  cd9724b2738a3032f29784ce2e37332ca5f80104e05182502dcdadf7b08f7fc9 \
-                        size    75028
+    checksums           rmd160  7cf48d719f690035b7d3bd5b477f50952494dff5 \
+                        sha256  4bc52d6683235307c92ddbb164c84e3e892ee2d00afa16ed89eca0fa7f85029e \
+                        size    81771
+
     livecheck.type      none
 } else {
     livecheck.type  pypi
