@@ -4,10 +4,10 @@ PortSystem              1.0
 PortGroup               python 1.0
 
 name                    jc
-version                 1.13.4
+version                 1.14.1
 revision                0
 
-platforms               darwin
+platforms               darwin macosx
 license                 MIT
 
 categories              textproc python sysutils
@@ -21,9 +21,9 @@ long_description        {*}${description} This allows for piping the output \
                         to tools like jq, and/or for easier parsing within \
                         scripts.
 
-checksums               rmd160  1c370160b6a2fb19ecc6f1e0063fddda76f94899 \
-                        sha256  45480ac3d399f70b57d8cc97a6795ea875a19863c55a56eae596c6e67303c5b8 \
-                        size    90374
+checksums               rmd160  7935d08d2cacea832b0d6743dd3750549e12ebfb \
+                        sha256  b6bfde3079d4385a643d9eb31c1c554e122ac32e594318363306375b25269473 \
+                        size    97860
 
 maintainers             {gmail.com:herby.gillot @herbygillot} \
                         openmaintainer

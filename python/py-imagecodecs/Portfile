@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-imagecodecs
-version             2020.5.30
+version             2021.1.8
 revision            0
 
 categories-append   graphics
@@ -17,9 +17,9 @@ long_description    ${description}
 
 homepage            https://www.lfd.uci.edu/~gohlke/
 
-checksums           rmd160  a50a9a8014d82672e9f6ea4fa73a370b6ffae2e0 \
-                    sha256  c8c776922d3a60824d8d3d31ba674a250d1b4d429e81349b5c88c34d4353ddb5 \
-                    size    8993252
+checksums           rmd160  0a4b0d11abffc7b540c8121bb8f3dfc60474aed1 \
+                    sha256  06eac2346df06c5cd772b3f6ef5ae81aaa2456b644320fbea8b9cf7323a8dc69 \
+                    size    9283466
 
 python.versions     37 38 39
 
@@ -46,8 +46,7 @@ if {${name} ne ${subport}} {
                     port:zopfli \
                     port:zstd
 
-    patchfiles      patch-setup.py.diff \
-                    patch-imagecodecs-_zopfli.c.diff
+    patchfiles      patch-imagecodecs-zopfli.diff 
 
     post-patch {
         reinplace "s|%PREFIX%|${prefix}|g" \

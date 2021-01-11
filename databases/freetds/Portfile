@@ -5,11 +5,11 @@ PortGroup           compiler_blacklist_versions 1.0
 
 name                freetds
 epoch               1
-version             1.2.13
+version             1.2.18
 revision            0
-checksums           rmd160  f72975c2d12b30e2d991411998b3feba7ceae5d7 \
-                    sha256  6d329003312f6bf5a35e8566e28d104c2bc594f1e045f57164a275449df58d08 \
-                    size    2247650
+checksums           rmd160  d5dd33717125779931adb1f61b929702af54cc75 \
+                    sha256  10d47e60986cfc51f8170fa9eaba43114eebdde0ba6e6b1c4813d86f021aaadd \
+                    size    2249206
 
 categories          databases
 platforms           darwin

@@ -16,10 +16,10 @@ description           SDRangel is an Open Source Qt5 / OpenGL 3.0+ SDR \
     and signal analyzer frontend to various hardware.
 long_description    ${description}
 
-github.setup          f4exb sdrangel 6.2.0 v
-checksums             rmd160  6fa309f0a314ebd67f71e39313e43dd3daa691ac \
-                      sha256  488114db78e118bbed1f5f5bae7021523c7c7c4f0c0f267427053c6d476e07d9 \
-                      size    33047468
+github.setup          f4exb sdrangel 6.4.0 v
+checksums             rmd160  071dd666860f03717d226cdeea49017968b976d1 \
+                      sha256  6ce4b452d7853705759d7e45ab32acda05f0f9339ae6e6973de109e9acf5809b \
+                      size    33555285
 revision              0
 
 # check just the version 6 branch for now

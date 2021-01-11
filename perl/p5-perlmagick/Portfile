@@ -7,11 +7,11 @@ PortGroup           perl5 1.0
 
 epoch               1
 perl5.branches      5.26 5.28 5.30
-perl5.setup         PerlMagick 6.9.11-45
+perl5.setup         PerlMagick 6.9.11-56
 revision            0
-checksums           rmd160  5acd399ec7a8972d59e87e06896730676e4e130a \
-                    sha256  784da2fe10ebc413c9d91eb51a9cf28c948c07875dc8d386dd04dc2cbc1c5f28 \
-                    size    9169004
+checksums           rmd160  8e0b765a31ad02882446e33a8aa1b8ebc8096df5 \
+                    sha256  882c785058378bcadfc14310abebbc7f6a704203a459fb7aeaad22282507adf4 \
+                    size    9163308
 
 set my_name         ImageMagick
 maintainers         {ryandesign @ryandesign}

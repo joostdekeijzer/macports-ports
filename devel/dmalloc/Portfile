@@ -1,7 +1,7 @@
 PortSystem 1.0
 
 name            dmalloc
-version         5.6.1
+version         5.6.5
 categories      devel
 maintainers     {toby @tobypeterson}
 description     Debug Malloc Library
@@ -16,9 +16,9 @@ platforms       darwin
 
 master_sites    ${homepage}releases/
 extract.suffix  .tgz
-checksums       rmd160 a656f8d2069c098c94ad08c84c9a435ce4fe2c3a \
-                sha256  4ac877aec5c8934ce075a14c5f637e5483186c7506acd23a186cc8f5eb3c0d71 \
-                size    392505
+checksums       rmd160  c708cd76bf7857a0ffc81248e5124c8844e7b226 \
+                sha256  480e3414ab6cedca837721c756b7d64b01a84d2d0e837378d98444e2f63a7c01 \
+                size    322310
 
 patchfiles      patch-configure
 

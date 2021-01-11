@@ -2,6 +2,10 @@
 
 PortSystem          1.0
 PortGroup           github 1.0
+PortGroup           legacysupport 1.0
+
+# clock_gettime
+legacysupport.newest_darwin_requires_legacy 15
 
 name                hamlib
 categories          science
@@ -19,16 +23,12 @@ homepage            https://hamlib.github.io
 
 subport hamlib-devel {}
 if {[string first "-devel" $subport] > 0} {
-    PortGroup       legacysupport 1.0
 
-    # clock_gettime
-    legacysupport.newest_darwin_requires_legacy 15
-
-    github.setup    Hamlib Hamlib 5fc36df24987133730f0458982846c4c30d26ed3
-    version         20201130-[string range ${github.version} 0 7]
-    checksums       rmd160  474d355d22338d140a0646d09a17d324da6e4beb \
-                    sha256  a5f58c5024b74aba8fb55dc8cfbdb858794beb6dd98f82e6661c039bbdebb8eb \
-                    size    1511843
+    github.setup    Hamlib Hamlib 4571dcb2a50497162e464d6928e86fc7571a1f2c
+    version         20210110-[string range ${github.version} 0 7]
+    checksums       rmd160  490724f55a0b27952bb24f5f8d7f503704a0a534 \
+                    sha256  ade4c252bf9b0fab60ea99103565838ca8da07c3368f7741d22855d15b41f316 \
+                    size    1533340
     revision        0
 
     name            hamlib-devel
@@ -47,11 +47,11 @@ if {[string first "-devel" $subport] > 0} {
 
 } else {
 
-    github.setup    Hamlib Hamlib 3.3
+    github.setup    Hamlib Hamlib 4.0
     github.tarball_from releases
-    checksums       rmd160  e9a09b5878101b44802adf2a82cb697e3560c918 \
-                    sha256  c90b53949c767f049733b442cd6e0a48648b55d99d4df5ef3f852d985f45e880 \
-                    size    2192119
+    checksums       rmd160  be6f24e0d9a155eab5a73d9f85254eae5ab80308 \
+                    sha256  1fa24d4a8397b29a29f39be49c9042884d524b7a584ea8852bd770bd658d66f2 \
+                    size    2242857
     revision        0
 
     conflicts       hamlib-devel
