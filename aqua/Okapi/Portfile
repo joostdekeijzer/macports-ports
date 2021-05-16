@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           java 1.0
 
 name                Okapi
-version             1.40.0
+version             1.41.0
 categories          aqua textproc java
 license             Apache-2
 maintainers         {amake @amake} openmaintainer
@@ -13,15 +13,15 @@ description         A set of tools for localization and translation
 long_description    The Okapi Framework is a cross-platform and free open-source set of \
                     components and applications that offer extensive support for localizing \
                     and translating documentation and software.
-homepage            http://okapiframework.org/
+homepage            https://okapiframework.org/
 platforms           darwin
 supported_archs     noarch
 distname            okapi-apps_cocoa-macosx-x86_64_${version}
-master_sites        https://dl.bintray.com/okapi/Distribution/
+master_sites        https://okapiframework.org/binaries/main/${version}
 
-checksums           rmd160  e86ce1a5d9fc997a4c4635c301ea5989047e7f63 \
-                    sha256  a9bb473734eeda8d62369f33fc51d9bd314ab92f63ad8831a336e3c9b5607fdf \
-                    size    39057222
+checksums           rmd160  c2cc8de2504359bc2256b6ed9ff13c208b3ecb63 \
+                    sha256  7c223f2a24fa15dfaa6c68f35f6de8ef70f495dc2ac362bcedff00670159e318 \
+                    size    39811861
 
 use_dmg             yes
 use_configure       no
@@ -52,5 +52,5 @@ destroot {
 universal_variant   no
 
 livecheck.type      regex
-livecheck.url       ${master_sites}
-livecheck.regex     {okapi-apps_cocoa-macosx-x86_64_([0-9]+(\.[0-9a-z]+)*)\.dmg}
+livecheck.url       https://okapiframework.org/binaries/main/
+livecheck.regex     {([0-9]+(?:\.[0-9a-z]+)*)/}

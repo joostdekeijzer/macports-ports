@@ -1,6 +1,8 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
 PortSystem          1.0
+
+PortGroup           conflicts_build 1.0
 if {${subport} eq "gmic-clib"} {
     PortGroup       makefile        1.0
 } else {
@@ -12,8 +14,8 @@ if {${subport} ne "gmic" && ${subport} ne "gmic-clib"} {
 }
 
 name                gmic
-version             2.9.4
-revision            0
+version             2.9.7
+revision            2
 license             CeCILL
 categories          science graphics
 platforms           darwin
@@ -33,22 +35,22 @@ long_description    G'MIC stands for GREYC's Magic Image Converter. It is \
 homepage            https://gmic.eu
 master_sites        https://gmic.eu/files/source/
 
-use_parallel_build  no
+# gmic will pick up include files from opencv, opencv3 dods not conflict
+conflicts_build     opencv
 
 distfiles           ${name}_${version}${extract.suffix}
 
-checksums           rmd160  f2b8179bd16d7a04b8c47355bb5582c268edb075 \
-                    sha256  790bee48f496765f6b59067dfb10dc34e1eb576caf9a95f30af0d567026eacc7 \
-                    size    7279628
+checksums           rmd160  f37cf8628635466aac2dba0a5f7f5653f955629f \
+                    sha256  942537487ea722141230579db3cd4331368429c0e33cb38fee1b17aae9557f16 \
+                    size    7401418
 
 depends_lib         port:curl \
                     path:lib/libavcodec.dylib:ffmpeg \
                     port:fftw-3 \
                     port:GraphicsMagick \
                     port:ilmbase \
-                    port:jpeg \
+                    path:include/turbojpeg.h:libjpeg-turbo \
                     port:libpng \
-                    port:opencv \
                     port:openexr \
                     port:tiff \
                     port:zlib
@@ -59,14 +61,16 @@ patchfiles          patch-CMakeLists.txt.diff \
 compiler.cxx_standard           2011
 
 subport ${name}-qt {
-    configure.args-append       -DGMIC_QT_HOST=none
     description-append          (GUI application)
+
+    configure.args-append       -DGMIC_QT_HOST=none
 }
 
 subport ${name}-gimp {
+    description-append          (GIMP plug-in).
+
     configure.args-append       -DGMIC_QT_HOST=gimp
     depends_lib-append          port:gimp2
-    description-append          (GIMP plug-in).
 }
 
 subport ${name}-clib {
@@ -90,12 +94,23 @@ if {${subport} eq ${name}} {
                                 -DENABLE_OPENMP=OFF \
                                 -DENABLE_X=OFF
 
+    variant opencv4 description {compile with OpenCV support} {
+        configure.args-append   -DENABLE_OPENCV=ON
+        configure.ldflags-append \
+                                -L${prefix}/lib/opencv4
+        configure.pkg_config_path-append \
+                                ${prefix}/lib/opencv4/pkgconfig
+
+        depends_lib-append      port:opencv4
+    }
+
     variant x11 {
         configure.args-replace  -DENABLE_X=OFF \
                                 -DENABLE_X=ON
 
         depends_lib-append      port:xorg-libX11 \
                                 port:xorg-libXext \
+                                port:xorg-libXcursor \
                                 port:xorg-libice \
                                 port:xorg-libsm
     }
@@ -151,18 +166,20 @@ if {${subport} eq ${name}} {
         cmake.build_type        Release
     }
 
-    depends_lib-append          port:${name}
-    require_active_variants     ${name} x11
-
     cmake.source_dir            ${worksrcpath}/gmic-qt
+
     configure.args-append       -DENABLE_DYNAMIC_LINKING=ON \
                                 -DENABLE_LTO=OFF \
+                                -DENABLE_OPENMP=OFF \
                                 -DGMIC_PATH=${worksrcpath}/src
 
     qt5.depends_build_component qttools
 
-    depends_lib-append          port:xorg-libX11 \
+    depends_lib-append          port:${name} \
+                                port:xorg-libX11 \
                                 port:xorg-libXext \
                                 port:xorg-libice \
                                 port:xorg-libsm
+
+    require_active_variants     ${name} x11
 }

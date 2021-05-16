@@ -6,11 +6,11 @@ PortGroup           github 1.0
 PortGroup           muniversal 1.0
 
 epoch               1
-github.setup        mongodb mongo 4.4.3 r
+github.setup        mongodb mongo 4.4.6 r
 revision            0
-checksums           rmd160  fc3a342a5beff701b099dca9e129f144f8e6491b \
-                    sha256  daab8e70911653c09157803dab616f3b1920a73c39b8791a6a67df0faa0e60f6 \
-                    size    49876077
+checksums           rmd160  22c78ae8822088741658227a1e38ea79ab71153d \
+                    sha256  b5189aa87977137574cd75432dac9bb91699d322358f857b7b6d1e191fbd2f32 \
+                    size    50069717
 
 name                mongodb
 license             SSPL
@@ -25,12 +25,15 @@ homepage            https://www.mongodb.com/community
 master_sites        https://fastdl.mongodb.org/src
 distname            ${name}-src-r${version}
 
-depends_build       port:python38 \
-                    port:py38-cheetah \
-                    port:py38-psutil \
-                    port:py38-regex \
-                    port:py38-setuptools \
-                    port:py38-yaml
+set python_branch   3.9
+set python_version  [string map {. {}} ${python_branch}]
+
+depends_build       port:python${python_version} \
+                    port:py${python_version}-cheetah \
+                    port:py${python_version}-psutil \
+                    port:py${python_version}-regex \
+                    port:py${python_version}-setuptools \
+                    port:py${python_version}-yaml
 
 depends_lib         port:curl \
                     port:cyrus-sasl2 \
@@ -56,7 +59,7 @@ configure.optflags
 # -L flags are handled via LIBPATH.
 configure.ldflags-delete -L${prefix}/lib
 
-build.cmd           ${prefix}/bin/python3.8 buildscripts/scons.py
+build.cmd           ${prefix}/bin/python${python_branch} buildscripts/scons.py
 build.target        install-core
 build.args          CC="${configure.cc}" \
                     CPPPATH="${prefix}/include" \
@@ -113,7 +116,10 @@ if {[vercmp ${version} 5.0] < 0} {
     lappend merger_build_args(arm64) --js-engine=none
 }
 
-if {![variant_isset universal] && [info exists merger_build_args(${build_arch})]} {
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
+if {(!${universal_possible} || ![variant_isset universal]) && [info exists merger_build_args(${build_arch})]} {
     build.args-append {*}$merger_build_args(${build_arch})
 }
 

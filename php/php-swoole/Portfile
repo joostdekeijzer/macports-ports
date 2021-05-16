@@ -13,13 +13,18 @@ license                 Apache-2
 php.branches            5.3 5.4 5.5 5.6 7.0 7.1 7.2 7.3 7.4 8.0
 php.pecl                yes
 
-if {[vercmp ${php.branch} 7.1] >= 0} {
-    version             4.5.10
+if {[vercmp ${php.branch} 7.2] >= 0} {
+    version             4.6.5
     revision            0
-    checksums           rmd160  c0f04b671a2252f03c218f257a6cecc0d7e9fb85 \
-                        sha256  01e5d40072e14d5240419b6da7c79ca53d0134040aa71ef9789277923c13a710 \
-                        size    1552841
-
+    checksums           rmd160  51923508ba0c6bfdc9fb1073af6fb33158d67aea \
+                        sha256  1fb0c02220a06b08185f74adf50653d3f2dc2c4aacef01c5c8a5ef2169e117a7 \
+                        size    1642233
+} elseif {[vercmp ${php.branch} 7.1] >= 0} {
+    version             4.5.11
+    revision            0
+    checksums           rmd160  787880685a821869f19c1b6f4645857b75a048fe \
+                        sha256  2d85752ee2b0944399c2901bb22832f196ba3f7ba4262c239d12ed494e2460dd \
+                        size    1554142
 } elseif {[vercmp ${php.branch} 7.0] >= 0} {
     version             4.3.6
     revision            0
@@ -62,10 +67,13 @@ if {${name} ne ${subport}} {
                 # https://github.com/swoole/swoole-src/issues/3896
                 # CLOCK_REALTIME
                 legacysupport.newest_darwin_requires_legacy \
-                                15
+                        15
             }
 
-            patchfiles      arm64.patch
+            if {[vercmp ${version} 4.6.2] < 0} {
+                patchfiles-append \
+                        arm64.patch
+            }
         }
     }
 

@@ -3,7 +3,7 @@ PortGroup muniversal 1.0
 PortGroup legacysupport 1.0
 
 name			clamav
-version		 	0.103.0
+version		 	0.103.2
 categories	  	sysutils
 maintainers	 	{geeklair.net:dluke @danielluke}
 description	 	clamav antivirus software
@@ -15,9 +15,9 @@ long_description	Clam AntiVirus is a GPL anti-virus toolkit for UNIX. The \
 
 homepage		http://www.clamav.net
 master_sites		http://www.clamav.net/downloads/production
-checksums	rmd160	c44cf27d6974af14103328d81ba562c513d764b7 \
-		sha256	32a9745277bfdda80e77ac9ca2f5990897418e9416880f3c31553ca673e80546 \
-		size	13357078
+checksums	rmd160	c85f82c4c1f4988936d4c2db31842cf257ee5c20 \
+		sha256	d4b5d0ac666262e423a326fb54778caa7c69624d6c3f9542895feb8478271bd2 \
+		size	13387954
 
 platforms	   	darwin
 
@@ -77,7 +77,7 @@ platform darwin 8 {
 post-destroot {
 			#muniversal should allow this to be hooked in some way that's less gross
 			#this code copied from nspr's portfile
-			if {[variant_isset universal]} {
+			if {[variant_exists universal] && [variant_isset universal]} {
 				copy ${destroot}${prefix}/bin/${build_arch}-clamav-config ${destroot}${prefix}/bin/bak-config
 				foreach file [glob ${destroot}${prefix}/bin/*clamav-config] {
 					delete $file

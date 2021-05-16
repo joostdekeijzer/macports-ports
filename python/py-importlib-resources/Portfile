@@ -5,7 +5,7 @@ PortGroup           python 1.0
 
 name                py-importlib-resources
 python.rootname     importlib_resources
-version             4.1.1
+version             5.1.2
 revision            0
 
 platforms           darwin
@@ -19,9 +19,9 @@ long_description    ${description}
 
 homepage            https://importlib-resources.readthedocs.io
 
-checksums           rmd160  5e04ac2b52358bb6c3706b67c65b5fef31aead9f \
-                    sha256  6b45007a479c4ec21165ae3ffbe37faf35404e2041fac6ae1da684f38530ca73 \
-                    size    30821
+checksums           rmd160  f448c9509eadbb36cdecf5bc31696a7bd5088de3 \
+                    sha256  642586fc4740bd1cad7690f836b3321309402b20b332529f25617ff18e8e1370 \
+                    size    32177
 
 # keep version for PY27/PY34/PY35, these are (indirect) dependencies of py-virtualenv
 python.versions     27 34 35 36 37 38

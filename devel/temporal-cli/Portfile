@@ -3,8 +3,9 @@
 PortSystem          1.0
 PortGroup           golang 1.0
 
-go.setup            github.com/temporalio/temporal 1.1.0 v
+go.setup            github.com/temporalio/temporal 1.8.1 v
 name                temporal-cli
+revision            0
 
 homepage            https://temporal.io
 
@@ -20,12 +21,13 @@ license             MIT
 maintainers         {gmail.com:herby.gillot @herbygillot} \
                     openmaintainer
 
-checksums           rmd160  d6ae255a9da1f8c4bf54b234bd5894cca0de01f1 \
-                    sha256  fc4e531135629f927c37439e9a8676e1b386fb7a843e8b682f4e67dd637dbefa \
-                    size    1671707
+checksums           rmd160  0f4af0252241db2255e7161527aab96b720f1b1f \
+                    sha256  d34060b545c47b85232bf58765acb3dcfc992c334b2f152933ad2f1e5bf9a559 \
+                    size    1718356
 
-build.env-append    GO111MODULE=on \
-                    GOPROXY=direct
+# Allow fetching dependencies at build time
+build.env-delete    GOPROXY=off GO111MODULE=off
+
 build.cmd           make
 build.target        tctl
 

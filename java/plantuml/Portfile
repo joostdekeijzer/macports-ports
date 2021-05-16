@@ -4,21 +4,21 @@ PortSystem              1.0
 PortGroup               github 1.0
 PortGroup               java 1.0
 
-github.setup            plantuml plantuml 1.2020.11 v
+github.setup            plantuml plantuml 1.2021.6 v
 revision                0
 categories              java editors
 platforms               darwin
 supported_archs         noarch
 license                 GPL-3+
-maintainers             nomaintainer
+maintainers             {outlook.de:judaew @judaew} openmaintainer
 description             PlantUML is a tool for generating UML diagrams from textual \
                         description.
 long_description        ${description}
 homepage                http://plantuml.com/
 
-checksums               rmd160  6d71695902455be81b7cab879af07c51feb07876 \
-                        sha256  038bbc9df6f94f33fb609456806f8e161e4b1ebbe03547f325989495ab6a4091 \
-                        size    5310503
+checksums               rmd160  459d88a129f4ca576c787102901e39f9b69a723a \
+                        sha256  93e39a538928bbd26753e39de16a017d43bccf7ccc3cdd90b6c96079eff1c921 \
+                        size    4665903
 
 depends_build           bin:ant:apache-ant
 
@@ -47,3 +47,6 @@ destroot {
     xinstall -m 0755 ${worksrcpath}/${name} ${destroot}${prefix}/bin
     xinstall -m 0644 ${worksrcpath}/${jarname} ${javadir}
 }
+
+notes "Graphiz/DOT notation is enabled by installing gnuplot.\n"
+

@@ -21,12 +21,27 @@ homepage            https://mkvtoolnix.download
 master_sites        ${homepage}/sources/
 use_xz              yes
 
-if {${os.platform} ne "darwin" || ${os.major} >= 17} {
-    version         52.0.0
+livecheck.type      none
+if {${os.platform} ne "darwin" || ${os.major} >= 19} {
+    version         56.1.0
     revision        0
-    checksums       rmd160  66200ecb9c41f9974123b7d2609719c59994bd23 \
-                    sha256  ba48b036f9cd30dcbc98835bc938e316d1d8c8e0c57270e8b49469172954c797 \
-                    size    7553452
+    checksums       rmd160  c950bb034f12d862f496308f4f885ce11315d941 \
+                    sha256  75ff6476e7c4eab10c315af4e2dd78f1399d35da7c4611a8f93f4c3c0b475f72 \
+                    size    7632872
+
+    livecheck.type  regex
+    livecheck.url   [lindex ${master_sites} 0]
+    livecheck.regex ${name}-(\[0-9.\]+)${extract.suffix}
+} elseif {${os.major} >= 17} {
+    # mkvtoolnix 54.0.0 and later do not build on macOS 10.14 or earlier
+    # (at least not with the versions of libc++ included on those systems) because:
+    # The following features of the C++17 standards are not supported by ccache /opt/local/bin/clang++-mp-9.0:
+    #   * file system library (C++17)
+    version         53.0.0
+    revision        0
+    checksums       rmd160  5fb3ea63712cbdaf9e61b8fd573ef7e1d9a06540 \
+                    sha256  8dfd66278c81e6f1df0fd84aad30ce2b4cf7a2ad4336924f01f1879f9d1e4cd6 \
+                    size    7567276
 
     if {${os.platform} eq "darwin" && ${os.major} == 17} {
         # libc++ on 10.13 supports std::optional but the compilers that
@@ -35,10 +50,6 @@ if {${os.platform} ne "darwin" || ${os.major} >= 17} {
         # MacPorts clang 8 and later have applied this fix.
         compiler.blacklist-append clang macports-clang-5.0 macports-clang-6.0 macports-clang-7.0
     }
-
-    livecheck.type  regex
-    livecheck.url   [lindex ${master_sites} 0]
-    livecheck.regex ${name}-(\[0-9.\]+)${extract.suffix}
 } else {
     # mkvtoolnix 42.0.0 and later do not build on macOS 10.12 or earlier
     # (at least not with the versions of libc++ included on those systems) because:
@@ -49,8 +60,6 @@ if {${os.platform} ne "darwin" || ${os.major} >= 17} {
     checksums       rmd160  17b2f3b7d6eb87e9d9d4aac536b66705c18d497f \
                     sha256  7cdd6ad9144324162604172b7e96cb13cdbb7913e07c4ad7633344aac20e4103 \
                     size    7401548
-
-    livecheck.type  none
 }
 
 set version_ruby    2.7

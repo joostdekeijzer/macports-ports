@@ -7,19 +7,10 @@
 # PortGroup meson 1.0
 #
 
-#---------
-# WARNING:
-#---------
-#
-# Meson's install_name currently seems to be broken, so workarounds might be needed to make ports actually work.
-# See: https://github.com/mesonbuild/meson/issues/2121
-
 
 # meson builds need to be done out-of-source
 default build_dir           {${workpath}/build}
 
-depends_build-append        port:meson \
-                            port:ninja
 depends_skip_archcheck-append \
                             meson \
                             ninja
@@ -39,13 +30,19 @@ default build.target        ""
 destroot.env-append         DESTDIR=${destroot}
 default destroot.post_args  ""
 
-namespace eval meson {
-    proc get_post_args {} {
-        global configure.dir build_dir muniversal.current_arch
-        if {[info exists muniversal.current_arch]} {
-            return "${configure.dir} ${build_dir}-${muniversal.current_arch} --cross-file=${muniversal.current_arch}-darwin"
-        } else {
-            return "${configure.dir} ${build_dir}"
-        }
+namespace eval meson { }
+
+proc meson::get_post_args {} {
+    global configure.dir build_dir muniversal.current_arch
+    if {[info exists muniversal.current_arch]} {
+        return "${configure.dir} ${build_dir}-${muniversal.current_arch} --cross-file=${muniversal.current_arch}-darwin"
+    } else {
+        return "${configure.dir} ${build_dir}"
     }
 }
+
+proc meson::add_depends {} {
+    depends_build-append    port:meson \
+                            port:ninja
+}
+port::register_callback meson::add_depends

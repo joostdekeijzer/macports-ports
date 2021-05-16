@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           github 1.0
 PortGroup           compiler_blacklist_versions 1.0
 
-github.setup        crystal-lang crystal 0.35.1
+github.setup        crystal-lang crystal 1.0.0
 revision            0
 categories          lang
 platforms           darwin
@@ -26,7 +26,7 @@ depends_lib         port:boehmgc \
                     port:libiconv \
                     port:libxml2 \
                     port:libyaml \
-                    port:llvm-9.0 \
+                    port:llvm-11 \
                     path:lib/libssl.dylib:openssl \
                     port:pcre \
                     port:zlib \
@@ -40,29 +40,26 @@ master_sites-append https://github.com/crystal-lang/${name}/releases/download/${
 distfiles-append    ${name}-${cr_full_ver}-${os.platform}-${build_arch}${extract.suffix}:bootstrap
 
 checksums           ${distname}${extract.suffix} \
-                    rmd160  9d94c27552be6a3fa1947c47af3f5debb0fdd8cc \
-                    sha256  4114cd1c4cb087851a501760ad5886ea2303182d6838475963bed9c739cf0a49 \
-                    size    2350164 \
+                    rmd160  d26c169e071adbf69a0bca4be74df2b6cd03e0f4 \
+                    sha256  0678f1ccc7875699d961b42bc842d78b372903556537507e3da1a485f63523b5 \
+                    size    2435397 \
                     ${name}-${cr_full_ver}-${os.platform}-${build_arch}${extract.suffix} \
-                    rmd160  fb39d2f6891221300e5ae0f0d799e3e322b47193 \
-                    sha256  7d75f70650900fa9f1ef932779bc23f79a199427c4219204fa9e221c330a1ab6 \
-                    size    19028706
+                    rmd160  2b09cda964ea14150d5b08a89163931dd0935823 \
+                    sha256  29019828d32df9807a3f08fb7354fa0e44a5ad8b000eccd1dea114f891cbc006 \
+                    size    19204819
 
 patchfiles          patch-compiler.diff patch-xml.diff \
                     patch-crypto.diff patch-ssl.diff
 
 post-patch {
-    reinplace "s|\"/usr/lib\", \"/usr/local/lib\"|\"${prefix}/lib\"|" \
-        ${worksrcpath}/src/compiler/crystal/codegen/link.cr
-
-    file copy -force ${worksrcpath}/src/lib_c/amd64-unknown-openbsd/c/iconv.cr \
-        ${worksrcpath}/src/lib_c/x86_64-macosx-darwin/c/iconv.cr
+    file copy -force ${worksrcpath}/src/lib_c/x86_64-openbsd/c/iconv.cr \
+        ${worksrcpath}/src/lib_c/x86_64-darwin/c/iconv.cr
 }
 
-configure.cmd       env | grep -v ^PATH=
+configure.cmd       env | grep -E '^(CC?|CPP|CXX|LD)(FLAGS)?='
 configure.pre_args  > Makefile.local
 
-set llvm_version    9.0
+set llvm_version    11
 set llvm_config     LLVM_CONFIG=llvm-config-mp-${llvm_version}
 
 # Use MP's clang based on above LLVM version
@@ -72,8 +69,7 @@ compiler.whitelist  macports-clang-${llvm_version}
 
 compiler.cxx_standard  2011
 
-build.args          CC="${configure.cc} -L${prefix}/lib" \
-                    FLAGS="--no-debug --release" \
+build.args          FLAGS="--no-debug --release" \
                     EXPORTS="CRYSTAL_CONFIG_PATH=lib:${prefix}/lib/${name} \
                         PATH=${workpath}/${name}-${cr_full_ver}/bin:\$PATH"
 

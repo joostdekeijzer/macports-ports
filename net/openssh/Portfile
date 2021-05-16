@@ -6,7 +6,7 @@ PortGroup           compiler_blacklist_versions 1.0
 
 name                openssh
 version             8.4p1
-revision            0
+revision            4
 categories          net
 platforms           darwin
 maintainers         nomaintainer
@@ -47,10 +47,14 @@ if {${name} eq ${subport}} {
     # the HPN patch needs this, so rewrite all other patches to support it, too
     patch.args          -p1
     patchfiles          launchd.patch \
+                        agent.patch \
                         pam.patch \
                         patch-sandbox-darwin.c-apple-sandbox-named-external.diff \
                         patch-sshd.c-apple-sandbox-named-external.diff \
                         macports-config.patch
+
+    # OpenBSD patch for CVE-2021-28041, remove after upgrading to >= 8.5p1
+    patchfiles-append   patch-zz-8.4-CVE-2021-28041.diff
 
     # We need a couple of patches
     # - pam.patch
@@ -65,6 +69,8 @@ if {${name} eq ${subport}} {
     # - macports-config.patch
     #   Changes the default configuration from the upstream-provided one by popular
     #   request.
+    # - agent.patch
+    #   Adds -l flag to ssh-agent to work with launchd.
 
     post-patch {
         # reinplace prefix in path to sandbox definition added by
@@ -81,6 +87,10 @@ if {${name} eq ${subport}} {
     # Use Apple's sandboxing feature
     configure.cppflags-append   -D__APPLE_SANDBOX_NAMED_EXTERNAL__ \
                                 -D__APPLE_API_STRICT_CONFORMANCE
+
+    # Support Apple's launchd in ssh-agent
+    configure.cppflags-append -D__APPLE_LAUNCHD__
+
     configure.ldflags-append  -Wl,-search_paths_first
     configure.args      --with-ssl-dir=${prefix} \
                         --sysconfdir=${prefix}/etc/ssh \
@@ -186,6 +196,12 @@ if {${name} eq ${subport}} {
         configure.args-replace  --without-ldns \
                                 --with-ldns
         depends_lib-append      port:ldns
+    }
+
+    variant fido2 description "Enable fido2 support" {
+        configure.args-delete  --without-security-key-builtin
+        configure.args-append  --with-security-key-builtin
+        depends_lib-append      port:libfido2
     }
 
     default_variants            +kerberos5 +xauth

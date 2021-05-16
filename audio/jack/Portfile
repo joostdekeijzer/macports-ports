@@ -5,12 +5,12 @@ PortGroup           github 1.0
 PortGroup           waf 1.0
 
 name                jack
-github.setup        jackaudio jack2 1.9.16 v
+github.setup        jackaudio jack2 1.9.18 v
 revision            0
 
-checksums           rmd160  01a536391dc525c79a78b40b07577b32b7675eb1 \
-                    sha256  e27090b14c21aae61f7dd82482638e0513a09c0a7d00e49e097681ed3680013c \
-                    size    974787
+checksums           rmd160  2bd9b7fcaa2a20db2f943cd647f47c8bbb5f2412 \
+                    sha256  1a6a0b637ce11008c2b8978bf222ff86570e1ec370a4b2c7f455df0c6ae6e21e \
+                    size    987697
 
 categories          audio
 maintainers         nomaintainer

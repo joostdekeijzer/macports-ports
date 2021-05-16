@@ -24,11 +24,11 @@ homepage            https://hamlib.github.io
 subport hamlib-devel {}
 if {[string first "-devel" $subport] > 0} {
 
-    github.setup    Hamlib Hamlib 4571dcb2a50497162e464d6928e86fc7571a1f2c
-    version         20210110-[string range ${github.version} 0 7]
-    checksums       rmd160  490724f55a0b27952bb24f5f8d7f503704a0a534 \
-                    sha256  ade4c252bf9b0fab60ea99103565838ca8da07c3368f7741d22855d15b41f316 \
-                    size    1533340
+    github.setup    Hamlib Hamlib 231f9faad8feaa761298c8595afa63379a077023
+    version         20210503-[string range ${github.version} 0 7]
+    checksums       rmd160  40128dc97df021271b774c4aa67124a13e31480a \
+                    sha256  d836dd700a8f6fc51cd9a16d990c24d4c0fd061248b78133b944bd51331bc4e7 \
+                    size    1660911
     revision        0
 
     name            hamlib-devel
@@ -47,14 +47,23 @@ if {[string first "-devel" $subport] > 0} {
 
 } else {
 
-    github.setup    Hamlib Hamlib 4.0
+    github.setup    Hamlib Hamlib 4.1
     github.tarball_from releases
-    checksums       rmd160  be6f24e0d9a155eab5a73d9f85254eae5ab80308 \
-                    sha256  1fa24d4a8397b29a29f39be49c9042884d524b7a584ea8852bd770bd658d66f2 \
-                    size    2242857
+    checksums       rmd160  fd5e2c165c02de0b60a6af1ff812cb12dbc64de7 \
+                    sha256  b4d4b9467104d1f316c044d002c4c8e62b9f792cbb55558073bd963203b32342 \
+                    size    2260629
     revision        0
 
     conflicts       hamlib-devel
+
+    # REMOVE with next version
+    patchfiles-append \
+        configure.ac.patch
+    use_autoconf    yes
+    depends_build-append \
+        port:autoconf    \
+        port:automake    \
+        port:libtool
 
 }
 
@@ -65,3 +74,67 @@ depends_lib-append \
     port:libtool \
     port:libusb-compat \
     port:libxml2
+
+set python_versions { 2.7 3.6 3.7 3.8 3.9 }
+# python binding is not enabled by default
+set default_python_variant ""
+
+# Define the available variants
+foreach py_ver ${python_versions} {
+    set py_ver_no_dot [join [split ${py_ver} "."] ""]
+    set variant_line {variant python${py_ver_no_dot} description "Build with python ${py_ver} support"}
+    foreach py_over ${python_versions} {
+        if { ${py_ver} == ${py_over} } { continue }
+        set py_over_no_dot [join [split ${py_over} "."] ""]
+        append variant_line " conflicts python${py_over_no_dot}"
+    }
+    append variant_line { { } }
+    eval $variant_line
+    if {[variant_isset python${py_ver_no_dot}]} {
+        if {${default_python_variant} != "+python${py_ver_no_dot}"} {
+            set default_python_variant ""
+        }
+    }
+}
+
+# set default python variant if not selected
+if {${default_python_variant} != ""} {
+    default_variants-append "${default_python_variant}"
+}
+
+# If a python variant is enabled, activate it
+set active_python_version ""
+set active_python_version_no_dot ""
+foreach py_ver ${python_versions} {
+    set py_ver_no_dot [join [split ${py_ver} "."] ""]
+    if {[variant_isset python${py_ver_no_dot}]} {
+        set active_python_version        ${py_ver}
+        set active_python_version_no_dot ${py_ver_no_dot}
+
+        depends_build-append \
+            port:swig-python
+
+        depends_lib-append \
+            port:python${active_python_version_no_dot}
+
+        configure.args-append \
+            --with-python-binding
+
+        # specify the Python version to use
+        set python_framework_dir ${frameworks_dir}/Python.framework/Versions/${active_python_version}
+        configure.args-append \
+            PYTHON=${python_framework_dir}/bin/python${active_python_version} \
+            PYTHON_EXECUTABLE=${python_framework_dir}/bin/python${active_python_version} \
+            PYTHON_INCLUDE_DIR=${python_framework_dir}/Headers \
+            PYTHON_LIBRARY=${python_framework_dir}/Python \
+            PYTHON_VERSION=${py_ver}
+
+        # install the binding in the right directory
+        set python_site_dir ${python_framework_dir}/lib/python${active_python_version}/site-packages
+        destroot.args-append \
+            pythondir=${python_site_dir} \
+            pyexecdir=${python_site_dir} \
+            pkgpythondir=${python_site_dir}/${name} \
+            pkgpyexecdir=${python_site_dir}/${name}
+    }
+}

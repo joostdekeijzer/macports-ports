@@ -3,7 +3,7 @@
 PortSystem          1.0
 PortGroup           github 1.0
 
-github.setup        beekeeper-studio beekeeper-studio 1.9.1 v
+github.setup        beekeeper-studio beekeeper-studio 1.10.2 v
 revision            0
 
 homepage            https://beekeeperstudio.io
@@ -28,20 +28,21 @@ platforms           darwin
 maintainers         {gmail.com:herby.gillot @herbygillot} \
                     openmaintainer
 
-checksums           ${distname}${extract.suffix} \
-                    rmd160  b1b5ccca911261601e5925e231c25c3021eb8d21 \
-                    sha256  52b8fee28caa839b8a046c51acd1c83a4962a03752cb89fe83ea099a539bbef1 \
-                    size    42332130
+checksums           rmd160  a2f100e214ae85a767e94f115c70a60d47be52bb \
+                    sha256  3d62ca9b1c3e110349c8be80ba8d633c6aa66dfc9af3cc62cdb9b096e54c9d85 \
+                    size    42386154
 
 depends_build       port:yarn
 
-build.env-append    CSC_IDENTITY_AUTO_DISCOVERY=false
+build.env-append    CSC_IDENTITY_AUTO_DISCOVERY=false \
+                    CXX=${configure.cxx}
 
 use_configure       no
+use_xcode           yes
 
 build {
     # Set up all JS dependencies
-    system -W ${worksrcpath} "yarn --frozen-lockfile"
+    system -W ${worksrcpath} "${build.env} yarn --frozen-lockfile"
 
     # Build electron app
     system -W ${worksrcpath} \

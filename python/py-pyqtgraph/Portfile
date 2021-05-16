@@ -20,16 +20,16 @@ long_description  PyQtGraph is a pure-python graphics and GUI library \
                   for number crunching and Qt’s GraphicsView framework \
                   for fast display.
 
-version           0.11.1
-checksums         rmd160  dd120edb7b6199222713dd67d01387edc52277b0 \
-                  sha256  7d1417f36b5b92d1365671633a91711513e5afbcc82f32475d0690317607714e \
-                  size    789229
+version           0.12.1
+checksums         rmd160  2f39de418f023e9a6ace283021c903f7d0e650f2 \
+                  sha256  d2ef3b5289184fb48dfe5f44ccb58d9d64ffb5452fc524a2bd7a640a36b3874d \
+                  size    899932
 revision          0
 
 homepage          http://pyqtgraph.org/
 distname          ${python.rootname}-${version}
 
-python.versions   27 35 36 37 38
+python.versions   27 35 36 37 38 39
 
 if {$subport ne $name} {
 

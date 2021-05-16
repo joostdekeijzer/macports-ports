@@ -1,59 +1,59 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
-PortSystem          1.0
-PortGroup           mpi 1.0
-PortGroup           muniversal 1.0
+PortSystem                  1.0
+PortGroup                   mpi 1.0
+PortGroup                   muniversal 1.0
 
-name                slepc
-version             3.13.2
-revision            0
-categories          math science
-maintainers         {mcalhoun @MarcusCalhoun-Lopez} openmaintainer
-license             BSD
-description         Scalable Library for Eigenvalue Problem Computations
-long_description    SLEPc is a software library for the solution of large \
-                    scale sparse eigenvalue problems on parallel computers. It is an \
-                    extension of PETSc and can be used for either standard or generalized \
-                    eigenproblems, with real or complex arithmetic. It can also be used for \
-                    computing a partial SVD of a large, sparse, rectangular matrix.
+name                        slepc
+version                     3.15.0
+revision                    1
+categories                  math science
+maintainers                 {mcalhoun @MarcusCalhoun-Lopez} openmaintainer
+license                     BSD
+description                 Scalable Library for Eigenvalue Problem Computations
+long_description            SLEPc is a software library for the solution of large \
+                            scale sparse eigenvalue problems on parallel computers. It is an \
+                            extension of PETSc and can be used for either standard or generalized \
+                            eigenproblems, with real or complex arithmetic. It can also be used for \
+                            computing a partial SVD of a large, sparse, rectangular matrix.
 
-notes               "Add the following lines to your .bash_profile if you plan to\
-                    use the PETSC/SLEPC makefile rules in ${prefix}/lib/petsc/conf:\n\
-                    \texport PETSC_DIR=${prefix}/lib/petsc\n\
-                    \texport SLEPC_DIR=${prefix}/lib/slepc"
+notes                       "Add the following lines to your .bash_profile if you plan to\
+                            use the PETSC/SLEPC makefile rules in ${prefix}/lib/petsc/conf:\n\
+                            \texport PETSC_DIR=${prefix}/lib/petsc\n\
+                            \texport SLEPC_DIR=${prefix}/lib/slepc"
 
-platforms           darwin
+platforms                   darwin
 
-homepage            https://slepc.upv.es
-master_sites        https://slepc.upv.es/download/distrib/
+homepage                    https://slepc.upv.es
+master_sites                https://slepc.upv.es/download/distrib/
 
-checksums           rmd160  6bd8e3f35a3a9fb5b523583121c8925c96330959 \
-                    sha256  04cb8306cb5d4d990509710d7f8ae949bdc2c7eb850930b8d0b0b5ca99f6c70d \
-                    size    4801813
+checksums                   rmd160  76c818bd5e4cd14b7c738d5f765592316a77d409 \
+                            sha256  e53783ae13acadce274ea65c67186b5ab12332cf17125a694e21d598aa6b5f00 \
+                            size    5191730
 
-mpi.setup           default
-mpi.enforce_variant petsc
+mpi.setup                   default
+mpi.enforce_variant         petsc
 
-depends_lib-append  port:petsc
-use_parallel_build  no
+depends_lib-append          port:petsc
+use_parallel_build          no
 
-set python.version  38
-set python_ver_dot  [join [split ${python.version} {}] "."]
+set python.version          39
+set python_ver_dot          [join [split ${python.version} {}] "."]
 
-depends_build-append \
-                    port:sowing \
-                    port:python${python.version}
+depends_build-append        port:sowing \
+                            port:python${python.version}
 
-post-patch {
-    reinplace -W ${worksrcpath} "s,#!/usr/bin/env python,#!${prefix}/bin/python${python_ver_dot}," configure
+# allow configure script to find MacPorts Python
+configure.env-append        PATH=${frameworks_dir}/Python.framework/Versions/${python_ver_dot}/bin:$env(PATH)
+
+configure.pre_args          --prefix=${prefix}/lib/slepc
+if {![info exists universal_possible]} {
+    set universal_possible  [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
 }
-
-configure.pre_args  --prefix=${prefix}/lib/slepc
-if {![variant_isset universal]} {
-configure.env-append \
-                    PETSC_DIR=${prefix}/lib/petsc
-build.env-append    PETSC_DIR=${prefix}/lib/petsc
-destroot.env-append PETSC_DIR=${prefix}/lib/petsc
+if {!${universal_possible} || ![variant_isset universal]} {
+configure.env-append        PETSC_DIR=${prefix}/lib/petsc
+build.env-append            PETSC_DIR=${prefix}/lib/petsc
+destroot.env-append         PETSC_DIR=${prefix}/lib/petsc
 } else {
     foreach arch ${configure.universal_archs} {
         if {${arch} eq ${build_arch}} {
@@ -70,7 +70,7 @@ destroot.env-append PETSC_DIR=${prefix}/lib/petsc
 
 configure.universal_args-delete --disable-dependency-tracking
 
-if {[variant_isset universal]} {
+if {${universal_possible} && [variant_isset universal]} {
     merger-post-destroot {
         foreach arch ${configure.universal_archs} {
             if {${arch} ne ${build_arch}} {
@@ -113,7 +113,7 @@ variant arpack description {compile with ARPACK support} {
 }
 
 post-destroot {
-    move ${destroot}${prefix}/lib/${name}/lib/pkgconfig/SLEPc.pc ${destroot}${prefix}/lib/pkgconfig/SLEPc.pc
+    move ${destroot}${prefix}/lib/${name}/lib/pkgconfig/slepc.pc ${destroot}${prefix}/lib/pkgconfig/
 }
 
 livecheck.url       https://slepc.upv.es/download

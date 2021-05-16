@@ -6,9 +6,25 @@ PortGroup           select 1.0
 PortGroup           compilers 1.0
 PortGroup           muniversal 1.0
 PortGroup           legacysupport 1.0
+PortGroup           mpiutil 1.0
+
+#===============================================================================
+#
+# *** IMPORTANT NOTE ***
+#
+# When making logic changes to this port, PLEASE review port 'mpich' to see
+# if the same changes should be applied. While the subports and variants aren't
+# exactly the same between the two - and things like configure arguments
+# certainly differ, as they're different code bases - much of the core logic
+# is very similar. (And often identical.)
+#
+# Please help us avoid divergent MPI ports, which cause serious migraines.
+#
+#===============================================================================
 
 name                openmpi
-version             4.1.0
+version             4.1.1
+revision            0
 set branch          [join [lrange [split ${version} .] 0 1] .]
 categories          science parallel net
 platforms           darwin
@@ -28,9 +44,9 @@ homepage            https://www.open-mpi.org/
 set subdir          ompi/v${branch}/downloads/
 master_sites        https://www.open-mpi.org/software/${subdir}
 
-checksums           rmd160  15e3b5429e74f0f39a46ca0cc35de92b68ea21d0 \
-                    sha256  73866fb77090819b6a8c85cb8539638d37d6877455825b74e289d647a39fd5b5 \
-                    size    10022171
+checksums           rmd160  60fff94c4c7a4bfaaa11285f35d76265516ed8b0 \
+                    sha256  e24f7a778bd11a71ad0c14587a7f5b00e68a71aa5623e2157bafee3d44c07cda \
+                    size    10052770
 
 use_bzip2           yes
 
@@ -38,19 +54,32 @@ livecheck.type      regex
 livecheck.url       https://www.open-mpi.org/
 livecheck.regex     Open MPI v(\[0-9\.\]+) released
 
+# Note: While openmpi-devel-* subports have been disabled for now, please
+# don't strip out devel-related logic like this. We may decide to re-add
+# them in the future, and it'll be easier if we don't have to dig through
+# git history.
+
 if {[string first "-devel" $subport] > 0} {
 
+    PortGroup           obsolete 1.0
+
+    # FIXME: this snapshot date is for 4.0.x not 4.1.x
     set base            201905080241
     set tag             5d4c9b4
+    # failing for now due to above old/incorrect snapshot
+    known_fail          yes
+    distfiles
+    pre-fetch {
+        error "$subport is currently broken"
+    }
 
-    name                openmpi-devel
+    dist_subdir         openmpi-devel
     version             ${branch}.999-${base}
-    revision            1
+    revision            2
 
     distname            openmpi-v${branch}.x-${base}-${tag}
 
-    master_sites        https://www.open-mpi.org/nightly/v${branch}.x \
-                        https://www.open-mpi.de/nightly/v${branch}.x
+    master_sites        https://www.open-mpi.org/nightly/v${branch}.x
 
     checksums           rmd160  65d03a8e8cb897ffb288eca36f4e2419cc119c81 \
                         sha256  d90dce8cadf9344b989e8b44ceadd3e8f878effc99c8a800f4ab250a071233b1 \
@@ -81,6 +110,7 @@ array set clist {
     gcc7    {macports-gcc-7}
     gcc8    {macports-gcc-8}
 }
+set clist_unsupported [list]
 # gcc   4.x     not supported on mac OS 10.12 (Darwin16) or newer
 # clang 3.{3,4} not supported on mac OS 10.12 (Darwin16) or newer
 if { ${os.major} < 16 } {
@@ -88,24 +118,44 @@ if { ${os.major} < 16 } {
     set clist(clang34) {macports-clang-3.4}
     # Only provide gcc 4.9, as older versions do not build.
     set clist(gcc49)   {macports-gcc-4.9}
+} else {
+    lappend clist_unsupported clang33 clang34 gcc49
 }
 # clang 3.7,4.0 not supported on mac OS 10.14 (Darwin18) or newer
 if { ${os.major} < 18 } {
     set clist(clang37) {macports-clang-3.7}
+} else {
+    lappend clist_unsupported clang37
 }
 # gcc 9+ only available on macOS10.7 (Darwin11) and newer
-if { ${os.major} > 10 } {
+# However, gcc9+ builds fail on MacOS 10.7, so only enable for MacOS 10.8+.
+if { ${os.major} > 11 } {
     set clist(gcc9)    {macports-gcc-9}
     set clist(gcc10)   {macports-gcc-10}
+    set clist(gcc11)   {macports-gcc-11}
+} else {
+    lappend clist_unsupported gcc9 gcc10 gcc11
 }
 
-foreach key [array name clist] {
+foreach key [array names clist] {
     subport ${name}-${key} {}
-    subport ${name}-devel-${key} {}
+    subport ${name}-devel-${key} {
+        replaced_by ${name}-${key}
+    }
+}
+foreach key ${clist_unsupported} {
+    subport ${name}-${key} {}
+    subport ${name}-devel-${key} {
+        replaced_by ${name}-${key}
+    }
 }
 subport ${name}-default {}
-subport ${name}-devel {}
-subport ${name}-devel-default {}
+subport ${name}-devel {
+    replaced_by ${name}
+}
+subport ${name}-devel-default {
+    replaced_by ${name}-default
+}
 
 pre-extract { file mkdir ${workpath}/build }
 
@@ -140,18 +190,29 @@ configure.ldflags-delete    -L${prefix}/lib
 build.dir           ${configure.dir}
 destroot.dir        ${build.dir}
 
-if {${subport} != ${name}} {
-    set cname                   [lindex [split ${subport} -] end]
+set cname           [lindex [split ${subport} -] end]
+if {${cname} in ${clist_unsupported}} {
+    known_fail  yes
+    pre-fetch {
+        error "${subport} is not supported on ${os.platform} ${os.major}"
+    }
+    append long_description " Note: ${cname} not supported on ${os.platform} ${os.major}."
+} elseif {${subport} ne ${name} && ${subport} ne "${name}-devel"} {
     if {${cname} == "default"} {
         set cname                   mp
     }
 
-    # Force buildbot to skip this since openmpi depends on hwloc and that would
-    # be different for a user's machine
-    archive_sites
+    # As we are making wrappers, we depend on the compilers to exist.
+    # Add them to depends_lib, not just depends_build.
+    mpiutil_add_compiler_depends_lib ${cname}
+
+    # Determine whether buildbot binaries should be used, and disable if necessary
+    mpiutil_set_binary_eligibility ${subport} ${cname}
 
     depends_build-append        port:pkgconfig
-    depends_lib-append          port:hwloc
+    depends_lib-append          port:hwloc \
+                                port:libevent \
+                                port:zlib
     depends_run                 port:mpi_select port:mpi-doc
     select.group                mpi
     select.file                 ${filespath}/${name}-${cname}
@@ -173,7 +234,18 @@ if {${subport} != ${name}} {
         --datadir=${prefix}/share/${name}-${cname} \
         --docdir=${prefix}/share/docdelete \
         --mandir=${prefix}/share/mandelete \
-        --with-hwloc=${prefix}
+        --with-hwloc=${prefix} \
+        --with-libevent=${prefix} \
+        --with-zlib=${prefix}
+
+    # For MacOS 10.8 and earlier, disable use of AVX instruction set. Necessary as
+    # system-provided assembler doesn't support AVX on those releases. And it's not
+    # straightforward to fix.
+    if {${os.major} <= 12} {
+        ui_debug "Disabling use of AVX instructions for this MacOS release"
+        configure.args-append \
+            --enable-mca-no-build=op-avx
+    }
 
     post-destroot {
         if {[string first "-devel" $subport] > 0} {
@@ -234,7 +306,7 @@ if {${subport} != ${name}} {
             select.file             ${filespath}/${name}-${cname}-fortran
 
             # Get the dependent port for the active fortran variant
-            depends_lib-append      [fortran_variant_depends_port_name]
+            depends_lib-append      [fortran_variant_depends]
         }
     }
     set devnotes ""
@@ -263,7 +335,18 @@ you execute 'mpicc' etc.) please run:
         configure.args-append --enable-debug --enable-memchecker --with-valgrind=${prefix}
     }
 
-    if {[variant_isset universal]} {
+    variant heterogeneous description {enable heterogeneous support} {
+        configure.args-append --enable-heterogeneous
+    }
+
+    variant mpi1 description {enable legacy mpi1 compatibility} {
+        configure.args-append --enable-mpi1-compatibility
+    }
+
+    if {![info exists universal_possible]} {
+        set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+    }
+    if {${universal_possible} && [variant_isset universal]} {
         # use open-mpi's multilib support to build universal
         # see https://github.com/open-mpi/ompi/wiki/MultiLib
         # Fortran is the only non-trivial case
@@ -339,15 +422,15 @@ you execute 'mpicc' etc.) please run:
     }
 
 } else {
-    depends_lib-append      port:$name-default
+    depends_lib-append      port:${subport}-default
     distfiles
     patchfiles
     supported_archs         noarch
     use_configure           no
     build {}
     destroot {
-        set docdir          ${destroot}${prefix}/share/doc/${name}
+        set docdir          ${destroot}${prefix}/share/doc/${subport}
         xinstall -d ${docdir}
-        system "echo $name is a stub port > ${docdir}/README"
+        system "echo $subport is a stub port > ${docdir}/README"
     }
 }

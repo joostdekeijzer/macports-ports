@@ -9,9 +9,9 @@ cmake.generator     Ninja
 name                inkscape
 conflicts           inkscape-devel inkscape-gtk3-devel
 version             0.92.5
-revision            6
+revision            7
 license             GPL-3+
-maintainers         {devans @dbevans}
+maintainers         {devans @dbevans} openmaintainer
 categories          graphics gnome
 platforms           darwin
 
@@ -31,7 +31,7 @@ checksums           rmd160  360feade19ee48dd081bb43df68189717a63267b \
                     size    32175410
 
 set python_major    3
-set python_minor    8
+set python_minor    9
 set python_version  ${python_major}${python_minor}
 
 # this port only uses boost headers during build
@@ -107,5 +107,5 @@ post-activate {
 }
 
 livecheck.type      regex
-livecheck.url       ${homepage}
-livecheck.regex     ">Current stable version: (\\d+(?:\\.\\d+)*)<"
+livecheck.url       https://inkscape.org/release/
+livecheck.regex     ">Inkscape (\\d+(?:\\.\\d+)*)<"

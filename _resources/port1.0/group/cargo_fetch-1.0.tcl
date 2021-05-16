@@ -37,12 +37,28 @@
 #    baz    author/baz  branch  abcdef12345678...commit...abcdef12345678  fedcba654321...
 #
 
+PortGroup compiler_blacklist_versions 1.0
+PortGroup legacysupport 1.1
+
 options cargo.bin cargo.home cargo.crates cargo.crates_github
 
 default cargo.bin           {${prefix}/bin/cargo}
 default cargo.home          {${workpath}/.home/.cargo}
 default cargo.crates        {}
 default cargo.crates_github {}
+
+# As building with rust uses the same underlying compiler as used to build it
+# replicate the same compiler selection options here
+compiler.cxx_standard       2017
+compiler.blacklist-append   {macports-clang-[4-9].0}
+
+# please remove when 8a088c3 has been in a released MacPorts version for at least two weeks
+# see https://github.com/macports/macports-base/commit/8a088c30d80c7c3eca10848f28835e1c180229b1
+if {"shellescape" ni [info commands shellescape]} {
+    proc shellescape {arg} {
+        return [regsub -all -- {[^A-Za-z0-9.:@%/+=_-]} $arg {\\&}]
+    }
+}
 
 option_proc cargo.crates handle_cargo_crates
 proc handle_cargo_crates {option action {value ""}} {
@@ -87,7 +103,7 @@ proc cargo._extract_crate {cratefile} {
     global cargo.home distpath
 
     set tar [findBinary tar ${portutil::autoconf::tar_path}]
-    system -W "${cargo.home}/macports" "$tar -xf ${distpath}/${cratefile}"
+    system -W "${cargo.home}/macports" "$tar -xf [shellescape ${distpath}/${cratefile}]"
 }
 
 proc cargo._write_cargo_checksum {cdirname chksum} {
@@ -214,61 +230,80 @@ post-extract {
 proc cargo.translate_arch_name {arch} {
     if {${arch} eq "i386"} {
         return "i686"
+    } elseif {${arch} eq "arm64"} {
+        return "aarch64"
     } else {
         return ${arch}
     }
 }
 
 proc cargo.rust_platform {{arch ""}} {
-    global os.platform build_arch muniversal.current_arch
+    global os.platform configure.build_arch muniversal.current_arch
     if {${arch} eq ""} {
         if {[info exists muniversal.current_arch]} {
             set arch ${muniversal.current_arch}
         } else {
-            set arch ${build_arch}
+            set arch ${configure.build_arch}
         }
     }
     return [cargo.translate_arch_name ${arch}]-apple-${os.platform}
 }
 
-foreach stage {build destroot} {
-    # see https://trac.macports.org/wiki/UsingTheRightCompiler
-    ${stage}.env-append CC=${configure.cc} \
-                        CXX=${configure.cxx}
+proc cargo.append_envs { var {phases {configure build destroot}} } {
+    foreach phase ${phases} {
+        ${phase}.env-delete ${var}
+        ${phase}.env-append ${var}
+    }
 }
 
-foreach stage {configure build destroot} {
-    ${stage}.env-append "RUSTFLAGS=-C linker=${configure.cc}"
-}
+# see https://trac.macports.org/wiki/UsingTheRightCompiler
+cargo.append_envs CC=${configure.cc}   {build destroot}
+cargo.append_envs CXX=${configure.cxx} {build destroot}
+
+cargo.append_envs "RUSTFLAGS=-C linker=${configure.cc}"
+
+# Is build caching enabled ?
+# WIP for now ...
+#if {[tbool configure.ccache]} {
+#    # Enable sccache for rust caching
+#    depends_build-append port:sccache
+#    cargo.append_envs    RUSTC_WRAPPER=${prefix}/bin/sccache
+#    cargo.append_envs    SCCACHE_CACHE_SIZE=2G
+#    cargo.append_envs    SCCACHE_DIR=${workpath}/.sccache
+#}
 
 # do not force all Portfiles to switch from ${stage}.env to ${stage}.env-append
 proc cargo.environments {} {
-    global configure.cc configure.cxx subport build_arch universal_archs merger_configure_env merger_build_env merger_destroot_env worksrcpath
-    foreach stage {build destroot} {
-        ${stage}.env-delete CC=${configure.cc} \
-                            CXX=${configure.cxx}
-        ${stage}.env-append CC=${configure.cc} \
-                            CXX=${configure.cxx}
+    global os.major prefix
+    global configure.cc configure.cxx subport configure.build_arch configure.universal_archs
+    global merger_configure_env merger_build_env merger_destroot_env worksrcpath
+
+    set cargo_ld ${configure.cc}
+    if { ${os.major} <= [option legacysupport.newest_darwin_requires_legacy] } {
+        # Use wrapped rust compilers
+        depends_build-append port:rust-compiler-wrap
+        configure.cc      ${prefix}/libexec/rust-compiler-wrap/bin/clang
+        configure.cxx     ${prefix}/libexec/rust-compiler-wrap/bin/clang++
+        configure.objc    ${prefix}/libexec/rust-compiler-wrap/bin/clang
+        configure.objcxx  ${prefix}/libexec/rust-compiler-wrap/bin/clang++
+        set cargo_ld      ${prefix}/libexec/rust-compiler-wrap/bin/ld-rust
     }
 
-    foreach stage {configure build destroot} {
-        ${stage}.env-delete "RUSTFLAGS=-C linker=${configure.cc}"
-        ${stage}.env-append "RUSTFLAGS=-C linker=${configure.cc}"
-    }
+    cargo.append_envs     CC=${configure.cc}   {build destroot}
+    cargo.append_envs     CXX=${configure.cxx} {build destroot}
+
+    cargo.append_envs     "RUSTFLAGS=-C linker=${cargo_ld}"
+    cargo.append_envs     "RUST_BACKTRACE=1"
+    cargo.append_envs     "CARGO_BUILD_RUSTC=${prefix}/bin/rustc"
 
     # CARGO_BUILD_TARGET does not work correctly
     # see the patchfile path-dyld.diff in cargo Portfile
     if {${subport} ne "cargo-stage1"} {
         if {![variant_exists universal] || ![variant_isset universal]} {
-            foreach stage {configure build destroot} {
-                ${stage}.env-delete \
-                    CARGO_BUILD_TARGET=[cargo.rust_platform ${build_arch}]
-                ${stage}.env-append \
-                    CARGO_BUILD_TARGET=[cargo.rust_platform ${build_arch}]
-            }
+            cargo.append_envs CARGO_BUILD_TARGET=[cargo.rust_platform ${configure.build_arch}] {configure build destroot}
         } else {
             foreach stage {configure build destroot} {
-                foreach arch ${universal_archs} {
+                foreach arch ${configure.universal_archs} {
                     lappend merger_${stage}_env(${arch}) \
                         CARGO_BUILD_TARGET=[cargo.rust_platform ${arch}]
                 }
@@ -278,21 +313,5 @@ proc cargo.environments {} {
 }
 port::register_callback cargo.environments
 
-# override universal_setup found in portutil.tcl so it uses muniversal PortGroup
 # see https://trac.macports.org/ticket/51643 for a similar case
-proc universal_setup {args} {
-    if {[variant_exists universal]} {
-        ui_debug "universal variant already exists, so not adding the default one"
-    } elseif {[exists universal_variant] && ![option universal_variant]} {
-        ui_debug "universal_variant is false, so not adding the default universal variant"
-    } elseif {[exists use_xmkmf] && [option use_xmkmf]} {
-        ui_debug "using xmkmf, so not adding the default universal variant"
-    } elseif {![exists os.universal_supported] || ![option os.universal_supported]} {
-        ui_debug "OS doesn't support universal builds, so not adding the default universal variant"
-    } elseif {[llength [option supported_archs]] == 1} {
-        ui_debug "only one arch supported, so not adding the default universal variant"
-    } else {
-        ui_debug "adding universal variant via PortGroup muniversal"
-        uplevel "PortGroup muniversal 1.0"
-    }
-}
+PortGroup muniversal 1.0

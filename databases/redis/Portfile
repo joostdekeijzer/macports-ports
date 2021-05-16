@@ -1,12 +1,16 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
 PortSystem          1.0
+PortGroup           legacysupport 1.1
 PortGroup           muniversal 1.0
 PortGroup           xcode_workaround 1.0
 PortGroup           makefile 1.0
 
+# clock_gettime
+legacysupport.newest_darwin_requires_legacy 15
+
 name                redis
-version             6.0.9
+version             6.2.3
 categories          databases
 platforms           darwin
 license             BSD
@@ -19,9 +23,9 @@ long_description    {*}${description}
 homepage            https://redis.io/
 master_sites        http://download.redis.io/releases/
 
-checksums           rmd160  685cc12eb7d2b14f42dd5fcdabcd18e625e5e4d1 \
-                    sha256  dc2bdcf81c620e9f09cfd12e85d3bc631c897b2db7a55218fd8a65eaa37f86dd \
-                    size    2261418
+checksums           rmd160  0b3aca2a155f9c5b51f80638256296b8b770df20 \
+                    sha256  98ed7d532b5e9671f5df0825bb71f0f37483a16546364049384c63db8764512b \
+                    size    2456050
 
 patchfiles          patch-redis.conf.diff
 
@@ -45,7 +49,7 @@ configure.cppflags-replace \
                     -isystem${prefix}/include
 
 # redis doesn't know about CPPFLAGS so pass it this way
-build.args-append   REDIS_CFLAGS=${configure.cppflags}
+build.args-append   REDIS_CFLAGS="${configure.cppflags}"
 
 # disable silent rules
 build.args-append   V=1

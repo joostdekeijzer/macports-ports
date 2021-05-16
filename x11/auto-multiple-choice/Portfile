@@ -22,44 +22,40 @@ homepage                http://www.auto-multiple-choice.net/
 
 subport auto-multiple-choice-devel {}
 
-set gitlab.home https://gitlab.com
-set gitlab.author jojo_boulix
-set gitlab.project ${name}
-
 if {${subport} eq ${name}} {
     # release
-    set gitlab.commit       "c6041a162202380b065b1b1abbdb016bb6d4b6a8"
-    set amc_revision        "201812291614"
-    set amc_date            "201812291614"
-    revision                1
-    version                 1.4.0-${amc_revision}
-    checksums               rmd160  205d1907927c3e3b230e19f3460d151dfa3dfa7d \
-                            sha256  8362dd01bd902556940a1415f23d00278b36c27e1e3d62e2190e32d78864b0fe \
-                            size    5125388
-    build.cmd               ${prefix}/bin/gmake
+    version                 1.4.0
+    checksums               rmd160  1c4774798321281f2fa76d0fcaeb490bd6ac58d3 \
+                            sha256  6d447bc5053fd2a57f854ead33ac50bb5c3a09e99e6f662c85febc5eb85a9fad \
+                            size    8513750
+
+    depends_lib-append      port:opencv
+
     conflicts               auto-multiple-choice-devel
 } else {
     # devel
-    set gitlab.commit       "fd2136db5241e33dec5d920535d23000525b6b6d"
-    set amc_revision        "202004101300"
-    set amc_date            "202004101300"
-    version                 1.4.0-${amc_revision}
-    checksums               rmd160  bb6b8faefbca2ba5293a6ba2861fffcdc26844c2 \
-                            sha256  ce77a35e6c72d32645921cdf327e2fc9569f4146823c6d1d98d54ecdcb2edf31 \
-                            size    6522121
-    build.cmd               ${prefix}/bin/gmake
+    set amc.version.main        1.5.0
+    set amc.version.secondary   rc2-4-g4357dcbf
+    version                 ${amc.version.main}_${amc.version.secondary}
+    revision                2
+    checksums               rmd160  e258d7fb16af0b71f06573b0f088f730856bfdd0 \
+                            sha256  a02734bf0177bae3fb72d34f80863c3dc0f74f2080244d22e50bc629cfa0c788 \
+                            size    11125547
+
+    set opencv_ver          4
+    depends_lib-append      port:opencv${opencv_ver}
+    build.env-append        PKG_CONFIG_PATH=${prefix}/lib/opencv${opencv_ver}/pkgconfig
+
     conflicts               auto-multiple-choice
 }
 
-master_sites            https://gitlab.com/jojo_boulix/auto-multiple-choice/repository/archive.tar.gz?ref=${gitlab.commit}&dummy=
-distname                ${gitlab.project}-${gitlab.commit}-${gitlab.commit}
+master_sites            https://download.auto-multiple-choice.net/precomp/
+distfiles               ${name}_${version}_dist${extract.suffix}
 
-depends_build-append    \
-                        port:dblatex \
-                        port:gmake \
-                        port:p${perl5.major}-xml-libxml
+use_configure           no
 
-depends_lib-append      port:opencv
+depends_build           port:gmake
+build.cmd               ${prefix}/bin/gmake
 
 depends_run             \
                         port:gdk-pixbuf2 \
@@ -74,8 +70,10 @@ depends_run             \
                         port:p${perl5.major}-email-sender \
                         port:p${perl5.major}-file-basedir \
                         port:p${perl5.major}-file-mimeinfo \
+                        port:p${perl5.major}-filesys-dfportable \
                         port:p${perl5.major}-glib-object-introspection \
                         port:p${perl5.major}-gtk3 \
+                        port:p${perl5.major}-io-compress \
                         port:p${perl5.major}-locale-codes \
                         port:p${perl5.major}-locale-gettext \
                         port:p${perl5.major}-module-load-conditional \
@@ -90,29 +88,32 @@ depends_run             \
                         port:texlive \
                         port:texlive-fonts-extra \
                         port:texlive-lang-japanese \
-                        port:texlive-latex-extra
+                        port:texlive-latex-extra \
+                        port:unzip
 
-configure {
+build.args              AMCCONF=macports \
+                        BASEPATH=${prefix}
+
+pre-build {
+    build.post_args-append PERLDIR=${perl5.lib}
     if {![variant_isset mactex]} {
         set amc.texmflocal ${texlive_texmflocal}
     }
-    system -W ${worksrcpath} "${build.cmd} version_files AMCCONF=macports BASEPATH=${prefix} PERLPATH=${perl5.bin} PERLDIR=${perl5.lib} SYSTEM_TYPE=macports TEXDIR=${amc.texmflocal}/tex/latex/AMC TEXDOCDIR=${amc.texmflocal}/doc/latex/AMC"
+    build.post_args-append TEXDIR="${amc.texmflocal}/tex/latex/AMC"
+    build.post_args-append TEXDOCDIR="${amc.texmflocal}/doc/latex/AMC"
 }
 
-build.env-append        AMCCONF=macports BASEPATH=${prefix}
+destroot.args           AMCCONF=macports \
+                        BASEPATH=${prefix}
 
 pre-destroot {
     destroot.args-append PERLDIR=${perl5.lib}
-
     if {![variant_isset mactex]} {
         set amc.texmflocal ${texlive_texmflocal}
     }
     destroot.args-append TEXDIR="${amc.texmflocal}/tex/latex/AMC"
     destroot.args-append TEXDOCDIR="${amc.texmflocal}/doc/latex/AMC"
 }
-
-destroot.args           AMCCONF=macports \
-                        BASEPATH=${prefix}
 
 # The mactex variant expects MacTeX to be installed
 # and installs dblatex's stylefiles to MacTeX's texmf (local)
@@ -128,7 +129,7 @@ instead of Macports texlive tools. To install the mactex variant \
        "/usr/texbin" \
     }
     foreach dir ${amc.mactex_candidates} {
-        if [file executable "${dir}/kpsewhich"] {
+        if {[file executable "${dir}/kpsewhich"]} {
             set amc.mactex_bin ${dir}
             break
         }
@@ -163,7 +164,7 @@ proc amc.mktexlsr {} {
     } else {
         global amc.mactex_bin
         system "${amc.mactex_bin}/mktexlsr"
-        if [file exists "${amc.mactex_bin}/mtxrun"] {
+        if {[file exists "${amc.mactex_bin}/mtxrun"]} {
             system "${amc.mactex_bin}/mtxrun --generate"
         }
     }
@@ -176,3 +177,7 @@ post-activate {
 post-deactivate {
     amc.mktexlsr
 }
+
+livecheck.type          regex
+livecheck.url           [lindex ${master_sites} 0]#
+livecheck.regex         ${name}_(\[0-9.a-z-\]+_\[0-9.a-z-\]+)_

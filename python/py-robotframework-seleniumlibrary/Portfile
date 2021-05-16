@@ -7,7 +7,7 @@ name                py-robotframework-seleniumlibrary
 set internal_name   SeleniumLibrary
 set rname           robotframework-seleniumlibrary
 
-version             4.5.0
+version             5.1.3
 license             Apache-2
 
 categories-append   devel
@@ -18,13 +18,13 @@ long_description    Library to run web-based tests with Selenium \
 
 homepage            https://github.com/robotframework/${rname}
 
-checksums           rmd160  368d8ef867d08f4a1ac99fbf97b08d5cc33d826b \
-                    sha256  a0a571642f54dabb481ff1ea7dc6195b82c69d241d0e01de79de64fcbfa69e44 \
-                    size    145126
+checksums           rmd160  d249382978d17f4c245dd4f998f9ca9b4a219ccd \
+                    sha256  f51a0068c6c0d8107ee1120874a3afbf2bbe751fd0782cb86a27a616d9ca30b6 \
+                    size    156935
 
 platforms           darwin
-python.versions         27 36 37 38
-python.default_version  38
+python.versions         36 37 38 39
+python.default_version  39
 
 master_sites        pypi:r/${rname}
 distname            ${rname}-${version}

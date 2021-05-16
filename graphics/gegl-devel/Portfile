@@ -11,7 +11,7 @@ conflicts           gegl
 set git_commit      123e846bed6c74696f25e150f425030d5b886ed2
 set git_date        20201101
 version             0.4.27-${git_date}
-revision            0
+revision            1
 license             {GPL-3+ LGPL-3+}
 categories          graphics
 maintainers         {devans @dbevans}
@@ -38,7 +38,7 @@ depends_lib         port:babl-devel \
                     path:lib/pkgconfig/cairo.pc:cairo \
                     path:lib/pkgconfig/pango.pc:pango \
                     port:gdk-pixbuf2 \
-                    port:jpeg \
+                    path:include/turbojpeg.h:libjpeg-turbo \
                     port:luajit \
                     port:exiv2 \
                     port:gexiv2 \
@@ -106,8 +106,11 @@ platform darwin powerpc {
 #    }
 #}
 
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
 # gobject-introspection uses g-ir-scanner, which uses $CC from env
-if {[variant_isset universal]} {
+if {${universal_possible} && [variant_isset universal]} {
     foreach arch ${configure.universal_archs} {
         lappend merger_build_env(${arch})  "CC=${configure.cc} -arch ${arch}"
         lappend merger_destroot_env(${arch})  "CC=${configure.cc} -arch ${arch}"

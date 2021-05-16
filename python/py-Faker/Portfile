@@ -1,0 +1,56 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           python 1.0
+
+name                py-Faker
+version             8.1.4
+revision            0
+platforms           darwin
+license             MIT
+maintainers         {outlook.de:judaew @judaew} openmaintainer
+
+description         Faker is a Python package that generates fake data for you.
+long_description    \
+    {*}${description} Whether you need to bootstrap your database, create \
+    good-looking XML documents, fill-in your persistence to stress test it, \
+    or anonymize data taken from a production service, Faker is for you.
+homepage            https://github.com/joke2k/faker
+
+checksums           rmd160  fc8f927786e69228b110e9a18de17ed420dba4b1 \
+                    sha256  c6a4a0a1dde71f16d489a3097661a87ae96329dbde4c3ece8a5ccc340441ade1 \
+                    size    1143731
+
+python.versions     37 38 39
+
+if {${name} ne ${subport}} {
+    depends_build-append \
+                    port:py${python.version}-setuptools
+
+    depends_run-append \
+                    port:py${python.version}-dateutil \
+                    port:py${python.version}-text-unidecode
+
+    depends_test-append \
+                    port:py${python.version}-decorator \
+                    port:py${python.version}-freezegun \
+                    port:py${python.version}-pytest \
+                    port:py${python.version}-random2 \
+                    port:py${python.version}-ukpostcodeparser \
+                    port:py${python.version}-validators
+
+    post-destroot {
+        set docdir ${prefix}/share/doc/${subport}
+        xinstall -d ${destroot}${docdir}
+        xinstall -m 0644 -W ${worksrcpath} LICENSE.txt README.rst \
+            ${destroot}${docdir}
+    }
+
+    test.run        yes
+    test.cmd        ${python.bin} -m pytest
+    test.target
+    test.env-append \
+                    PYTHONPATH=${worksrcpath}/build/lib
+
+    livecheck.type  none
+}

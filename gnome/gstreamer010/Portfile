@@ -10,7 +10,7 @@ PortGroup           gobject_introspection 1.0
 name                gstreamer010
 set my_name         gstreamer
 version             0.10.36
-revision            1
+revision            2
 description         GStreamer is a library for constructing graphs of media-handling components.
 long_description    The applications it supports range from simple Ogg/Vorbis playback, audio/video \
                     streaming to complex audio (mixing) and video (non-linear editing) processing.
@@ -30,6 +30,7 @@ checksums           rmd160  5dd01d8ea7afe98e96037bf73f995654f469096e \
                     sha256  e556a529e0a8cf1cd0afd0cab2af5488c9524e7c3f409de29b5d82bb41ae7a30
 
 patchfiles          patch-gst__gstdatetime.c \
+                    implicit.patch \
                     bison3.patch
 
 depends_build       port:gzip \
@@ -54,7 +55,10 @@ configure.args-append \
                     --disable-examples \
                     --disable-silent-rules
 
-if {[variant_isset universal]} {
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
+if {${universal_possible} && [variant_isset universal]} {
     set merger_host(x86_64) x86_64-apple-${os.platform}${os.major}
     set merger_host(i386) i686-apple-${os.platform}${os.major}
     set merger_configure_args(x86_64) --build=x86_64-apple-${os.platform}${os.major}

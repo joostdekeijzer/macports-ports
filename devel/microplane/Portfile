@@ -3,11 +3,8 @@
 PortSystem          1.0
 PortGroup           golang 1.0
 
-go.setup            github.com/Clever/microplane 0.0.25 v
-
-categories          devel
-license             Apache-2
-platforms           darwin
+go.setup            github.com/Clever/microplane 0.0.28 v
+revision            0
 
 description         A CLI tool to make git changes across many repos, \
                     especially useful with Microservices.
@@ -17,13 +14,18 @@ long_description    {*}${description}
 maintainers         {gmail.com:herby.gillot @herbygillot} \
                     openmaintainer
 
-checksums           rmd160  37a36d6ebe05063e79c74017057d84df94088397 \
-                    sha256  53d14bd71a1c3d37723fd3e66c77a981bdd08cd05bf73b273a3b7980e4fdc996 \
-                    size    29056
+categories          devel
+license             Apache-2
+platforms           darwin
+
+checksums           rmd160  9c56b25d2e5adcbaefd3423b45808281beea9ecd \
+                    sha256  8454885dadcc862f2a9093c14d25a3eb5a4104b5aaab253829117e995761da42 \
+                    size    50674
 
 depends_build-append \
                     port:dep
 
+build.env-delete    GO111MODULE=off GOPROXY=off
 build.cmd           make
 build.target        install_deps build
 use_parallel_build  no

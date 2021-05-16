@@ -7,7 +7,7 @@
 
 global available_qt_versions
 array set available_qt_versions {
-    qt5   {qt5-qtbase   5.14}
+    qt5   {qt5-qtbase   5.15}
     qt513 {qt513-qtbase 5.13}
     qt511 {qt511-qtbase 5.11}
     qt59  {qt59-qtbase  5.9}
@@ -660,7 +660,10 @@ global qt_qmake_spec_32
 global qt_qmake_spec_64
 compiler.blacklist-append *gcc*
 
-if {[vercmp ${qt5.version} 5.10]>=0} {
+if {[vercmp ${qt5.version} 5.15]>=0} {
+    # only qt5 5.15.x has so far been built as arm64 on MacPorts
+    default supported_archs "x86_64 arm64"
+} elseif {[vercmp ${qt5.version} 5.10]>=0} {
     # see https://bugreports.qt.io/browse/QTBUG-58401
     default supported_archs x86_64
 } else {
@@ -681,30 +684,14 @@ if {[vercmp ${qt5.version} 5.9]>=0} {
     # no universal binary support in Qt 5 versions < 5.9
     #     see http://lists.qt-project.org/pipermail/interest/2012-December/005038.html
     #     and https://bugreports.qt.io/browse/QTBUG-24952
-    # override universal_setup found in portutil.tcl so it uses muniversal PortGroup
     # see https://trac.macports.org/ticket/51643
-    proc universal_setup {args} {
-        if {[variant_exists universal]} {
-            ui_debug "universal variant already exists, so not adding the default one"
-        } elseif {[exists universal_variant] && ![option universal_variant]} {
-            ui_debug "universal_variant is false, so not adding the default universal variant"
-        } elseif {[exists use_xmkmf] && [option use_xmkmf]} {
-            ui_debug "using xmkmf, so not adding the default universal variant"
-        } elseif {![exists os.universal_supported] || ![option os.universal_supported]} {
-            ui_debug "OS doesn't support universal builds, so not adding the default universal variant"
-        } elseif {[llength [option supported_archs]] == 1} {
-            ui_debug "only one arch supported, so not adding the default universal variant"
-        } else {
-            ui_debug "adding universal variant via PortGroup muniversal"
-            uplevel "PortGroup muniversal 1.0"
-            uplevel "default universal_archs_supported {\"i386 x86_64\"}"
-        }
-    }
+    PortGroup muniversal 1.0
+    default universal_archs_supported {i386 x86_64}
 
     # standard destroot environment
     pre-destroot {
         global merger_destroot_env
-        if { ![option universal_variant] || ![variant_isset universal] } {
+        if {![variant_exists universal]  || ![variant_isset universal]} {
             destroot.env-append \
                 INSTALL_ROOT=${destroot}
         } else {
@@ -723,7 +710,7 @@ default qt_qmake_spec {[qt5pg::get_default_spec]}
 namespace eval qt5pg {
     proc get_default_spec {} {
         global configure.build_arch qt_qmake_spec_32 qt_qmake_spec_64
-        if { ![option universal_variant] || ![variant_isset universal] } {
+        if {![variant_exists universal]  || ![variant_isset universal]} {
             if { ${configure.build_arch} eq "i386" } {
                 return ${qt_qmake_spec_32}
             } else {
@@ -917,11 +904,16 @@ if {!${private_building_qt5}} {
     port::register_callback qt5pg::register_dependents
 }
 
-pre-fetch {
+proc qt5pg::check_min_version {} {
+    global qt5.version qt5.min_version
     if {[vercmp ${qt5.version} ${qt5.min_version}] < 0} {
-        ui_error "Qt version ${qt5.min_version} or above is required, but Qt version ${qt5.version} is installed"
-        return -code error "Qt version too old"
+        known_fail yes
+        pre-fetch {
+            ui_error "Qt version ${qt5.min_version} or above is required, but Qt version ${qt5.version} is installed"
+            return -code error "Qt version too old"
+        }
     }
 }
+port::register_callback qt5pg::check_min_version
 
 unset private_building_qt5

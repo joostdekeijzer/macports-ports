@@ -3,7 +3,7 @@
 PortSystem          1.0
 
 name                mutt
-version             2.0.3
+version             2.0.7
 categories          mail
 platforms           darwin
 license             GPL-2+
@@ -21,9 +21,9 @@ master_sites        https://bitbucket.org/mutt/mutt/downloads/
 
 # Does not conflict with neomutt (without the 'mutt' variant)
 
-checksums           rmd160  8833883585553d5d9d026cd0c428cf596f8cfc9f \
-                    sha256  9c327cafb7acbfd4a57e7c817148fe438720a4545a5f628926f7745bc752c1ed \
-                    size    5292808
+checksums           rmd160  b6673d7899e498f96e55df552b77c0c19850cebe \
+                    sha256  957688c6a521561992d4f2f27cf9feb239c7c6c0042c6061c0e474a7dd26cc91 \
+                    size    5299366
 
 depends_lib         port:gettext \
                     port:libiconv \
@@ -86,7 +86,7 @@ variant gdbm conflicts lmdb db4 description {Use GNU dbm database} {
     depends_lib-append      port:gdbm
 }
 
-variant lmdb conflicts gdbm db4 description {Use GNU dbm database} {
+variant lmdb conflicts gdbm db4 description {Use LMDB database} {
     configure.args-replace  --disable-hcache --enable-hcache
     configure.args-append   --with-lmdb
     depends_lib-append      port:lmdb

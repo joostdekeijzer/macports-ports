@@ -7,8 +7,8 @@ PortGroup           mpi 1.0
 PortGroup           python 1.0
 
 name                py-pytorch
-version             1.6.0
-revision            0
+version             1.8.1
+revision            1
 github.setup        pytorch pytorch ${version} v
 fetch.type          git
 
@@ -32,22 +32,26 @@ long_description    PyTorch is a Python package that provides two\
 
 homepage            https://pytorch.org/
 
-python.versions     36 37 38
-python.default_version 37
+python.versions     37 38 39
 
 patch.pre_args      -p1
 
-mpi.setup           -gcc44 -gcc45 -clang33 -clang34 -clang37 -gfortran -g95
+mpi.setup
 
 # Compiler selection
-compiler.cxx_standard 2011
+compiler.cxx_standard 2017
 
 compiler.blacklist-append *gcc* {clang < 800} {macports-clang-3.[0-9]} macports-clang-4.0
 
 variant mkl description {Enable Intel Math Kernel Library support} { }
-# enable MKL by default on 10.12 and newer
-if {${os.major} >= 16} {
-    default_variants-append +mkl
+default_variants-append +mkl
+
+if {${os.platform} eq "darwin" && ${os.major} <= 15} {
+    known_fail yes
+    pre-fetch {
+        ui_error "$subport is not supported on OS X 10.11 and older."
+        return -code error "unsupported platform"
+    }
 }
 
 if {${name} ne ${subport}} {
@@ -73,15 +77,18 @@ if {${name} ne ${subport}} {
         port:leveldb \
         port:lmdb \
         port:libomp \
+        port:py${python.version}-click \
         port:py${python.version}-cffi \
         port:py${python.version}-future \
         port:py${python.version}-gmpy \
         port:py${python.version}-numpy \
         port:py${python.version}-pybind11 \
+        port:py${python.version}-typing_extensions \
         port:py${python.version}-yaml 
 
-    # py-spaCy currentlt has build problems
-    #port:py${python.version}-torchtext
+    if { ${python.version} < 37 } {
+        depends_lib-append  port:py${python.version}-dataclasses
+    }
     
     depends_run-append \
         port:py${python.version}-onnx
@@ -110,6 +117,7 @@ if {${name} ne ${subport}} {
     build.env-append \
         CMAKE_LIBRARY_PATH=${prefix}/lib:${prefix}/lib/libomp \
         LIBRARY_PATH=${prefix}/lib:${prefix}/lib/libomp \
+        OpenCV_DIR=${prefix}/libexec/opencv4/cmake \
         USE_CUDA=OFF \
         USE_GFLAGS=ON \
         USE_GLOG=ON \

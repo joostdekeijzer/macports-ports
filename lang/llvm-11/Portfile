@@ -5,30 +5,27 @@ PortGroup compiler_blacklist_versions 1.0
 PortGroup active_variants 1.1
 PortGroup cmake         1.0
 PortGroup legacysupport 1.0
-PortGroup github        1.0
 
 # link legacysupport statically for compilers
 legacysupport.use_static yes
-
-# limit legacysupport to 10.9 for now
 legacysupport.newest_darwin_requires_legacy 13
 
 set llvm_version        11
 set clang_executable_version 11
 set lldb_executable_version 11
 
-github.setup            llvm llvm-project 11.0.0 llvmorg-
-
-github.tarball_from     releases
+version                 11.1.0
+master_sites            https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}
+distname                llvm-project-${version}.src
 use_xz                  yes
 
-checksums               rmd160  594eb676d9c9786d809587c39dff087f2e8c9429 \
-                        sha256  b7b639fc675fa1c86dd6d0bc32267be9eb34451748d2efd03f674b773000e92b \
-                        size    84792772
+checksums               rmd160  f566b4b75c8f30418f19069a9a84864ead766401 \
+                        sha256  74d2529159fd118c3eac6f90107b5611bccc6f647fdea104024183e8d5e25831 \
+                        size    84065492
 
 name                    llvm-${llvm_version}
 revision                0
-subport                 clang-${llvm_version} { revision 0 }
+subport                 clang-${llvm_version} { revision 2 }
 subport                 flang-${llvm_version} { revision 0 }
 subport                 lldb-${llvm_version} { revision 0 }
 set suffix              mp-${llvm_version}
@@ -87,7 +84,7 @@ if {${subport} eq "llvm-${llvm_version}"} {
         if {${os.major} <= 10} {
             depends_run-append  port:gcc8
         } else {
-            depends_run-append  port:gcc10
+            depends_run-append  port:gcc11
         }
     }
 
@@ -103,14 +100,11 @@ if {${subport} eq "llvm-${llvm_version}"} {
 # for devel version only
 # default_variants-append +assertions
 
-# the backtik pkgconfig setting in the ffi config line requires pkg-config
-depends_build-append    port:pkgconfig
-
-worksrcdir              llvm-project-${version}/llvm
+worksrcdir              llvm-project/llvm
 patch.dir               ${workpath}/llvm-project/llvm
 
 post-extract {
-    ln -s ${workpath}/llvm-project-${version} ${workpath}/llvm-project
+    ln -s ${workpath}/${distname} ${workpath}/llvm-project
 
     if {${subport} eq "llvm-${llvm_version}"} {
         if {[variant_isset polly]} {
@@ -121,6 +115,7 @@ post-extract {
         ln -s ${workpath}/llvm-project/compiler-rt                      ${worksrcpath}/projects/compiler-rt
         ln -s ${workpath}/llvm-project/libcxx                           ${worksrcpath}/projects/libcxx
         ln -s ${workpath}/llvm-project/libcxxabi                        ${worksrcpath}/projects/libcxxabi
+        ln -s ${workpath}/llvm-project/lld                              ${worksrcpath}/projects/lld
         ln -s ${workpath}/llvm-project/clang-tools-extra                ${worksrcpath}/tools/clang/tools/extra
     } elseif {${subport} eq "flang-${llvm_version}"} {
         ln -s ${workpath}/llvm-project/mlir                             ${worksrcpath}/tools/mlir
@@ -156,7 +151,8 @@ if {${subport} eq "clang-${llvm_version}"} {
         openmp-locations.patch \
         leopard-no-asan.patch \
         5000-patch-compilerrtdarwinutils-find-macosxsdkversion.diff \
-        5002-patch-toolchains-darwin-add-back-pre-10.6-link-libs.diff
+        5002-patch-toolchains-darwin-add-back-pre-10.6-link-libs.diff \
+        patch-clang-fix-include-next-sysroot-cpp-headers.diff
 }
 
 if {${subport} eq "flang-${llvm_version}"} {
@@ -199,9 +195,9 @@ configure.args-append \
     -DLLVM_ENABLE_RTTI=ON \
     -DLLVM_INCLUDE_TESTS=OFF \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
-    -DLLVM_ENABLE_FFI=ON \
     -DLLVM_BINDINGS_LIST=none \
-    -DFFI_INCLUDE_DIR=`pkg-config --cflags-only-I libffi | sed 's/-I//'` \
+    -DLLVM_ENABLE_FFI=ON \
+    -DFFI_INCLUDE_DIR=${prefix}/include \
     -DFFI_LIBRARY_DIR=${prefix}/lib
 
 if {${subport} eq "llvm-${llvm_version}"} {
@@ -220,8 +216,8 @@ if {${subport} eq "llvm-${llvm_version}"} {
         -DCLANG_ENABLE_ARCMT=OFF \
         -DDARWIN_PREFER_PUBLIC_SDK=ON \
         -DLLVM_BUILD_RUNTIME=ON \
-        -DLIBCXX_ENABLE_SHARED=OFF \
-        -DLIBCXX_INSTALL_LIBRARY=OFF
+        -DLIBCXX_ENABLE_SHARED=ON \
+        -DLIBCXX_INSTALL_LIBRARY=ON
 
 } elseif {${subport} eq "flang-${llvm_version}"} {
 
@@ -290,8 +286,8 @@ if {[lsearch -exact $PortInfo(depends_build) port:cctools] != -1} {
         -DCMAKE_LIBTOOL=${prefix}/bin/libtool
 }
 
-depends_lib-append      port:python38
-set pythonfullpath      ${prefix}/bin/python3.8
+depends_lib-append      port:python39
+set pythonfullpath      ${prefix}/bin/python3.9
 configure.args-append   -D_Python3_EXECUTABLE=${pythonfullpath}
 
 platform darwin {
@@ -353,6 +349,9 @@ platform darwin {
             # the directorywatcher code is currently 10.7+
             patchfiles-append 5003-patch-no-directory-watcher-on-snowleopard.diff
 
+            # reexported_symbols_list is available on 10.7+ only, used by libcxx
+            patchfiles-append 5004-patch-libcxx-reexport-symbols-lionorgreater-only.diff
+
             # the libcxx installed by MacPorts on darwin 10 and less does not correspond to Apple's builtin libcxx
             patchfiles-append 5005-MacPorts-only-patch-libcxx-includes-disable-availability-tests.diff
         }
@@ -384,6 +383,8 @@ if {${subport} eq "clang-${llvm_version}"} {
         system "cd ${destroot.dir}/tools/clang && ${destroot.cmd} ${destroot.pre_args} ${destroot.target} ${destroot.post_args}"
         system "cd ${destroot.dir}/projects/compiler-rt && ${destroot.cmd} ${destroot.pre_args} ${destroot.target} ${destroot.post_args}"
         system "cd ${destroot.dir}/projects/libcxx && ${destroot.cmd} ${destroot.pre_args} ${destroot.target} ${destroot.post_args}"
+        system "cd ${destroot.dir}/projects/libcxxabi && ${destroot.cmd} ${destroot.pre_args} ${destroot.target} ${destroot.post_args}"
+        system "cd ${destroot.dir}/projects/lld && ${destroot.cmd} ${destroot.pre_args} ${destroot.target} ${destroot.post_args}"
 
         delete ${destroot}${sub_prefix}/bin/clang
         file rename ${destroot}${sub_prefix}/bin/clang-${clang_executable_version} ${destroot}${sub_prefix}/bin/clang

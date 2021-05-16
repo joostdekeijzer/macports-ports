@@ -3,11 +3,8 @@
 PortSystem          1.0
 PortGroup           golang 1.0
 
-go.setup            github.com/go-acme/lego 4.1.3 v
+go.setup            github.com/go-acme/lego 4.3.1 v
 revision            0
-
-categories          security
-license             MIT
 
 homepage            https://go-acme.github.io/lego
 
@@ -20,24 +17,23 @@ long_description    {*}${description}. Supports ACME v2 RFC 8555.  Allows \
                     for ACME challenges (HTTP, DNS, TLS), certificate \
                     bundling, and more.
 
-maintainers         {gmail.com:herby.gillot @herbygillot} \
-                    openmaintainer
-
-build.pre_args      -o ./dist/${name} -ldflags '-X \"main.version=${version}\"'
-build.args          ./cmd/lego
-
+categories          security www
+license             MIT
 installs_libs       no
 
 # Do not restrict Go from downloading dependencies at build time.
 build.env-delete    GOPROXY=off GO111MODULE=off
 
-checksums           rmd160  3ef7bdebd943803e075077426c3b4c69ea894921 \
-                    sha256  4c56449d66d15ff0b32d2ffbe28f596aecfb835b7cfa082ee7b7bbd6b775b12a \
-                    size    418697
+build.cmd           make
+build.pre_args      VERSION=v${version}
+build.args          build
 
-pre-build {
-    file mkdir ${worksrcpath}/dist
-}
+maintainers         {gmail.com:herby.gillot @herbygillot} \
+                    openmaintainer
+
+checksums           rmd160  2f9851f2d101743fd7b71fdfac940c79a379d601 \
+                    sha256  5f57c34b6142baf5cc7dfcc3e4ea382ac1a8a29e23a9acad310740d4e0985db8 \
+                    size    458203
 
 destroot {
     xinstall -m 755 ${worksrcpath}/dist/${name} ${destroot}${prefix}/bin/

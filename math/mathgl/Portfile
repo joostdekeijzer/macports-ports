@@ -5,7 +5,7 @@ PortGroup           cmake 1.0
 
 name                mathgl
 version             2.4.4
-revision            3
+revision            4
 categories          math
 license             GPL-3
 maintainers         {mps @Schamschula} openmaintainer
@@ -25,15 +25,10 @@ checksums           rmd160  ff6b87430832ea45a68ebd2f581ccfa0d3b22a8a \
 depends_lib-append  path:lib/libfltk.dylib:fltk \
                     port:giflib \
                     port:libpng \
-                    port:jpeg \
+                    path:include/turbojpeg.h:libjpeg-turbo \
                     port:zlib \
                     port:gsl \
                     port:hdf5
-
-# gif_lib.h defines TRUE and FALSE as a
-#    "backward-compatibility hack; these will go away in 5.0"
-# TRUE and FALSE are also defined in jmorecfg.h
-patchfiles-append   patch-jpeg.diff
 
 # find correct site-package location
 patchfiles-append   patch-python.diff

@@ -162,7 +162,13 @@ proc cmake::handle_generator {option action args} {
                                 port:ninja
                 build.cmd       ninja
                 # force Ninja to use the exact number of requested build jobs
-                build.post_args -j${build.jobs} -v
+                # Need to check use_parallel_build here, as build.jobs is still > 1
+                # even if use_parallel_build=no ....
+                set njobs ${build.jobs}
+                if { ![option use_parallel_build] } {
+                    set njobs 1
+                }
+                build.post_args -j${njobs} -v
                 destroot.target install
                 # ninja needs the DESTDIR argument in the environment
                 destroot.destdir
@@ -202,7 +208,11 @@ proc cmake::ccaching {} {
     if {${cccache} && [file exists ${prefix}/bin/ccache]} {
         return [list \
             -DCMAKE_C_COMPILER_LAUNCHER=${prefix}/bin/ccache \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=${prefix}/bin/ccache]
+            -DCMAKE_CXX_COMPILER_LAUNCHER=${prefix}/bin/ccache \
+            -DCMAKE_Fortran_COMPILER_LAUNCHER=${prefix}/bin/ccache \
+            -DCMAKE_OBJC_COMPILER_LAUNCHER=${prefix}/bin/ccache \
+            -DCMAKE_OBJCXX_COMPILER_LAUNCHER=${prefix}/bin/ccache \
+            -DCMAKE_ISPC_COMPILER_LAUNCHER=${prefix}/bin/ccache ]
     }
 }
 
@@ -222,6 +232,8 @@ default configure.pre_args {[list \
                     {*}[cmake::ccaching] \
                     {-DCMAKE_C_COMPILER="$CC"} \
                     {-DCMAKE_CXX_COMPILER="$CXX"} \
+                    {-DCMAKE_OBJC_COMPILER="$CC"} \
+                    {-DCMAKE_OBJCXX_COMPILER="$CXX"} \
                     -DCMAKE_POLICY_DEFAULT_CMP0025=NEW \
                     -DCMAKE_POLICY_DEFAULT_CMP0060=NEW \
                     -DCMAKE_VERBOSE_MAKEFILE=ON \
@@ -432,7 +444,7 @@ platform darwin {
 
         configure.args-append -DCMAKE_OSX_DEPLOYMENT_TARGET="${macosx_deployment_target}"
 
-        if {${configure.sdkroot} != ""} {
+        if {${configure.sdkroot} ne ""} {
             configure.args-append -DCMAKE_OSX_SYSROOT="${configure.sdkroot}"
         } else {
             configure.args-append -DCMAKE_OSX_SYSROOT="/"

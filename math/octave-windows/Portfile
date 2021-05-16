@@ -3,15 +3,15 @@
 PortSystem          1.0
 PortGroup           octave 1.0
 
-octave.setup        windows 1.5.0
-revision            1
+octave.setup        windows 1.6.1
+revision            0
 platforms           darwin
 license             GPL-2+
 maintainers         nomaintainer
 description         Provides COM interface and additional \
                     functionality on Windows.
-long_description    ${description}
+long_description    {*}${description}
 
-checksums           rmd160  259a6f0c7abbc41d3512d7e733a77d49b8b5178f \
-                    sha256  6a74abf203aae61542dbb8ff66b0ca6856b87c30a736591fdf699980f0707a15 \
-                    size    302719
+checksums           rmd160  04a5e26a764ac8bc4c2de70da9f3f818afa69161 \
+                    sha256  66f5410595ebccdb49ef5bb199473eb48115dd4c87bf74bb230c21f0a5810d84 \
+                    size    323414

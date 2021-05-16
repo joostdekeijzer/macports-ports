@@ -14,12 +14,12 @@ perl5.create_variants   ${perl5.branches}
 # therefore omit version suffixes on linked binaries
 perl5.link_binaries_suffix
 
-github.setup            XMLTV xmltv 0.6.1 v
-perl5.setup             xmltv 0.6.1
+github.setup            XMLTV xmltv 1.0.0 v
+perl5.setup             xmltv 1.0.0
 revision                1
-checksums           rmd160  28454a829db2bbe762a4a45dc21d93f225eded6f \
-                    sha256  930b97b8ae399016aa7b70feea82f47a5049f2d3bd22bb0161aea835d3e51221 \
-                    size    838492
+checksums           rmd160  05d527ddfc40105237752819c39aeb466d7bfa3a \
+                    sha256  f303293c0ebf943ab463f151ccbc85764829b6200bce169fb6f4b48e9077fae1 \
+                    size    780309
 
 description             utilities to download tv listings and format them in xml 
 long_description        ${description}
@@ -71,6 +71,7 @@ depends_lib-append      port:p${perl5.major}-archive-zip \
                         port:p${perl5.major}-json-xs \
                         port:p${perl5.major}-lingua-preferred \
                         port:p${perl5.major}-list-moreutils \
+                        port:p${perl5.major}-lwp-protocol-https \
                         port:p${perl5.major}-lwp-useragent-determined \
                         port:p${perl5.major}-soap-lite \
                         port:p${perl5.major}-term-progressbar \
@@ -88,6 +89,8 @@ depends_lib-append      port:p${perl5.major}-archive-zip \
 
 # These dependencies are missing for tv_grab_it_dvb:
 #    Linux::DVB
+# These dependencies are missing for tv_grab_pt_vodafone:
+#    URI::Encode
 # These dependencies are missing for tv_check:
 #    Tk::TableMatrix
 # the scripts are created but not linked by port select
@@ -102,6 +105,8 @@ post-destroot {
     file delete ${destroot}${xmllnk}/tv_check
     file delete ${destroot}${xmlbin}/tv_grab_it_dvb
     file delete ${destroot}${xmllnk}/tv_grab_it_dvb
+    file delete ${destroot}${xmlbin}/tv_grab_pt_vodafone
+    file delete ${destroot}${xmllnk}/tv_grab_pt_vodafone
 
     xinstall -m 0755 -d ${destroot}${docdir}
 
@@ -110,7 +115,7 @@ post-destroot {
 # several example files
     xinstall -m 0644 -W ${worksrcpath} \
         COPYING \
-        README \
+        README.md \
         authors.txt \
         xmltv-lineups.xsd \
         xmltv.dtd \
@@ -119,3 +124,7 @@ post-destroot {
         doc/QuickStart \
         ${destroot}${docdir}
 }
+
+livecheck.type      regex
+livecheck.url       ${github.homepage}/tags
+livecheck.regex     v(\\d+(?:\\.\\d+)*).tar.gz

@@ -3,11 +3,11 @@
 PortSystem          1.0
 
 name                dar
-version             2.6.13
+version             2.7.1
 revision            0
-checksums           rmd160  295adf41ecf0dad4073c2d1d925b042960b01849 \
-                    sha256  3fea9ff9e55fb9827e17a080de7d1a2605b82c2320c0dec969071efefdbfd097 \
-                    size    2148732
+checksums           rmd160  0fe25e0151747345f1798f0f00b364d018005c86 \
+                    sha256  76dade8adbeb817ffc78bf592c8200487ab5650234cf539539a9cbc5d346beef \
+                    size    2290659
 
 categories          archivers
 platforms           darwin
@@ -19,15 +19,17 @@ description         Disk Archiver
 long_description    dar is a shell command that backs up directory trees \
                     and files.
 
-homepage            http://dar.sourceforge.net/
+homepage            https://dar.sourceforge.io
 master_sites        sourceforge:project/dar/dar/${version}
 
 depends_build       port:doxygen \
                     port:pkgconfig
 
-depends_lib         port:bzip2 \
+depends_lib         port:argon2 \
+                    port:bzip2 \
                     port:curl \
                     port:gettext \
+                    port:gpgme \
                     port:libgcrypt \
                     port:libiconv \
                     port:lzo2 \
@@ -37,8 +39,11 @@ depends_lib         port:bzip2 \
 
 patchfiles          dynamic_lookup-11.patch
 
-compiler.cxx_standard 2011
+compiler.cxx_standard 2014
 compiler.thread_local_storage yes
+
+# https://github.com/Edrusb/DAR/issues/29
+configure.cxxflags-append -std=c++14
 
 universal_variant   no
 

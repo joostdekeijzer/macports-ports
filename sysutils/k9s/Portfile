@@ -3,12 +3,19 @@
 PortSystem          1.0
 PortGroup           golang 1.0
 
-go.setup            github.com/derailed/k9s 0.24.2 v
+go.setup            github.com/derailed/k9s 0.24.9 v
+revision            0
+
 homepage            https://k9scli.io
 
 categories          sysutils devel
-maintainers         {breun.nl:nils @breun} openmaintainer
-description         K9s
+
+maintainers         {breun.nl:nils @breun} \
+                    {gmail.com:herby.gillot @herbygillot} \
+                    openmaintainer
+
+description         K9s - Kubernetes CLI To Manage Your Clusters In Style
+
 long_description    K9s provides a curses based terminal UI to interact with \
                     your Kubernetes clusters. The aim of this project is to \
                     make it easier to navigate, observe and manage your \
@@ -17,18 +24,19 @@ long_description    K9s provides a curses based terminal UI to interact with \
                     interact with observed Kubernetes resources.
 
 platforms           darwin
-supported_archs     x86_64
 license             Apache-2
+installs_libs       no
 
-checksums           rmd160  dd04ff16073e42b6ace63e3cc9634a189f7b0185 \
-                    sha256  8fd17f788b0b952974716c557a159287d5e38e8eb0b8aa5c177b1d1034a3192a \
-                    size    6181931
+checksums           rmd160  7873840b1c2814e0f4dcf885260363639fcdf728 \
+                    sha256  d4a97a244d2320e42015505e4d78dd1a459adf822371e5e910f6b33027b290ae \
+                    size    6194364
 
+set build_date      [exec date +%FT%T%z]
 # Reproduce the "build" target from the upstream Makefile
 set go_ldflags      "-w -s \
     -X ${go.package}/cmd.version=v${version} \
     -X ${go.package}/cmd.commit=unknown \
-    -X ${go.package}/cmd.date=unknown"
+    -X ${go.package}/cmd.date=${build_date}"
 build.args          -ldflags \"${go_ldflags}\" ${go.package}
 
 # FIXME: This port currently can't be built without allowing go mod to fetch
@@ -39,3 +47,5 @@ build.env-delete    GOPROXY=off GO111MODULE=off
 destroot {
     xinstall -m 0755 ${worksrcpath}/${name} ${destroot}${prefix}/bin/
 }
+
+github.tarball_from archive

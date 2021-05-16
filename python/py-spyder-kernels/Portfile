@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-spyder-kernels
-version             1.10.1
+version             2.0.2
 revision            0
 epoch               1
 
@@ -19,22 +19,27 @@ long_description    ${description}
 
 homepage            https://github.com/spyder-ide/spyder-kernels
 
-checksums           rmd160  b1985c87cf07c53cb1f591ea56d410b3ff53b9c5 \
-                    sha256  416534d7504c0f337e6e6e2cbd893d1866ad20d3bec99a94ad617d2fd60699ae \
-                    size    61507
+checksums           rmd160  0429a6731c06d9a099595fca40894ad5144dfe5c \
+                    sha256  83bfd8fb1a73f06843cd8c918d45b9e8675c73c2c7eba55ef8b71bdf1d3bba5a \
+                    size    63809
 
 python.versions     27 35 36 37 38 39
 
 if {${name} ne ${subport}} {
     if {${python.version} in "36 37 38"} {
-        conflicts       py${python.version}-spyder-kernels-devel
+        conflicts   py${python.version}-spyder-kernels-devel
     }
+
+    # remove version cap on decorator
+    patchfiles-append \
+                    patch-setup.py.diff
 
     depends_build-append \
                     port:py${python.version}-setuptools
 
     depends_lib-append \
                     port:py${python.version}-cloudpickle \
+                    port:py${python.version}-decorator \
                     port:py${python.version}-ipykernel \
                     port:py${python.version}-jupyter_client \
                     port:py${python.version}-wurlitzer \

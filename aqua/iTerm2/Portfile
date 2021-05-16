@@ -6,11 +6,11 @@ PortGroup           xcodeversion 1.0
 
 
 if {${os.major} > 17} {
-    version             3.4.3
+    version             3.4.6
     revision            0
-    checksums           rmd160  d625bfb03db87e4574dccbbf422f2f571517b0f6 \
-                        sha256  3bec3a09a74e7219e71b1c1c5c0c20773b25addd700b96f2f41e5d906dec03c5 \
-                        size    23220589
+    checksums           rmd160  699ffdb3fb911c0cc2ee3e274253694345aaf8df \
+                        sha256  c6bd43aa2b1f2ff09e3180b7e2f2107ea42f4eaee48a27daf7a8889288a6cfb5 \
+                        size    28916294
     patchfiles          patch-Makefile-XC10.diff \
                         patch-remove-sparkle-3.4.diff \
                         patch-nsur.diff
@@ -73,7 +73,7 @@ post-destroot {
     }
 }
 
-minimum_xcodeversions {16 9.0 17 10.0}
+minimum_xcodeversions {16 9.0 17 10.0 18 11.0}
 
 if {${os.platform} eq "darwin" && ${os.major} < 16} {
     known_fail      yes

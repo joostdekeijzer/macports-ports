@@ -9,11 +9,11 @@ PortGroup                   muniversal 1.0
 PortGroup                   legacysupport 1.0
 legacysupport.newest_darwin_requires_legacy 10
 
-github.setup                libgd libgd 2.3.0 gd-
+github.setup                libgd libgd 2.3.2 gd-
 revision                    0
-checksums                   rmd160  c490d426083763bb6fc678da98a4bf6b26dc2bdb \
-                            sha256  ecd9155b9a417fb3f837f29e5966323796de247789163761dd72dbf83bfcac58 \
-                            size    2539188
+checksums                   rmd160  6d88b4cdee53d8ff4a1559cfbf1cd7a1da1fee0d \
+                            sha256  478a047084e0d89b83616e4c2cf3c9438175fb0cc55d8c8967f06e0427f7d7fb \
+                            size    2821096
 
 name                        gd2
 categories                  graphics
@@ -43,7 +43,8 @@ depends_build               port:gettext
 
 depends_lib                 port:freetype \
                             port:fontconfig \
-                            port:jpeg \
+                            path:include/turbojpeg.h:libjpeg-turbo \
+                            port:libheif \
                             port:libiconv \
                             port:libpng \
                             port:tiff \
@@ -52,14 +53,18 @@ depends_lib                 port:freetype \
 
 patchfiles                  patch-src-gdft.c.diff
 
+# Supports libavif but we don't have a port for it yet.
+
 configure.args-append       --disable-werror \
                             --with-freetype=${prefix} \
                             --with-fontconfig=${prefix} \
+                            --with-heif=${prefix} \
                             --with-jpeg=${prefix} \
                             --with-png=${prefix} \
                             --with-tiff=${prefix} \
                             --with-webp=${prefix} \
                             --with-zlib=${prefix} \
+                            --without-avif \
                             --without-liq \
                             --without-x \
                             --without-xpm

@@ -4,11 +4,11 @@ PortSystem          1.0
 PortGroup           github 1.0
 PortGroup           xcode 1.0
 
-github.setup        rharder imagesnap 0.2.6
+github.setup        rharder imagesnap 0.2.12
 revision            0
-checksums           rmd160  44eeb357a3bb5101940a0e7ccffe3fe62bb4b971 \
-                    sha256  e55c9f8c840c407b7441c16279c39e004f6225b96bb64ff0c2734da18a759033 \
-                    size    44592
+checksums           rmd160  925c467c0e6972967a7d662a8fd50c6fa8f4f196 \
+                    sha256  34ba713a79b7e0598bd598441dc2ba4045cf503e13f14e71575ead5bc5257c7d \
+                    size    10701
 
 name                ImageSnap
 categories          sysutils graphics
@@ -40,14 +40,10 @@ if {${os.major} < 9} {
     master_sites    sourceforge:project/iharder/imagesnap
     distname        ${name}-v${version}
     extract.suffix  .tgz
+    set readme      ReadMeOrDont.rtf
 } else {
-    patchfiles      dont-exit-until-the-file-is-saved.patch \
-                    save-to-the-right-filename.patch \
-                    version.patch
-
-    post-patch {
-        reinplace "s|@VERSION@|${version}|g" ${worksrcpath}/ImageSnap.m
-    }
+    patchfiles      README.md.patch
+    set readme      README.md
 }
 
 post-extract {
@@ -60,5 +56,5 @@ xcode.destroot.path ${prefix}/bin
 post-destroot {
     set docdir ${destroot}${prefix}/share/doc/${name}
     xinstall -d ${docdir}
-    xinstall -m 0644 -W ${worksrcpath} ReadMeOrDont.rtf ${docdir}
+    xinstall -m 0644 -W ${worksrcpath} ${readme} ${docdir}
 }

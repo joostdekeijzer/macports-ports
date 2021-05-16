@@ -1,6 +1,6 @@
 PortSystem 1.0
 name             epic5
-version          2.1.2
+version          2.1.4
 categories       irc
 maintainers      {toby @tobypeterson} openmaintainer
 description      (E)nhanced (P)rogrammable (I)RC-II (C)lient 5
@@ -20,9 +20,9 @@ master_sites     http://ftp.epicsol.org/pub/epic/EPIC5-PRODUCTION/ \
                  ftp://ftp.epicsol.org/pub/epic/EPIC5-PRODUCTION/
 use_xz           yes
 
-checksums        rmd160 acdb97910a3e2f5c36edbea2655b5e856a46434c \
-                 sha256 5e41cf00f924e79e3503dd456ecd9b1dd93ac447c2573d4fa7da03b8bd19dbad \
-                 size   853124
+checksums        rmd160 cb7835f99d73586f32e80059c816ba8c957f2e23 \
+                 sha256 ddea079c9362fc446701c9fdeeae9ed8f6523fbc15ee75fbadb1d6ee292e11bf \
+                 size   859964
 
 patchfiles       patch-configure
 

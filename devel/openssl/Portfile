@@ -5,7 +5,7 @@ PortGroup           muniversal 1.0
 
 name                openssl
 epoch               1
-version             1.1.1i
+version             1.1.1k
 revision            0
 
 # Please revbump these ports when updating OpenSSL.
@@ -41,9 +41,9 @@ master_sites        ${homepage}/source \
                     ftp://ftp.linux.hr/pub/openssl/source/ \
                     ftp://guest.kuria.katowice.pl/pub/openssl/source/
 
-checksums           rmd160  95a45fa7c2240dde179e8f8028f998bfa5177cc3 \
-                    sha256  e8be6a35fe41d10603c3cc635e93289ed00bf34b79671a3a4de64fcee00d5242 \
-                    size    9808346
+checksums           rmd160  5c9fbbeae7d115e59be705162e58195517a37cae \
+                    sha256  892a0875b9872acd04a9fde79b1f943075d5ea162415de3047c327df33fbaee5 \
+                    size    9823400
 
 if {${os.platform} eq "darwin" && ${os.major} < 11} {
     # Having the stdlib set to libc++ on 10.6 causes a dependency on a
@@ -91,7 +91,10 @@ platform darwin {
 # Don't pass --host to configure.
 array set merger_host {ppc {} i386 {} ppc64 {} x86_64 {} arm64 {}}
 
-if {![variant_isset universal]
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
+if {(!${universal_possible} || ![variant_isset universal])
         && [info exists merger_configure_args(${configure.build_arch})]} {
     configure.args-append $merger_configure_args(${configure.build_arch})
 }
@@ -102,8 +105,8 @@ use_parallel_build  no
 
 test.run            yes
 
-if {[variant_isset universal]} {
-    pre-destroot {
+pre-destroot {
+    if {[variant_exists universal] && [variant_isset universal]} {
         global merger_dont_diff
         if {[llength ${universal_archs_to_use}] > 2} {
             lappend merger_dont_diff ${prefix}/include/openssl/opensslconf.h

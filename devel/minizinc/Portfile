@@ -7,7 +7,7 @@ PortGroup           github 1.0
 # Need strndup()
 PortGroup           legacysupport 1.0
 
-github.setup        MiniZinc libminizinc 2.5.3
+github.setup        MiniZinc libminizinc 2.5.5
 name                minizinc
 revision            0
 
@@ -28,13 +28,11 @@ long_description    {*}${description} You can use MiniZinc to model \
 maintainers         {gmail.com:herby.gillot @herbygillot} \
                     openmaintainer
 
-checksums           rmd160  da12d7a9cb4b4b72b0c9f2439d825a8a07cf43b6 \
-                    sha256  67eba09d12a28419ba9624061166dce5998cd467be3082fb97b5ba01c969fcf2 \
-                    size    12586186
+checksums           rmd160  3bda69f4c4de414f1149051bf520f6d17664624a \
+                    sha256  22b40b7d86c1db79c1f291c0a1b822f47738abcd44fdb1269cd3a6b9f30a452f \
+                    size    12595439
 
 legacysupport.newest_darwin_requires_legacy 10
-
-cmake.build_type    Release
 
 categories          devel
 license             MPL-2
@@ -42,3 +40,6 @@ platforms           darwin linux
 
 depends_build-append \
                     port:bison
+
+configure.args-append \
+                    -DUSE_CCACHE=OFF

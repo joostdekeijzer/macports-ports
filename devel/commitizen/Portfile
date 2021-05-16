@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                commitizen
-version             2.13.0
+version             2.17.5
 revision            0
 categories-prepend  devel
 platforms           darwin
@@ -12,7 +12,7 @@ license             MIT
 supported_archs     noarch
 
 python.default_version \
-                    38
+                    39
 
 maintainers         {@harens gmail.com:harensdeveloper} \
                     openmaintainer
@@ -26,9 +26,9 @@ long_description    Commitizen is a tool designed for teams. Its main purpose is
 
 homepage            https://${name}-tools.github.io/${name}/
 
-checksums           rmd160  a2c44fa8c786dee49894728647b81223133a4ace \
-                    sha256  bef4c1dcb63eb8fc5cb6ca4bfa547c227caab8f69732c0fd72cb9f41a8de2e35 \
-                    size    30390
+checksums           rmd160  0de85c3ca7b25eb904a8d0cce3f345a27cc9ff9f \
+                    sha256  02595f743a1f012b70ed2981c42e2d6b9ee04164ca1bcb929cc5286f33cfc38b \
+                    size    31316
 
 depends_lib-append \
     port:py${python.version}-setuptools
@@ -54,5 +54,3 @@ variant bash description {Include Bash completion support} {
         To use bash completion, run the following:
             register-python-argcomplete-${python.branch} cz >> ~/.bashrc"
 }
-
-livecheck.type      pypi

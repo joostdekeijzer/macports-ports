@@ -1,0 +1,39 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           github 1.0
+PortGroup           java 1.0
+
+name                VisualVM
+
+github.setup        oracle visualvm 2.0.7
+github.tarball_from releases
+
+categories          java
+platforms           macosx
+supported_archs     x86_64
+license             GPL-2
+maintainers         {gmx.net:lothar.haeger @lhaeger} openmaintainer
+
+description         All-in-One Java Troubleshooting Tool
+long_description    VisualVM is a visual tool integrating commandline JDK tools and lightweight profiling capabilities. \
+                    Designed for both development and production time use.
+
+homepage            https://visualvm.github.io
+
+distname            [strsed ${name}_${version} {g/[.]//}]
+use_dmg             yes
+
+checksums           rmd160  4a1ce847c1a1327e034989258901dfbb4ec0b964 \
+                    sha256  50352c34f76ea7ab9368d2e381b499bfbe7f9d8ba96feb49ad436e33084647cc \
+                    size    20073480
+
+java.version        1.8+
+java.fallback       openjdk11
+
+use_configure       no
+build               {}
+
+destroot {
+    copy ${worksrcpath}/${name}.app ${destroot}${applications_dir}
+}

@@ -80,7 +80,7 @@ proc texlive.mktexlsr {} {
 
     # If mtxrun is available (i.e. ConTeXt is installed), update its
     # cache too. If it's not installed, that's OK.
-    if [file exists "${prefix}/bin/mtxrun"] {
+    if {[file exists "${prefix}/bin/mtxrun"]} {
         system "${prefix}/bin/mtxrun --generate"
     }
 }
@@ -90,7 +90,7 @@ proc texlive.mktexlsr {} {
 proc texlive.removedocdepends {} {
     global depends_lib
     foreach dep $depends_lib {
-        if [regexp {^port:texlive-documentation-} $dep] {
+        if {[regexp {^port:texlive-documentation-} $dep]} {
             depends_lib-delete $dep
         }
     }
@@ -205,13 +205,13 @@ proc texlive.texmfport {} {
                 set srcfile ${worksrcpath}/${indexname}/$line
 
                 # check for manpages and treat specially
-                if [regexp {^texmf/doc/man/man(\d)/([^/]+)} $line -> section filename] {
-                    if [string match "*.$section" $filename] {
+                if {[regexp {^texmf/doc/man/man(\d)/([^/]+)} $line -> section filename]} {
+                    if {[string match "*.$section" $filename]} {
                         # actually a manpage; install it.  If
                         # texlive-bin installed a manpage with the
                         # same name, use it instead to make sure the
                         # documentation matches the binary.
-                        if [file exists ${texlive_bindir}/man${section}/$filename.gz] {
+                        if {[file exists ${texlive_bindir}/man${section}/$filename.gz]} {
                             ln -s ${texlive_bindir}/man${section}/$filename.gz \
                                 ${destroot}${prefix}/share/man/man$section/
                         } else {
@@ -258,7 +258,7 @@ proc texlive.texmfport {} {
         close $docfile
 
         # install fmtutil.cnf file
-        if {${texlive.formats} != ""} {
+        if {${texlive.formats} ne ""} {
             xinstall -d ${destroot}${texlive_texmfsysconfig}/fmtutil.d
             set fmtfilename \
                 ${destroot}${texlive_texmfsysconfig}/fmtutil.d/10${name}.cnf
@@ -310,7 +310,7 @@ proc texlive.texmfport {} {
         }
 
         # install updmap.cfg file
-        if {${texlive.maps} != ""} {
+        if {${texlive.maps} ne ""} {
             xinstall -d ${destroot}${texlive_texmfsysconfig}/updmap.d
             set mapfilename \
                 ${destroot}${texlive_texmfsysconfig}/updmap.d/10${name}.cfg
@@ -322,7 +322,7 @@ proc texlive.texmfport {} {
         }
 
         # install languages.dat and languages.def files
-        if {${texlive.languages} != ""} {
+        if {${texlive.languages} ne ""} {
             xinstall -d ${destroot}${texlive_texmfsysconfig}/language.d
             set langdatfilename \
                 ${destroot}${texlive_texmfsysconfig}/language.d/10${name}.dat
@@ -363,13 +363,13 @@ proc texlive.texmfport {} {
                 }
                 set qsynlist [join $qsyns ", "]
                 puts $langluafile "\t\tsynonyms = { $qsynlist },"
-                if {$langpatt != ""} {
+                if {$langpatt ne ""} {
                     puts $langluafile "\t\tpatterns = '$langpatt',"
                 }
-                if {$langhyph != ""} {
+                if {$langhyph ne ""} {
                     puts $langluafile "\t\thyphenation = '$langhyph',"
                 }
-                if {$langspecial != ""} {
+                if {$langspecial ne ""} {
                     puts $langluafile "\t\tpatterns = '$langspecial',"
                 }
                 puts $langluafile "\t},\n"
@@ -418,16 +418,16 @@ proc texlive.texmfport {} {
             # Otherwise, only update the config files that are
             # actually affected, and only generate the needed
             # formats.
-            if {${texlive.languages} != ""} {
+            if {${texlive.languages} ne ""} {
                 system "${prefix}/libexec/texlive-update-cnf language.dat"
                 system "${prefix}/libexec/texlive-update-cnf language.def"
                 system "${prefix}/libexec/texlive-update-cnf language.dat.lua"
             }
-            if {${texlive.maps} != ""} {
+            if {${texlive.maps} ne ""} {
                 system "${prefix}/libexec/texlive-update-cnf updmap.cfg"
                 catch {system "${prefix}/bin/updmap-sys"}
             }
-            if {${texlive.formats} != ""} {
+            if {${texlive.formats} ne ""} {
                 system "${prefix}/libexec/texlive-update-cnf fmtutil.cnf"
             }
 
@@ -435,9 +435,9 @@ proc texlive.texmfport {} {
             # patterns, then we need to regenerate all
             # formats. Otherwise, just generate the formats we just
             # installed.
-            if {${texlive.languages} != ""} {
+            if {${texlive.languages} ne ""} {
                 catch {system "${prefix}/bin/fmtutil-sys --all"}
-            } elseif {${texlive.formats} != ""} {
+            } elseif {${texlive.formats} ne ""} {
                 foreach x ${texlive.formats} {
                     set fmtname [lindex $x 1]
                     catch {system "${prefix}/bin/fmtutil-sys --byfmt $fmtname"}
@@ -459,15 +459,15 @@ proc texlive.texmfport {} {
         if {${texlive.use_mktexlsr} && ${texlive.use_mktexlsr_on_deactivate}} {
             texlive.mktexlsr
         }
-        if {${texlive.forceupdatecnf} || ${texlive.languages} != ""} {
+        if {${texlive.forceupdatecnf} || ${texlive.languages} ne ""} {
             system "${prefix}/libexec/texlive-update-cnf language.dat"
             system "${prefix}/libexec/texlive-update-cnf language.def"
             system "${prefix}/libexec/texlive-update-cnf language.dat.lua"
         }
-        if {${texlive.forceupdatecnf} || ${texlive.maps} != ""} {
+        if {${texlive.forceupdatecnf} || ${texlive.maps} ne ""} {
             system "${prefix}/libexec/texlive-update-cnf updmap.cfg"
         }
-        if {${texlive.forceupdatecnf} || ${texlive.formats} != ""} {
+        if {${texlive.forceupdatecnf} || ${texlive.formats} ne ""} {
             system "${prefix}/libexec/texlive-update-cnf fmtutil.cnf"
         }
 

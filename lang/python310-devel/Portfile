@@ -6,7 +6,7 @@ PortGroup select 1.0
 name                python310-devel
 
 # Remember to keep py310-tkinter and py310-gdbm's versions sync'd with this
-version             3.10.0a4
+version             3.10.0b1
 
 set branch          [join [lrange [split ${version} .] 0 1] .]
 categories          lang
@@ -24,16 +24,16 @@ master_sites        ${homepage}ftp/python/3.10.0/
 
 distname            Python-${version}
 use_xz              yes
-checksums           md5 f59708a8a36365d58a82f75c374ebd5f \
-                    rmd160 e7d0df03f0128aa42916455d178437c061591eaf \
-                    sha256 31c1c197b219b8e1fdea37bf8b3931babd04762ae7fa281591053fa5b7a4ef73
+checksums           md5 8a1d22cc68dccffab13f5e2e0d005ef0 \
+                    rmd160 2775e624181180a3b4efd0e06af9b5f8e77fef24 \
+                    sha256 a30c55b26a91f4c76392ba2b2e87c2d591fdb2b36f7b58d39fe90bd400fef1a3
 
 patchfiles          patch-setup.py.diff \
                     patch-Lib-cgi.py.diff \
                     patch-configure.diff \
                     patch-Lib-ctypes-macholib-dyld.py.diff \
-                    patch-libedit.diff \
-                    patch-configure-xcode4bug.diff
+                    patch-configure-xcode4bug.diff \
+                    sysconfig.py.patch
 
 if {${os.platform} eq "darwin" && ${os.major} < 10} {
     # work around no copyfile and/or pthread_threadid_np on older systems
@@ -65,6 +65,7 @@ configure.args      --enable-framework=${frameworks_dir} \
                     --enable-loadable-sqlite-extensions \
                     --with-computed-gotos \
                     --with-ensurepip=no \
+                    --with-readline=editline \
                     --with-system-expat \
                     --with-system-ffi
 
@@ -119,11 +120,9 @@ platform darwin {
         # work for dependents that incorrectly use this variable to find out
         # how to link against python (see ticket #15099); instead we mirror
         # the behavior of `python-config --ldflags` here.
-        system -W ${buildlibdir} "awk -F : \
-            \"/'LINKFORSHARED'/ {printf \\\"%s: '-L${framewdir}/lib/python${branch}/${confdir}\
-            -lpython${branch} -ldl -framework CoreFoundation',\\n\\\", \\\$1; getline; next} {print}\"\
-            _sysconfigdata__darwin_darwin.py > _sysconfigdata__darwin_darwin.py.new"
-        file rename -force ${buildlibdir}/_sysconfigdata__darwin_darwin.py.new \
+        set lfs_pattern {^([[:space:]]*'LINKFORSHARED':).*}
+        set lfs_replacement "\\1 '-L${framewdir}/lib/python${branch}/${confdir} -lpython${branch} -ldl -framework CoreFoundation',"
+        reinplace -E s|${lfs_pattern}|${lfs_replacement}| \
             ${buildlibdir}/_sysconfigdata__darwin_darwin.py
 
         # remove -arch flags from the config
@@ -176,20 +175,38 @@ variant universal {
     post-patch {
         set universal_arch_flags {}
         set arch_run_32bit {}
+        set lipo_32bit_flags {}
+        set any64 no
         foreach arch ${universal_archs} {
             lappend universal_arch_flags -arch ${arch}
-            if {${arch} eq "i386" || ${arch} eq "ppc"} {
+            if {${arch} in {i386 ppc}} {
                 lappend arch_run_32bit -${arch}
+                lappend lipo_32bit_flags -extract ${arch}
+            } else {
+                set any64 yes
             }
         }
-        reinplace \
-          "s|UNIVERSAL_ARCH_FLAGS=\".*\"|UNIVERSAL_ARCH_FLAGS=\"${universal_arch_flags}\"|" \
-          ${worksrcpath}/configure
-        if {${arch_run_32bit} ne ""} {
-            reinplace \
-              "s|ARCH_RUN_32BIT=\".*\"|ARCH_RUN_32BIT=\"arch ${arch_run_32bit}\"|" \
-              ${worksrcpath}/configure
+        if {$any64} {
+            if {$arch_run_32bit eq ""} {
+                set arch_run_32bit true
+                set lipo_32bit_flags ""
+            } else {
+                set arch_run_32bit "/usr/bin/arch $arch_run_32bit"
+                #lipo_32bit_flags already correct
+            }
+        } else {
+            set arch_run_32bit ""
+            set lipo_32bit_flags ""
         }
+        reinplace \
+            "s|@@UNIVERSAL_ARCH_FLAGS@@|${universal_arch_flags}|" \
+            ${worksrcpath}/configure
+        reinplace \
+            "s|@@LIPO_32BIT_FLAGS@@|${lipo_32bit_flags}|" \
+            ${worksrcpath}/configure
+        reinplace \
+            "s|@@ARCH_RUN_32BIT@@|${arch_run_32bit}|" \
+            ${worksrcpath}/configure
     }
     if {${configure.sdkroot} ne ""} {
         configure.args-append   --enable-universalsdk=${configure.sdkroot}

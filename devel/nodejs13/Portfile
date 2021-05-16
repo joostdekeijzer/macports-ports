@@ -2,7 +2,7 @@
 
 PortSystem              1.0
 PortGroup               compiler_blacklist_versions 1.0
-PortGroup               legacysupport 1.0
+PortGroup               legacysupport 1.1
 
 # on macOS nodejs only builds against libc++
 # this force is OK as node does not link against any other c++ libs
@@ -26,7 +26,7 @@ long_description        Node's goal is to provide an easy way to build scalable 
                         Machine or Python's Twisted. Node takes the event model a bit further-it \
                         presents the event loop as a language construct instead of as a library.
 
-conflicts               nodejs8 nodejs10 nodejs12 nodejs14 nodejs15
+conflicts               nodejs8 nodejs10 nodejs12 nodejs14 nodejs15 nodejs16
 
 homepage                https://nodejs.org/
 master_sites            ${homepage}dist/v${version}
@@ -38,9 +38,9 @@ checksums               rmd160  22d2a26a283a015145ddc66dc9ce05ab1d381630 \
 
 distname                node-v${version}
 
-depends_build           port:pkgconfig
+depends_build-append    port:pkgconfig
 
-depends_lib             port:icu \
+depends_lib-append      port:icu \
                         port:python38 \
                         path:lib/libssl.dylib:openssl
 
@@ -63,9 +63,11 @@ post-patch {
                    ${worksrcpath}/tools/gyp/gyp \
                    ${worksrcpath}/deps/v8/tools/objdump-v8 \
                    [rec_glob ${worksrcpath} *.py]] {
+        reinplace -q "s|/usr/bin/env python3|${configure.python}|" ${f}
         reinplace -q "s|/usr/bin/env python|${configure.python}|" ${f}
     }
     foreach gypfile [rec_glob ${worksrcpath} *.gyp*] {
+        reinplace -q "s|'python3'|'${configure.python}'|" ${gypfile}
         reinplace -q "s|'python'|'${configure.python}'|" ${gypfile}
     }
 }

@@ -13,12 +13,11 @@ php.branches            5.3 5.4 5.5 5.6 7.0 7.1 7.2 7.3 7.4 8.0
 php.pecl                yes
 
 if {[vercmp ${php.branch} 7.0] >= 0} {
-    version             5.3.2
+    version             5.3.4
     revision            0
-    checksums           rmd160  2f0f853c687631453304ec9f1fbebcd6b2a388c5 \
-                        sha256  f4e92de628abcb917cdc810df045ca3fa0f2af34673eaa2a03350e3c5c5fdab1 \
-                        size    266814
-
+    checksums           rmd160  cee35d535a389bf41b68d158522919d8e3f65e92 \
+                        sha256  4b39056f3356f135255e059efd76398d1c7607c86bd52513e6341bb07a3fb4cc \
+                        size    268154
 } elseif {[vercmp ${php.branch} 5.3] >= 0} {
     version             4.3.0
     revision            0

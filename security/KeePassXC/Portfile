@@ -20,8 +20,8 @@ platforms               darwin
 license                 GPL-2+
 license_noconflict      openssl
 
-github.setup            keepassxreboot keepassxc 2.6.2
-revision                1
+github.setup            keepassxreboot keepassxc 2.6.4
+revision                0
 github.tarball_from     releases
 distname                keepassxc-${version}-src
 use_xz                  yes
@@ -29,13 +29,13 @@ distfiles-append        ${distname}${extract.suffix}.sig
 
 # See keepassxc-${version}-src.tar.xz.DIGEST on upstream GitHub releases page for SHA256 sums
 checksums               ${distname}${extract.suffix} \
-                        rmd160  a0d5a8aa6cae87adb8104b5c666f1009f9614209 \
-                        sha256  101bfade0a760d6ec6b8c4f3556e7f1201f1edd29ceabc73ad5846f9a57d7e38 \
-                        size    5720788 \
+                        rmd160  cfc515bfcda0c54c132ea44f6a2374aa2b1e0b37 \
+                        sha256  e536e2a71c90fcf264eb831fb1a8b518ee1b03829828f862eeea748d3310f82b \
+                        size    7575164 \
                         ${distname}${extract.suffix}.sig \
-                        rmd160  3e7a7dafedd0825152c886b02ef667a2da6ca1b4 \
-                        sha256  d7c803e7f262e7f99fc3ef920b12f526290be9a08ca9541b5bcafe31121cd4f9 \
-                        size    488
+                        rmd160  127e840b31666ecfd44dce4124f21cc48231cf13 \
+                        sha256  849367d10f6ca0936f130c4d091e10f422c863ee5088439a2b13bcc58dff8937 \
+                        size    499
 
 gpg_verify.use_gpg_verification \
                         yes

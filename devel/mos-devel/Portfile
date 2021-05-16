@@ -4,10 +4,10 @@ PortSystem          1.0
 PortGroup           golang 1.0
 
 name                mos-devel
-go.setup            github.com/mongoose-os/mos 8291cd5ccb64c455ef1a17c1bee917d1a0ee794e
+go.setup            github.com/mongoose-os/mos 9bf406d90c65fca0b377220940735015dcfbb76c
 conflicts           mos
 revision            0
-version             202012192021
+version             202102072216
 categories          devel
 license             Apache-2
 
@@ -67,11 +67,11 @@ destroot {
 }
 
 checksums           ${distname}${extract.suffix} \
-                        rmd160  6b066ac1a17d55ebf13daaa4a1310ae48320d86b \
-                        sha256  df6d0f4a5ea597947d64f3a977b2eefde94aed8ca43da4fc98d078385a69c036 \
-                        size    674760
+                        rmd160  8e8ba47761daca0a8cee0cc841f45659ba6f04af \
+                        sha256  f5a5ca320de4ea4c3cea63225423828338a77cfdcaec7d0777d38074b3abdcbe \
+                        size    675443
 
-# NOTES FOR UPDATING 
+# NOTES FOR UPDATING
 # github.com/docker/docker is now github.com/moby/moby
 # v17.12.0-ce-rc1.0.20181016164535-5271c7cb484d+incompatible of docker/docker should be v17.12.0-ce-rc1
 # github.com/go-ini/ini hash should be used, and placed above gopkg.in/ini.v1
@@ -191,11 +191,6 @@ go.vendors          k8s.io/klog \
                         rmd160  b805b5d5289522203baf525dd4cb74bae626ff29 \
                         sha256  006fa8c289cd49892caea60763e6fe69fd171539201e59e15cc13e22c9d8f3b9 \
                         size    206837 \
-                    github.com/zserge/webview \
-                        lock    1a9ebffc2601 \
-                        rmd160  31b012d28e32a9dbda3cb8c6b68f00755300b18a \
-                        sha256  dd65fe035195ea1ef237725ba4adf2ab7463aed2db7005e1f1c18678f0e4df83 \
-                        size    407123 \
                     github.com/xanzy/ssh-agent \
                         lock    v0.2.1 \
                         rmd160  356547460413381067ab37d9a8ce904dc91e5d9b \

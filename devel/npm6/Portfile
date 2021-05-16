@@ -3,7 +3,7 @@
 PortSystem          1.0
 
 name                npm6
-version             6.14.11
+version             6.14.13
 revision            0
 categories          devel
 platforms           darwin
@@ -15,7 +15,7 @@ long_description    npm is a package manager for node. \
                     You can use it to install and publish your node programs. \
                     It manages dependencies and does other cool stuff.
 
-conflicts           npm3 npm4 npm5
+conflicts           npm3 npm4 npm5 npm7
 
 homepage            https://www.npmjs.com/
 
@@ -25,11 +25,12 @@ distname            npm-${version}
 
 extract.suffix      .tgz
 
-# Please keep the sha1 - users can use it to validate sha values published on npmjs.org for the package
-checksums           sha1    e0b5598d7b9a42d275e61d8bd28cd7eee0074a3b \
-                    rmd160  e772ab0ba54c1e2df086c73c391e6f6307d233e8 \
-                    sha256  13ed5653ba2ac2b7bb65852ea2e8b2e247738850f6c07c69c22394cb22db56e0 \
-                    size    5942611
+# Please keep the sha1 - users can use it to validate sha values
+# published on npmjs.org for the package
+checksums           sha1    e88bcb6c48209869c40b5cedad8a1508e58e6f30 \
+                    rmd160  029ad30ceb83ba144d7c3599dfcc903abcdc010e \
+                    sha256  29f58763d9bc29291ff513bcef1c1a2d75e09f8ff882010c43b4b7dcdb56ab9c \
+                    size    5758507
 
 worksrcdir          "package"
 
@@ -37,7 +38,7 @@ depends_lib         path:bin/node:nodejs15
 
 platform darwin {
     if {${os.major} < 13} {
-        depends_lib-replace path:bin/node:nodejs14 path:bin/node:nodejs8
+        depends_lib-replace path:bin/node:nodejs15 path:bin/node:nodejs8
     }
 }
 
@@ -98,4 +99,4 @@ ${prefix}/lib/node_modules/ until you manually delete them.
 
 livecheck.type      regex
 livecheck.url       https://registry.npmjs.org/npm
-livecheck.regex     {"latest":"(.*?)"}
+livecheck.regex     {"latest-6":"(.*?)"}

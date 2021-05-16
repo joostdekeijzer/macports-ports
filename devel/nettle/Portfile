@@ -5,11 +5,12 @@ PortGroup           muniversal 1.0
 PortGroup           compiler_blacklist_versions 1.0
 
 name                nettle
-version             3.6
+version             3.7.2
 revision            0
-checksums           rmd160  26dd0cda467edff59ba98f0b9ce377a879f0a3dd \
-                    sha256  d24c0d0f2abffbc8f4f34dcf114b0f131ec3774895f3555922fe2f40f3d5e3f1 \
-                    size    2288173
+
+checksums           rmd160  78dced3b71dbcb531f0b0a27c8f9c858d1cbe47b \
+                    sha256  8d2a604ef1cde4cd5fb77e422531ea25ad064679ff0adf956e78b3352e0ef162 \
+                    size    2382309
 
 categories          devel crypto
 platforms           darwin
@@ -55,9 +56,12 @@ configure.args      --disable-openssl \
 # aes-decrypt-internal.s:76:8: error: vector register expected
 # aes-decrypt-internal.s:77:6: error: invalid operand for instruction
 # etc.
-set merger_configure_args(arm64) --disable-assembler
+set merger_configure_args(arm64) --build=aarch64-apple-darwin${os.major}
 
-if {![variant_isset universal] && [info exists merger_configure_args(${build_arch})]} {
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
+if {(!${universal_possible} || ![variant_isset universal]) && [info exists merger_configure_args(${build_arch})]} {
     configure.args-append $merger_configure_args(${build_arch})
 }
 

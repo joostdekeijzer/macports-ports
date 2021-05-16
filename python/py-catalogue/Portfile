@@ -6,11 +6,12 @@ PortGroup           python 1.0
 
 epoch               1
 # Don't upgrade past py-spaCy's highest supported version.
-github.setup        explosion catalogue 1.0.0 v
+github.setup        explosion catalogue 2.0.4 v
 revision            0
-checksums           rmd160  4c9cd255190c1fe4ac4d477732212b00a673df14 \
-                    sha256  172d02f89b5b53fcccace7e8c9a43eb94639489bb08ea709b323a5dcf20e6756 \
-                    size    8417
+
+checksums           rmd160  bafda6dd4b9d82b4441c93204f4c05c83fcb2cc8 \
+                    sha256  ef4c996a7b5d23cb8582a26baa69607d74d0032c07c166d0e887e7de72a21b18 \
+                    size    15691
 
 name                py-${github.project}
 categories-append   devel

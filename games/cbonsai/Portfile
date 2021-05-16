@@ -1,0 +1,40 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           gitlab   1.0
+PortGroup           makefile 1.0
+
+gitlab.setup        jallbrit cbonsai 1.0.4 v
+epoch               1
+revision            0
+
+description         grow bonsai trees in your terminal
+
+long_description    cbonsai is a bonsai tree generator, written in C using \
+                    ncurses. It intelligently creates, colors, and positions \
+                    a bonsai tree, and is entirely configurable via CLI \
+                    options-- see usage. There are 2 modes of operation: \
+                    static (the default), and live.
+
+categories          games
+license             GPL-3
+platforms           darwin linux freebsd
+installs_libs       no
+
+maintainers         {gmail.com:herby.gillot @herbygillot} \
+                    openmaintainer
+
+checksums           rmd160  7c09c9b195553a9b1fc916217973009586616b7f \
+                    sha256  ee8a0631c57884ddaa6be19cdba39185dede9b68bc53b72b608b90a2c9abd147 \
+                    size    19060
+
+depends_build       port:pkgconfig
+depends_lib         port:ncurses
+
+build.target        ${name}
+
+makefile.has_destdir    yes
+
+destroot {
+    xinstall -m 0755 ${worksrcpath}/${name} ${destroot}${prefix}/bin/
+}

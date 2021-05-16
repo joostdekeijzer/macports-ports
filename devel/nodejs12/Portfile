@@ -2,16 +2,16 @@
 
 PortSystem              1.0
 PortGroup               compiler_blacklist_versions 1.0
-PortGroup               legacysupport 1.0
+PortGroup               legacysupport 1.1
 
 # on macOS nodejs only builds against libc++
 # this force is OK as node does not link against any other c++ libs
 depends_lib-append      port:libcxx
 configure.cxx_stdlib    libc++
-compiler.cxx_standard   2011
+compiler.cxx_standard   2014
 
 name                    nodejs12
-version                 12.20.1
+version                 12.22.1
 
 categories              devel net
 platforms               darwin
@@ -25,21 +25,21 @@ long_description        Node's goal is to provide an easy way to build scalable 
                         Machine or Python's Twisted. Node takes the event model a bit further-it \
                         presents the event loop as a language construct instead of as a library.
 
-conflicts               nodejs8 nodejs10 nodejs13 nodejs14 nodejs15
+conflicts               nodejs8 nodejs10 nodejs13 nodejs14 nodejs15 nodejs16
 
 homepage                https://nodejs.org/
 master_sites            ${homepage}dist/v${version}
 use_xz                  yes
 
-checksums               rmd160  0e30c760735f9c1e769007d536044c230c2b8793 \
-                        sha256  e00eee325d705b2bfa9929b7d061eb2315402d7e8548945eac9870bf84321853 \
-                        size    23641412
+checksums               rmd160  840b4f5835a00136164d9950709957d476cf14bf \
+                        sha256  dd650df7773a6ed3e390320ba51ef33cba6499f0e9397709ea3d1debdcbcb989 \
+                        size    23650180
 
 distname                node-v${version}
 
-depends_build           port:pkgconfig
+depends_build-append    port:pkgconfig
 
-depends_lib             port:icu \
+depends_lib-append      port:icu \
                         port:python38 \
                         path:lib/libssl.dylib:openssl
 
@@ -62,9 +62,11 @@ post-patch {
                    ${worksrcpath}/tools/gyp/gyp \
                    ${worksrcpath}/deps/v8/tools/objdump-v8 \
                    [rec_glob ${worksrcpath} *.py]] {
+        reinplace -q "s|/usr/bin/env python3|${configure.python}|" ${f}
         reinplace -q "s|/usr/bin/env python|${configure.python}|" ${f}
     }
     foreach gypfile [rec_glob ${worksrcpath} *.gyp*] {
+        reinplace -q "s|'python3'|'${configure.python}'|" ${gypfile}
         reinplace -q "s|'python'|'${configure.python}'|" ${gypfile}
     }
 }
@@ -82,7 +84,7 @@ configure.args-append   --shared-openssl-includes=${prefix}/include/openssl
 configure.args-append   --shared-openssl-libpath=${prefix}/lib
 
 # V8 only supports ARM and IA-32 processors
-supported_archs         i386 x86_64
+supported_archs         i386 x86_64 arm64
 
 universal_variant       no
 
@@ -98,6 +100,9 @@ switch $build_arch {
     }
     x86_64 {
         configure.args-append   --dest-cpu=x64
+    }
+    arm64 {
+        configure.args-append   --dest-cpu=arm64
     }
 }
 

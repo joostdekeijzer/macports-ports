@@ -50,13 +50,26 @@ patchfiles              patch-Makefile.pre.in.diff \
                         patch-libedit.diff \
                         yosemite.patch \
                         improve-QuickTime.h-check.patch \
-                        darwin20.diff
+                        darwin20.diff \
+                        implicit.patch
 
 depends_lib             port:gettext port:zlib \
                         port:sqlite3 port:db46 port:ncurses \
                         port:bzip2 port:libedit
 depends_run             port:python_select \
                         port:python2_select
+
+platform darwin arm {
+    known_fail  yes
+    if {$build_arch ne "x86_64"} {
+        pre-fetch {
+            error "${name} cannot be built for Apple Silicon"
+        }
+        depends_build
+        depends_lib
+        depends_run
+    }
+}
 
 configure.args          --enable-framework=${frameworks_dir} \
                         --enable-ipv6

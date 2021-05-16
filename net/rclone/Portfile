@@ -3,8 +3,11 @@
 PortSystem          1.0
 PortGroup           golang 1.0
 
-go.setup            github.com/ncw/rclone 1.53.3 v
+go.setup            github.com/ncw/rclone 1.55.1 v
+revision            0
+
 homepage            http://rclone.org
+
 categories          net
 maintainers         {eborisch @eborisch} openmaintainer
 description         Rclone is a command line cloud-service sync program
@@ -16,11 +19,12 @@ long_description \
 license             MIT
 
 checksums \
-    rmd160  ed01e6f2119e05b7cbe9494a2af64b8a54527013 \
-    sha256  7eccc84b0fad51825d3392bd70d5c219a0f783040074ee5127f3f9671b4b8f64 \
-    size    14714425
+    rmd160  f5246d1017603601638d846d11d613b06606ca18 \
+    sha256  df557d2f31842b7476600808e4582cd1e0e28580747275b9021c78cce7d4e9f8 \
+    size    15073386
 
 platforms           darwin
+installs_libs       no
 
 # FIXME: This port currently can't be built without allowing go mod to fetch
 # dependencies during the build phase. See

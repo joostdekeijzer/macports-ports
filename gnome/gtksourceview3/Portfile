@@ -8,6 +8,7 @@ PortGroup           gobject_introspection 1.0
 name                gtksourceview3
 set gname           gtksourceview
 version             3.24.11
+revision            1
 license             LGPL-2.1+
 set branch          [join [lrange [split ${version} .] 0 1] .]
 maintainers         {devans @dbevans} openmaintainer
@@ -31,7 +32,8 @@ checksums           rmd160  34e86ab283b39f2778d5091a8595f5440598eb62 \
                     sha256  691b074a37b2a307f7f48edc5b8c7afa7301709be56378ccf9cc9735909077fd \
                     size    1438232
 
-depends_build       port:pkgconfig
+depends_build       port:gtk-doc \
+                    port:pkgconfig
 
 depends_lib         path:lib/pkgconfig/glib-2.0.pc:glib2 \
                     port:gettext \

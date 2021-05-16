@@ -5,7 +5,7 @@ PortGroup           kde4   1.1
 
 name                marble
 version             4.14.3
-revision            4
+revision            5
 categories          kde kde4
 maintainers         {nicos @NicosPavlov}
 license             LGPL-2.1+ GFDL-1.2
@@ -25,7 +25,8 @@ depends_lib-append  port:libkdeedu \
                     port:gpsd
 
 patchfiles-append   patch-GpsdSymbols.diff \
-                    patch-interfaces.diff
+                    patch-interfaces.diff \
+                    patch-gpsd.diff
 
 if {![variant_isset docs]} {
     patchfiles-append   patch-CMakeLists.txt.diff

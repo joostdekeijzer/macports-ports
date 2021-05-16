@@ -1,7 +1,7 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
-PortSystem 1.0
-PortGroup  active_variants 1.1
+PortSystem      1.0
+PortGroup       active_variants 1.1
 
 name            emacs
 
@@ -82,32 +82,36 @@ platform darwin {
 }
 
 if {$subport eq $name || $subport eq "emacs-app"} {
-    version         27.1
-    revision        5
+    version         27.2
+    revision        0
 
-    checksums       rmd160  9ddfd28ab54c4aee168eeecb783d13599e5b5288 \
-                    sha256  ffbfa61dc951b92cf31ebe3efc86c5a9d4411a1222b8a4ae6716cfd0e2a584db \
-                    size    65782481
-
-    # apply upstream patch to fix configure on arm machines
-    # See https://trac.macports.org/ticket/61594 and
-    # https://git.savannah.gnu.org/cgit/emacs.git/commit/configure.ac?id=4cba236749aafade7bd88cf2a10be48f44983faa
-    patchfiles-append patch-4cba236749aafade7bd88cf2a10be48f44983faa.diff \
-                      apple-silicon-codesign.diff
-    use_autoreconf  yes
+    checksums       rmd160  5cf2927984b34cfd611114190c8b7f498093e994 \
+                    sha256  80ff6118fb730a6d8c704dccd6915a6c0e0a166ab1daeef9fe68afa9073ddb73 \
+                    size    67153050
 }
 
 if {$subport eq "emacs-devel" || $subport eq "emacs-app-devel"} {
     # Need openat()
-    PortGroup       legacysupport 1.0
+    PortGroup       legacysupport 1.1
     legacysupport.newest_darwin_requires_legacy 13
 
-    epoch           2
-    version         20210105
+    # When bumping
+    # - be sure to update git.branch for the nativecomp variant as well
+    # - be sure to choose a date that exists for the native-comp branch as well
+    # This should no longer be required after native-comp is merged into master
+    # (expected in late April 2021)
+    set date        2021-04-30
+    epoch           4
+    version         [string map {- {}} ${date}]
 
     fetch.type      git
-    git.url         --depth=1000 https://github.com/emacs-mirror/emacs.git
-    git.branch      80e26472206cc44837521ba594cd50e724d9af5c
+    git.url         --shallow-since=${date}T00:00:00 https://github.com/emacs-mirror/emacs.git
+    git.branch      04266a2cacc0f0705d0d1abaada464b402cc7b07
+
+    # --shallow-since needs a newer version of git than on some older systems
+    # So use MacPorts version
+    depends_fetch-append port:git
+    git.cmd         ${prefix}/bin/git
 
     pre-configure {
         system -W ${worksrcpath} "sh ./autogen.sh"
@@ -116,14 +120,9 @@ if {$subport eq "emacs-devel" || $subport eq "emacs-app-devel"} {
     livecheck.type none
 
     variant nativecomp description {Builds emacs with native compilation support} {
-        git.url-prepend  --branch feature/native-comp
-        git.branch       8ad983c4acef60a80e8d6b6ba891b1ef957f2d7c
-
-        depends_build-append     port:coreutils
         depends_lib-append       port:gcc10
 
-        configure.install        ${prefix}/bin/ginstall
-        configure.args-append    --with-nativecomp
+        configure.args-append    --with-native-compilation
 
         compiler.cpath-prepend   ${prefix}/include/gcc10
         compiler.library_path-prepend \
@@ -131,13 +130,6 @@ if {$subport eq "emacs-devel" || $subport eq "emacs-app-devel"} {
 
         build.args-append        NATIVE_FULL_AOT=1 \
             {BYTE_COMPILE_EXTRA_FLAGS='--eval "(setq comp-speed 2)"'}
-
-        if {$subport eq "emacs-app-devel"} {
-            post-patch {
-                reinplace {s|^ELN_DESTDIR =.*|ELN_DESTDIR="${ns_appbindir}/../"|g} \
-                    Makefile.in
-            }
-        }
     }
 } else {
     livecheck.type  regex
@@ -164,7 +156,7 @@ if {$subport eq $name || $subport eq "emacs-devel"} {
         depends_lib-append      port:xorg-libXmu \
             port:xorg-libXaw \
             port:xpm \
-            port:jpeg \
+            path:include/turbojpeg.h:libjpeg-turbo \
             port:tiff \
             port:giflib \
             port:libpng \

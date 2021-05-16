@@ -1,11 +1,12 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
 PortSystem      1.0
+PortGroup       compiler_blacklist_versions 1.0
 PortGroup       python 1.0
 PortGroup       github 1.0
 
 name            py-protobuf3
-version         3.14.0
+version         3.17.0
 revision        0
 categories-append   devel
 maintainers     {toby @tobypeterson} openmaintainer
@@ -36,14 +37,16 @@ master_sites    https://github.com/google/protobuf/releases/download/v${version}
 distfiles       protobuf-python-${version}.tar.gz
 worksrcdir      protobuf-${version}
 
-checksums       sha256  969019c5fd9c1345f0b34afa06ab2664c1441d159d5ae87ded5fa01d79f028c1 \
-                rmd160  498920f161944574781c011ae5687753f34e36ef \
-                size    4982470
+checksums       sha256  3011bfbc18d1c695ee393cb0dc1042282cfa33ef6573fe82732aefc9f7286121 \
+                rmd160  f27cb62352e01ebc4171f19372be303ad80f39a4 \
+                size    5020336
 
 platforms       darwin
 
 compiler.cxx_standard  \
                 2011
+# error: constexpr constructor never produces a constant expression [-Winvalid-constexpr]
+compiler.blacklist {clang < 900}
 
 python.versions 27 35 36 37 38 39
 
@@ -58,6 +61,11 @@ if {${name} ne ${subport}} {
     depends_lib-append \
                     port:protobuf3-cpp \
                     port:py${python.version}-six
+
+    if {${python.version} > 36} {
+           depends_lib-append \
+               port:py${python.version}-flatbuffers
+    }
 
     worksrcdir      ${worksrcdir}/python
     
@@ -82,6 +90,7 @@ if {${name} ne ${subport}} {
         reinplace "s|@@MACPORTS_EXTRAARG@@|${extraargs}|g" setup.py
     }
 
+    build.cmd-append       --cpp_implementation
 
     destroot.cmd-append    --cpp_implementation
 

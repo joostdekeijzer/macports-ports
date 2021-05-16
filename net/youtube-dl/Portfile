@@ -4,11 +4,11 @@ PortSystem          1.0
 PortGroup           github 1.0
 PortGroup           python 1.0
 
-github.setup        ytdl-org youtube-dl 2021.01.03
+github.setup        ytdl-org youtube-dl 2021.04.26
 revision            0
-checksums           rmd160  989aefaa9a01bf9c271b7cc1e08266d39155b043 \
-                    sha256  91de98ce1ad5d53c912eb810dd747ed30825dbf7eacb09a385ce227232eb1163 \
-                    size    3258305
+checksums           rmd160  6df5914fa0dc9a6c40ff832f8e6deb90c73012dc \
+                    sha256  4ccf21f4a0daee0d58bef569c71dd459bd1f629248995b4e4856b6926531ea4a \
+                    size    3333530
 
 categories          net
 platforms           darwin
@@ -63,33 +63,33 @@ variant ffmpeg description {Add ffmpeg dependency, used to extract audio} {
 
 default_variants    +ffmpeg
 
-variant python27 conflicts python35 python36 python37 python38 python39 description {Use Python 2.7} {
-    python.default_version  27
-}
-
-variant python35 conflicts python27 python36 python37 python38 python39 description {Use Python 3.5} {
-    python.default_version  35
-}
-
-variant python36 conflicts python27 python35 python37 python38 python39 description {Use Python 3.6} {
-    python.default_version  36
-}
-
-variant python37 conflicts python27 python35 python36 python38 python39 description {Use Python 3.7} {
-    python.default_version  37
-}
-
-variant python38 conflicts python27 python35 python36 python37 python39 description {Use Python 3.8} {
-    python.default_version  38
-}
-
-variant python39 conflicts python27 python35 python36 python37 python38 description {Use Python 3.9} {
-    python.default_version  39
-}
+variant python27 conflicts python35 python36 python37 python38 python39 description {Use Python 2.7} {}
+variant python35 conflicts python27 python36 python37 python38 python39 description {Use Python 3.5} {}
+variant python36 conflicts python27 python35 python37 python38 python39 description {Use Python 3.6} {}
+variant python37 conflicts python27 python35 python36 python38 python39 description {Use Python 3.7} {}
+variant python38 conflicts python27 python35 python36 python37 python39 description {Use Python 3.8} {}
+variant python39 conflicts python27 python35 python36 python37 python38 description {Use Python 3.9} {}
 
 if {![variant_isset python27] && ![variant_isset python35] && ![variant_isset python36] && ![variant_isset python37] && ![variant_isset python38] && ![variant_isset python39]} {
     default_variants +python39
 }
+
+if {[variant_isset python27]} {
+    python.default_version  27
+} elseif {[variant_isset python35]} {
+    python.default_version  35
+} elseif {[variant_isset python36]} {
+    python.default_version  36
+} elseif {[variant_isset python37]} {
+    python.default_version  37
+} elseif {[variant_isset python38]} {
+    python.default_version  38
+} elseif {[variant_isset python39]} {
+    python.default_version  39
+}
+
+# WARNING: hlsnative has detected features it does not support, extraction will be delegated to ffmpeg
+depends_lib-append          port:py${python.version}-crypto
 
 livecheck.type              regex
 livecheck.url               ${homepage}/update/LATEST_VERSION

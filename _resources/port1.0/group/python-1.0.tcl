@@ -17,9 +17,12 @@
 #
 # Note: setting these options requires name to be set beforehand
 
+PortGroup       compiler_wrapper 1.0
+
 categories      python
 
 use_configure   no
+
 # we want the default universal variant added despite not using configure
 universal_variant yes
 
@@ -39,7 +42,7 @@ post-extract {
     close $fs
 }
 
-pre-destroot    {
+pre-destroot {
     xinstall -d -m 0755 ${destroot}${prefix}/share/doc/${subport}/examples
 }
 
@@ -56,9 +59,9 @@ default distname        {${python.rootname}-${version}}
 options python.versions python.version python.default_version
 option_proc python.versions python_set_versions
 default python.default_version {[python_get_default_version]}
-default python.version {[python_get_version]}
+default python.version         {[python_get_version]}
 
-# see #34562
+# see https://trac.macports.org/ticket/34562
 options python.consistent_destroot
 default python.consistent_destroot yes
 
@@ -84,6 +87,14 @@ proc python_get_default_version {} {
     }
 }
 
+proc python_set_env_compilers {phase} {
+    foreach tag [option compwrap.compilers_to_wrap] {
+        if {[option configure.${tag}] ne ""} {
+            ${phase}.env-append [string toupper $tag]=[compwrap::wrap_compiler ${tag}]
+        }
+    }
+}
+
 proc python_set_versions {option action args} {
     if {$action ne "set"} {
         return
@@ -91,7 +102,6 @@ proc python_set_versions {option action args} {
     global name subport python._addedcode
     if {[string match py-* $name]} {
         foreach v [option $option] {
-
             subport py${v}[string trimleft $name py] { depends_lib-append port:python${v} }
         }
         if {$subport eq $name || $subport eq ""} {
@@ -173,11 +183,7 @@ proc python_set_versions {option action args} {
                 build.env-append        OBJCFLAGS=$pyobjcflags
             }
             if {${python.set_compiler}} {
-                foreach var {cc objc cxx fc f77 f90} {
-                    if {[set configure.${var}] ne ""} {
-                        build.env-append [string toupper $var]=[set configure.${var}]
-                    }
-                }
+                python_set_env_compilers build
             }
         }
         pre-destroot {
@@ -224,11 +230,7 @@ proc python_set_versions {option action args} {
                 destroot.env-append     OBJCFLAGS=$pyobjcflags
             }
             if {${python.set_compiler} && ${python.consistent_destroot}} {
-                foreach var {cc objc cxx fc f77 f90} {
-                    if {[set configure.${var}] ne ""} {
-                        destroot.env-append [string toupper $var]=[set configure.${var}]
-                    }
-                }
+                python_set_env_compilers destroot
             }
         }
         post-destroot {
@@ -297,7 +299,7 @@ proc python_set_pep517 {option action args} {
         } else {
             depends_build-delete    port:py${python.version}-pep517 \
                                     port:py${python.version}-python-install
-        }  
+        }
     }
 }
 
@@ -355,7 +357,7 @@ proc python_get_defaults {var} {
             } else {
                 # look for "${inc_dir}*" and pick the first one found;
                 # make assumptions if none are found
-                if {[catch {set inc_dirs [glob ${inc_dir}*]}]} {
+                if {[catch {glob ${inc_dir}*} inc_dirs]} {
                     # append 'm' suffix if 30 <= PyVer <= 37
                     # Py27- and Py38+ do not use this suffix
                     if {${python.version} < 30 || ${python.version} > 37} {

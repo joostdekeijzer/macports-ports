@@ -6,7 +6,7 @@ PortGroup           compiler_blacklist_versions  1.0
 PortGroup           active_variants              1.1
 PortGroup           conflicts_build              1.0
 
-epoch               4
+epoch               5
 name                gcc-devel
 
 homepage            https://gcc.gnu.org/
@@ -29,27 +29,27 @@ if { ${build_arch} eq "arm64" } {
     # Arm machines can use same snapshots as Intel.
     PortGroup github 1.0
 
-    github.setup    iains gcc-darwin-arm64 62cfbb7cf8a06c2ec07d3343bfdc67ca8123239e
+    github.setup    iains gcc-darwin-arm64 a172e8791faf8b1ef795371e24ffa9527e6b4ad8
 
     # Version must follow same scheme as with GCC snapshots below <version>-<commit-date>
-    version         11-20210101
+    version         11-20210418
     revision        0
     subport         libgcc-devel { revision 0 }
 
-    checksums       rmd160  2585a22e0de7ef9836954454fc8f7d5859c39328 \
-                    sha256  7e2077f9331e8b33e3ead87424e97da65beea721fce31ca5bd8becd413f82c62 \
-                    size    124251461
+    checksums       rmd160  30782c24fc617b65a58c092fe7a77ce5a985c112 \
+                    sha256  dec4ee8e56c154c76bd6725547666569c1ec21ca2e9b6b3e40760fc236e6f450 \
+                    size    125451045
 
 } else {
     # Use regular GCC releases and snapshsots
 
-    version         11-20210103
+    version         12-20210509
     revision        0
     subport         libgcc-devel { revision 0 }
 
-    checksums       rmd160  ddde1ece4803b4b38345283264f6dc0905095faa \
-                    sha256  10bc465bb81833bf4ae7344f3bfd6bd77dec7de5fa08873aaf0d4f4999f405da \
-                    size    74783204
+    checksums       rmd160  562fb7ded4caf02c424a8ab09d7b2f03d0dce53a \
+                    sha256  06f06a4d283b14262626a683f7c48958ae87b0a821e91131d8310f892c952e3c \
+                    size    75507172
 
     # Primary releases
     master_sites    https://ftpmirror.gnu.org/gcc/gcc-${version}/ \
@@ -102,7 +102,7 @@ platform darwin {
 }
 
 set gcc_configure_langs {c c++ objc obj-c++ lto fortran}
-if {${subport} eq "gcc-devel"} {
+if {${subport} eq ${name}} {
     lappend gcc_configure_langs jit
 }
 
@@ -166,7 +166,9 @@ pre-configure {
         #
         # https://trac.macports.org/ticket/53726
         # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79885
-        configure.args-append --with-sysroot="${configure.sdkroot}"
+
+        # if the sdkroot is one of the current, rapidly changing SDKS, use the generic one
+        configure.args-append --with-sysroot="[regsub {MacOSX1[1-9]\.[0-9]+\.sdk} ${configure.sdkroot} {MacOSX.sdk}]"
     }
 
 }
@@ -177,9 +179,9 @@ pre-configure {
 # https://trac.macports.org/ticket/58493
 compiler.blacklist-append {clang < 800} gcc-4.0 *gcc-4.2 {llvm-gcc-4.2 < 2336.1} {macports-clang-3.[4-7]}
 
-# at present, clang-9.0+ can't build gcc devel
-# https://trac.macports.org/ticket/59253
-# compiler.blacklist-append macports-clang-9.0 macports-clang-10
+# https://build.macports.org/builders/ports-10.13_x86_64-builder/builds/105513/steps/install-port/logs/stdio
+# c++/v1/functional:1408:2: error: no member named 'fancy_abort' in namespace 'std::__1'; did you mean simply 'fancy_abort'?
+compiler.blacklist-append {clang < 1000}
 
 # "-stdlib" would be passed on to the bootstrap compiler if present
 configure.cxx_stdlib
@@ -208,7 +210,7 @@ conflicts_build-append libunwind-headers
 # gcc port.
 set dylibs {libgcc_ext.10.4.dylib libgcc_ext.10.5.dylib libgcc_s.1.dylib libgcc_s.2.dylib libgfortran.5.dylib libquadmath.0.dylib libstdc++.6.dylib libobjc-gnu.4.dylib libgomp.1.dylib libitm.1.dylib libssp.0.dylib libasan.6.dylib libubsan.1.dylib libatomic.1.dylib}
 
-if {${subport} eq "libgcc-devel"} {
+if {${subport} ne ${name}} {
 
     # Set conflict against port providing primary runtime
     if { ${os.major} < 10 } {
@@ -272,7 +274,7 @@ if {${subport} eq "libgcc-devel"} {
             }
 
             move ${destroot}${prefix}/lib/libgcc/${dylib} ${destroot}${prefix}/lib/libgcc.merged
-            if {[variant_isset universal]} {
+            if {[variant_exists universal] && [variant_isset universal]} {
                 foreach archdir [glob ${destroot}${prefix}/lib/libgcc/*/] {
                     set archdir_nodestroot [string map "${destroot}/ /" ${archdir}]
                     if {[file exists ${archdir}/${dylib}]} {
@@ -330,7 +332,7 @@ if {${subport} eq "libgcc-devel"} {
                 delete ${destroot}${prefix}/lib/${name}/${dylib}
                 ln -s ${prefix}/lib/libgcc/${dylib} ${destroot}${prefix}/lib/${name}/${dylib}
             }
-            if {[variant_isset universal]} {
+            if {[variant_exists universal] && [variant_isset universal]} {
                 foreach archdir [glob ${destroot}${prefix}/lib/${name}/*/] {
                     if {[file exists ${archdir}/${dylib}]} {
                         delete ${archdir}/${dylib}

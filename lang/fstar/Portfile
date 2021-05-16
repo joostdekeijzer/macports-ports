@@ -49,7 +49,7 @@ if {${fstar.stable}} {
     # Strip everything but <major>.<minor>
     fstar.release       [regsub {^([^\.]+\.[^\.]+).*} ${fstar.version} {\1}]
 } else {
-    fstar.version       20201204
+    fstar.version       20210511
     fstar.release       devel
 }
 
@@ -112,8 +112,6 @@ if {${fstar.project} eq "fstar"} {
     depends_build-append    port:coreutils
     depends_lib-append      port:z3-fstar \
                             port:gmp \
-                            port:ocaml-ulex \
-                            port:ocaml-migrate-parsetree \
                             port:realpath
     depends_run-append      port:fstar_select
 
@@ -173,19 +171,40 @@ subport fstar {
 
     patchfiles-append   fstar-stable/patch-ocaml4.08 \
                         fstar-stable/patch-examples-fix-tests
+
+    depends_lib-append  port:ocaml-ulex \
+                        port:ocaml-migrate-parsetree
+
+    build.args          PREFIX=${fstar.home}
+
+    build {
+        foreach {dir ftargets} {
+            src     {ocaml-fstar-ocaml}
+            ulib    {install-fstarlib install-fstar-tactics all}
+        } {
+            build.dir       ${worksrcpath}/${dir}
+            build.target    {*}${ftargets}
+            do-build
+        }
+    }
+
+    destroot.dir        ${worksrcpath}/src/ocaml-output
 }
 
 subport fstar-devel {
-    github.setup        ${github.author} ${github.project} ab9bc64a2ae0b110eea99d81247687fd365c2286
+    github.setup        ${github.author} ${github.project} bcb002a0dc32da605ceda7932de4c6cc2a20b971
     version             ${fstar.version}-[string range ${github.version} 0 6]
     revision            0
 
-    checksums           rmd160  3f1590c2ac5ae437d89cdd7ddd4be3091c19eda8 \
-                        sha256  cd8a1fd2c7f9308733e07502ad33839ecaf3bdf85576c2cc155983254b451d92 \
-                        size    7715449
+    checksums           rmd160  b4e10f3d1269c2ee25b6b0989a725818457eebdb \
+                        sha256  d37bd8323e2c5a2bf2a639fa679438cca35ec591c52e1ac8cfa2c05db04788df \
+                        size    8068341
     github.tarball_from tarball
 
     patchfiles-append   fstar-devel/patch-tests_machine__integers_Makefile
+
+    depends_lib-append  port:ocaml-sedlex \
+                        port:ocaml-ppxlib
 }
 
 subport kremlin {
@@ -226,17 +245,19 @@ subport kremlin {
 }
 
 subport kremlin-devel {
-    github.setup        ${github.author} ${fstar.project} c113d20b84a55dd1ba60c86c1502f2c49459b645
-    version             ${fstar.version}-[string range ${github.version} 0 6]
+    github.setup        ${github.author} ${fstar.project} 5a8c41548147e548b258cefa755064a48cb31b39
+    version             20210510-[string range ${github.version} 0 6]
     revision            0
 
-    checksums           rmd160  24173bb48509ec21ff9365cf584739498e42f942 \
-                        sha256  feef7873556634a55bd4db31ae6ceeb96f8a4b1ad748aec19af1cd9d06018d83 \
-                        size    892380
+    checksums           rmd160  7e7ffb011ae41c8dd55ac2a00220b08aa2b15986 \
+                        sha256  5db9af845067b58d772f47b9b24410d221cdd5b702c4153c621400f0caeec0c7 \
+                        size    894013
 
     patchfiles-append   kremlin-devel/patch-clang-driver-options \
-                        kremlin-devel/patch-fix-make-command \
                         kremlin-devel/patch-fstar-discover-path \
+                        kremlin-devel/patch-fstar-driver-no-lax \
+                        kremlin-devel/patch-kremlib-march-native \
+                        kremlin-devel/patch-kremlib-builtin-readcyclecounter \
                         kremlin-devel/patch-test_system_system.h
 
     depends_lib-append  port:ocaml-sedlex
@@ -246,9 +267,6 @@ subport kremlin-devel {
 # Apply shared fstar/fstar-devel subport configuration
 if {${fstar.project} eq "fstar"} {
     ocaml.package_dir   ${fstar.home}/bin
-
-    build.args          PREFIX=${fstar.home}
-    build.target        ocaml-fstar-ocaml
 
     test.run            yes
     test.env            KREMLIN_HOME=${kremlin.home}/home
@@ -276,20 +294,7 @@ if {${fstar.project} eq "fstar"} {
     #   - typeclasses
     #
     depends_test        port:${kremlin.port}
-
-    destroot.dir        ${worksrcpath}/src/ocaml-output
     destroot.args       PREFIX=${destroot}${fstar.home}
-
-    build {
-        foreach {dir ftargets} {
-            src     {ocaml-fstar-ocaml}
-            ulib    {install-fstarlib install-fstar-tactics all}
-        } {
-            build.dir       ${worksrcpath}/${dir}
-            build.target    {*}${ftargets}
-            do-build
-        }
-    }
 
     post-destroot {
         # Remove intermediate build directories

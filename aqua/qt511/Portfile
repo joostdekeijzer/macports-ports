@@ -159,12 +159,12 @@ array set modules {
             46997676
         }
         ""
-        "port:zlib port:libpng port:jpeg port:freetype path:bin/dbus-daemon:dbus path:lib/pkgconfig/glib-2.0.pc:glib2 port:icu port:pcre2 port:harfbuzz"
+        "port:zlib port:libpng path:include/turbojpeg.h:libjpeg-turbo port:freetype path:bin/dbus-daemon:dbus path:lib/pkgconfig/glib-2.0.pc:glib2 port:icu port:pcre2 port:harfbuzz"
         ""
         {"Qt Core" "Qt GUI" "Qt Network" "Qt SQL" "Qt Test" "Qt Widgets" "Qt Concurrent" "Qt D-Bus" "Qt OpenGL" "Qt Platform Headers" "Qt Print Support" "Qt XML"}
         ""
         "variant overrides: "
-        "revision 5"
+        "revision 6"
         "License: "
     }
     qtcanvas3d {
@@ -629,7 +629,7 @@ array set modules {
         {"Qt WebKit" "Qt WebKit Widgets"}
         "community support only (use Qt WebEngine)"
         "variant overrides: "
-        "revision 2"
+        "revision 3"
         "License: "
     }
     qtwebkit-examples {
@@ -912,8 +912,8 @@ foreach {module module_info} [array get modules] {
             patchfiles-append patch-qmake_flags.diff
             post-patch {
                 if {[variant_exists universal] && [variant_isset universal]} {
-                    set arch_replace_cxx [portconfigure::configure_get_universal_cflags]
-                    set arch_replace_ld  [portconfigure::configure_get_universal_ldflags]
+                    set arch_replace_cxx [portconfigure::configure_get_universal_archflags]
+                    set arch_replace_ld  [portconfigure::configure_get_universal_archflags]
                 } else {
                     set arch_replace_cxx [portconfigure::configure_get_archflags cxx]
                     set arch_replace_ld  [portconfigure::configure_get_ld_archflags]
@@ -1399,6 +1399,11 @@ foreach {module module_info} [array get modules] {
 
                 # see https://bugs.webkit.org/show_bug.cgi?id=171612
                 patchfiles-append patch-qtwebkit_fix_icu.diff
+
+                # work around https://trac.macports.org/ticket/60975
+                patchfiles-append patch-webkit_XPathGrammar.y.diff
+                patchfiles-append patch-webkit_makegrammar.pl.diff
+
             }
 
             # special case

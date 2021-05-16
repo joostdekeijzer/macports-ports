@@ -65,11 +65,11 @@ if {${os.platform} eq "darwin" && ${os.major} == 10} {
 
         # release
 
-        github.setup glfw glfw 3.3.2
-        checksums rmd160 33cf93d62c22862144bcfd25894a165d970d7206 \
-                  sha256 ae736d73367b7f38a714ce4ee22cc2afa6749464d3ed7d3544848715aaea03a2 \
-                  size   760096
-        revision  0
+        github.setup glfw glfw 3.3.4
+        checksums   rmd160  87c35b8aa8162bc2af6e643ac2e1153d15a7b518 \
+                    sha256  9d4cc392dc7c90e9501db1456de115c723287f1b9847ac59c3334772d7240fcf \
+                    size    762985
+        revision    0
 
         # bump the epoch because I moved the version from 20151012 to 3.1.2
 
@@ -83,32 +83,24 @@ if {${os.platform} eq "darwin" && ${os.major} == 10} {
 
         patchfiles-append patch-CMakeLists.txt.release.diff
 
-        # patch to fix install name of library
-
-        patchfiles-append patch-src_CMakeLists.txt.release.diff
-
     } else {
 
         # devel
 
-        github.setup glfw glfw 0b9e48fa3df9c184ff1abfb2452fd1a4b696ecd8
-        version   20201214-[string range ${github.version} 0 7]
-        checksums rmd160 be3f12d8e3a151b07e748aec9d63deea2d685bce \
-                  sha256 3aeebcfa80e36ee8db4640ff73f37a2f634780f2b9b3e3b1a5368786c525d3e4 \
-                  size   779881
-        revision  0
+        github.setup glfw glfw 33cd8b865d9289cfbcf3d95e6e68e4050b94fcd3
+        version     20210319-[string range ${github.version} 0 7]
+        checksums   rmd160  536a4eb8eb1aa642e037b1a2476796fc1db5294d \
+                    sha256  90930f20f4b855313e7449124dc77298c6cd5f481575b71a5a7c6ef09b53113a \
+                    size    781268
+        revision    0
 
-        conflicts       glfw
+        conflicts   glfw
         long_description ${description}: \
             This port follows the GIT master version of GLFW, which is typically updated every few days to weeks.
 
         # patch to fix install directory for cmake files and docs
 
         patchfiles-append patch-CMakeLists.txt.devel.diff
-
-        # patch to fix install name of library
-
-        patchfiles-append patch-src_CMakeLists.txt.devel.diff
 
     }
 }

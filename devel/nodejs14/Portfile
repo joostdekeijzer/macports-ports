@@ -2,7 +2,7 @@
 
 PortSystem              1.0
 PortGroup               compiler_blacklist_versions 1.0
-PortGroup               legacysupport 1.0
+PortGroup               legacysupport 1.1
 
 # on macOS nodejs only builds against libc++
 # this force is OK as node does not link against any other c++ libs
@@ -11,7 +11,8 @@ configure.cxx_stdlib    libc++
 compiler.cxx_standard   2014
 
 name                    nodejs14
-version                 14.15.4
+version                 14.17.0
+revision                0
 
 categories              devel net
 platforms               darwin
@@ -25,22 +26,22 @@ long_description        Node's goal is to provide an easy way to build scalable 
                         Machine or Python's Twisted. Node takes the event model a bit further-it \
                         presents the event loop as a language construct instead of as a library.
 
-conflicts               nodejs8 nodejs10 nodejs12 nodejs13 nodejs15
+conflicts               nodejs8 nodejs10 nodejs12 nodejs13 nodejs15 nodejs16
 
 homepage                https://nodejs.org/
 master_sites            ${homepage}dist/v${version}
 use_xz                  yes
 
-checksums               rmd160  0ad20166cb8829e9bf79d84b54b9063ec00cd2fa \
-                        sha256  adb7ecf66c74b52a14a08cc22bb0f9aedc157cac1ac93240f7f455e8c8edec9c \
-                        size    33296076
+checksums               rmd160  03dd676362365118c1b5341a73a242e18f244ba3 \
+                        sha256  56e05bff9331039317db417f772e635e0cd1c55f733f7b1b079d71ab5842c9ed \
+                        size    33484212
 
 distname                node-v${version}
 
-depends_build           port:pkgconfig
+depends_build-append    port:pkgconfig
 
-depends_lib             port:icu \
-                        port:python38 \
+depends_lib-append      port:icu \
+                        port:python39 \
                         path:lib/libssl.dylib:openssl
 
 use_xcode               yes
@@ -53,7 +54,7 @@ proc rec_glob {basedir pattern} {
     return $files
 }
 
-configure.python ${prefix}/bin/python3.8
+configure.python ${prefix}/bin/python3.9
 
 patchfiles              patch-common.gypi.diff
 
@@ -62,9 +63,11 @@ post-patch {
                    ${worksrcpath}/tools/gyp/gyp \
                    ${worksrcpath}/deps/v8/tools/objdump-v8 \
                    [rec_glob ${worksrcpath} *.py]] {
+        reinplace -q "s|/usr/bin/env python3|${configure.python}|" ${f}
         reinplace -q "s|/usr/bin/env python|${configure.python}|" ${f}
     }
     foreach gypfile [rec_glob ${worksrcpath} *.gyp*] {
+        reinplace -q "s|'python3'|'${configure.python}'|" ${gypfile}
         reinplace -q "s|'python'|'${configure.python}'|" ${gypfile}
     }
 }
@@ -82,7 +85,7 @@ configure.args-append   --shared-openssl-includes=${prefix}/include/openssl
 configure.args-append   --shared-openssl-libpath=${prefix}/lib
 
 # V8 only supports ARM and IA-32 processors
-supported_archs         i386 x86_64
+supported_archs         i386 x86_64 arm64
 
 universal_variant       no
 
@@ -98,6 +101,9 @@ switch $build_arch {
     }
     x86_64 {
         configure.args-append   --dest-cpu=x64
+    }
+    arm64 {
+        configure.args-append   --dest-cpu=arm64
     }
 }
 

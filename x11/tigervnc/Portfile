@@ -7,6 +7,7 @@ PortGroup               github 1.0
 PortGroup               muniversal 1.0
 
 github.setup            TigerVNC tigervnc 1.7.1 v
+revision                1
 conflicts               vnc tightvnc
 categories              x11 vnc
 maintainers             ryandesign openmaintainer
@@ -29,7 +30,7 @@ checksums               rmd160  837aac1c72218cc7717cb9f0cfebdab8c5360ec5 \
 depends_lib             port:gettext \
                         port:gnutls \
                         path:lib/libfltk.dylib:fltk \
-                        port:jpeg \
+                        path:include/turbojpeg.h:libjpeg-turbo \
                         port:libiconv \
                         port:zlib
 
@@ -45,7 +46,10 @@ cmake.out_of_source     yes
 
 build.target            translations dmg
 
-if {[variant_isset universal]} {
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
+if {${universal_possible} && [variant_isset universal]} {
     merger-post-destroot {
         foreach arch ${universal_archs_to_use} {
             copy "${build.dir}-${arch}/TigerVNC Viewer.app" ${destroot}-${arch}${applications_dir}

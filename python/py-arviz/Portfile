@@ -4,12 +4,12 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-arviz
-version             0.10.0
+version             0.11.2
 revision            0
 
 platforms           darwin
 supported_archs     noarch
-license             Apache-2.0
+license             Apache-2
 maintainers         {reneeotten @reneeotten} openmaintainer
 
 description         Exploratory analysis of Bayesian models
@@ -17,11 +17,11 @@ long_description    ${description}
 
 homepage            https://github.com/arviz-devs/arviz
 
-checksums           rmd160  0c65e1e586c204878b1f29034fc3763dd27a0d5b \
-                    sha256  dc1f08ce02459989dd4f41fa6012e736cf2ba00ee44b29bebe0a451c58a68e42 \
-                    size    1469889
+checksums           rmd160  5923493224439f28843e70befaf0ed5a547f1dd7 \
+                    sha256  a9d0eb32e84a0472aa78a488ba9b12b05e7be8c2c8fb34a1ba6286cc1254ee0d \
+                    size    1484198
 
-python.versions     35 36 37 38
+python.versions     36 37 38 39
 
 if {${name} ne ${subport}} {
     depends_build-append \
@@ -35,6 +35,11 @@ if {${name} ne ${subport}} {
                     port:py${python.version}-pandas \
                     port:py${python.version}-scipy \
                     port:py${python.version}-xarray
+
+    if {${python.version} > 36} {
+    depends_lib-append \
+                    port:py${python.version}-typing_extensions
+    }
 
     post-destroot {
         set docdir ${prefix}/share/doc/${subport}

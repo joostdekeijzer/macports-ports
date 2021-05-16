@@ -3,7 +3,7 @@
 PortSystem          1.0
 PortGroup           golang 1.0
 
-go.setup            github.com/mvdan/sh 3.2.1 v
+go.setup            github.com/mvdan/sh 3.2.4 v
 name                shfmt
 categories          devel
 maintainers         {amake @amake} openmaintainer
@@ -16,9 +16,9 @@ long_description    A shell script formatter supporting POSIX shell, Bash, and m
 go.package          mvdan.cc/sh
 
 checksums           ${distname}${extract.suffix} \
-                        rmd160  32f39100c38d5dcc34065a221a0ebbecb6799fba \
-                        sha256  1105e27544abccabc519d5f7247b6c5fb6408caba1fa0a04f50600a6ac4489c5 \
-                        size    181070 \
+                        rmd160  53e050665be2fc05e8508f1818cc0ea492f8f584 \
+                        sha256  af677b74d54d576cabd2737f4e78dd6a3736c0716901e61be12391c4e4e14d79 \
+                        size    181213
 
 go.vendors          mvdan.cc/editorconfig \
                         repo    github.com/mvdan/editorconfig \
@@ -121,4 +121,4 @@ destroot {
     xinstall -m 0644 ${worksrcpath}/shfmt.1.gz ${destroot}${prefix}/share/man/man1
 }
 
-livecheck.regex     {archive/v([0-9.]+)\.tar\.gz}
+github.livecheck.regex  {([0-9.]+)}

@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-py2app
-version             0.22
+version             0.24
 categories-append   devel
 license             {MIT PSF}
 maintainers         {jmr @jmroot} openmaintainer
@@ -16,16 +16,22 @@ long_description \
 
 platforms           darwin
 
-homepage            https://wiki.python.org/moin/MacPython/py2app
+homepage            https://github.com/ronaldoussoren/py2app
 
-checksums           md5 80f27c88c07a0e4526c98656bba61703 \
-                    rmd160 8e8fc2737cb4efdf230a04483028c212e5e71262 \
-                    sha256 0ec29109338cb7c5340457aa6df972904d0d00533e8ab4107b9e00fe1da5d300
+checksums           md5 cf9a2a27d150856f9845cb5ef9249e81 \
+                    rmd160 597e745425c76d765067b8f0ec25de83a411144d \
+                    sha256 753915b2efaa72b23de1553e00f2cd9d3b4fdc05269ccae4b65c710e38121d67
 
-python.versions     27 34 35 36 37 38 39
+python.versions     27 35 36 37 38 39
 
 if {$subport ne $name} {
     depends_lib     port:py${python.version}-macholib
+    # needs either importlib.metadata or pkg_resources at runtime
+    if {${python.version} >= 38} {
+        depends_build-append  port:py${python.version}-setuptools
+    } else {
+        depends_lib-append  port:py${python.version}-setuptools
+    }
 
     post-destroot {
         xinstall -m 755 -d ${destroot}${prefix}/share/doc/${subport} \

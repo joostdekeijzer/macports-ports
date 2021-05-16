@@ -92,7 +92,6 @@ set portfetch::mirror_sites::sites(cpan) {
     http://mirror.23media.de/cpan/modules/by-module/
     http://mirror.amberit.com.bd/CPAN/modules/by-module/
     http://mirror.as43289.net/pub/CPAN/modules/by-module/
-    http://mirror.bhoovd.com/CPAN/modules/by-module/
     http://mirror.bibleonline.ru/cpan/modules/by-module/
     http://mirror.biznetgio.com/cpan/modules/by-module/
     http://mirror.bytemark.co.uk/CPAN/modules/by-module/
@@ -422,6 +421,7 @@ set portfetch::mirror_sites::sites(macports) {
 # to their SSL certificate as Subject Alternative Names so we can't use
 # https with them yet.
 global os.platform os.major
+set fastly      [expr {${os.platform} eq "darwin" && ${os.major} < 13 ? "http" : "https"}]
 # cert doesn't have macports.org SANs; admin notified
 #set aarnet.au   [expr {${os.platform} eq "darwin" && ${os.major} < 13 ? "http" : "https"}]
 set aarnet.au   http
@@ -431,10 +431,10 @@ set cjj.kr      http
 # cert doesn't have macports.org SANs; admin notified
 #set fco.it      [expr {${os.platform} eq "darwin" && ${os.major} < 13 ? "http" : "https"}]
 set fco.it      http
+set fra.de      [expr {${os.platform} eq "darwin" && ${os.major} < 13 ? "http" : "https"}]
 set jnb.za      [expr {${os.platform} eq "darwin" && ${os.major} < 10 ? "" : "https"}]
 set jog.id      http
 set kmq.jp      [expr {${os.platform} eq "darwin" && ${os.major} < 10 ? "http" : "https"}]
-set lil.fr      [expr {${os.platform} eq "darwin" && ${os.major} < 13 ? "http" : "https"}]
 set mse.uk      [expr {${os.platform} eq "darwin" && ${os.major} < 13 ? "http" : "https"}]
 # server is (temporarily?) offline
 set nou.nc      ""
@@ -446,18 +446,19 @@ set ykf.ca      http
 set ywg.ca      [expr {${os.platform} eq "darwin" && ${os.major} < 10 ? "http" : "https"}]
 
 set portfetch::mirror_sites::sites(macports_distfiles) [lsearch -all -glob -inline -not "
+    ${fastly}://distfiles.macports.org/:mirror
     ${aarnet.au}://aarnet.au.distfiles.macports.org/pub/macports/distfiles/:mirror
     ${atl.us}://atl.us.distfiles.macports.org/:mirror
     ${cjj.kr}://cjj.kr.distfiles.macports.org/:mirror
     ${cph.dk}://cph.dk.distfiles.macports.org/:mirror
     ${fco.it}://fco.it.distfiles.macports.org/:mirror
+    ${fra.de}://fra.de.distfiles.macports.org/:mirror
     ${jnb.za}://jnb.za.distfiles.macports.org/distfiles/:mirror
     ${jog.id}://jog.id.distfiles.macports.org/macports/distfiles/:mirror
     ${kmq.jp}://kmq.jp.distfiles.macports.org/:mirror
-    ${lil.fr}://lil.fr.distfiles.macports.org/:mirror
     ${mse.uk}://mse.uk.distfiles.macports.org/:mirror
     ${nou.nc}://nou.nc.distfiles.macports.org/pub/macports/distfiles.macports.org/:mirror
-    ${nue.de}://distfiles.macports.org/:mirror
+    ${nue.de}://nue.de.distfiles.macports.org/:mirror
     ${pek.cn}://pek.cn.distfiles.macports.org/macports/distfiles/:mirror
     ${ykf.ca}://ykf.ca.distfiles.macports.org/MacPorts/mpdistfiles/:mirror
     ${ywg.ca}://ywg.ca.distfiles.macports.org/mirror/macports/distfiles/:mirror

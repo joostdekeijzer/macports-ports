@@ -7,7 +7,7 @@ name                gdk-pixbuf2
 set gname           gdk-pixbuf
 epoch               2
 version             2.42.2
-revision            0
+revision            2
 license             LGPL
 set branch          [join [lrange [split ${version} .] 0 1] .]
 categories          graphics
@@ -38,7 +38,7 @@ depends_lib         path:lib/pkgconfig/glib-2.0.pc:glib2 \
                     port:shared-mime-info \
                     port:libpng \
                     port:jasper \
-                    port:jpeg \
+                    path:include/turbojpeg.h:libjpeg-turbo \
                     port:tiff
 
 license_noconflict  gobject-introspection
@@ -53,8 +53,11 @@ configure.args      -Dx11=false \
                     -Ddocs=true \
                     -Djasper=true
 
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
 # gobject-introspection uses g-ir-scanner, which uses $CC from env
-if {[variant_isset universal]} {
+if {${universal_possible} && [variant_isset universal]} {
     foreach arch ${configure.universal_archs} {
         lappend merger_build_env(${arch})  "CC=${configure.cc} -arch ${arch}"
         lappend merger_destroot_env(${arch})  "CC=${configure.cc} -arch ${arch}"
@@ -79,9 +82,7 @@ variant x11 {
     configure.args-replace  -Dx11=false -Dx11=true
 }
 
-if {![variant_isset quartz]} {
-    default_variants    +x11
-}
+default_variants    +x11
 
 post-activate {
         system "${prefix}/bin/gdk-pixbuf-query-loaders --update-cache"

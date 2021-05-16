@@ -5,10 +5,10 @@ PortGroup           python 1.0
 
 name                py-construct
 
-version             2.10.56
-checksums           rmd160 5cb579e4e60b9d34678ac9c93fa6eb6afb21f908 \
-                    sha256 97ba13edcd98546f10f7555af41c8ce7ae9d8221525ec4062c03f9adbf940661 \
-                    size   54823
+version             2.10.67
+checksums           rmd160  49705948bf830a103b2520e813985bafa835182a \
+                    sha256  730235fedf4f2fee5cfadda1d14b83ef1bf23790fb1cc579073e10f70a050883 \
+                    size    57697
 revision            0
 
 categories-append   devel
@@ -16,7 +16,7 @@ platforms           darwin
 license             MIT
 supported_archs     noarch
 
-python.versions     27 35 36 37 38
+python.versions     27 35 36 37 38 39
 
 maintainers         {michaelld @michaelld} openmaintainer
 

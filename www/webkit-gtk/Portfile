@@ -52,6 +52,7 @@ depends_lib         path:lib/pkgconfig/glib-2.0.pc:glib2 \
                     port:xorg-libXt
 
 # case-insensitive.patch: https://bugs.webkit.org/show_bug.cgi?id=65811
+# gtk-doc.patch: https://aur.archlinux.org/cgit/aur.git/tree/gtk-doc.patch?h=webkitgtk
 # our-icu.patch: No upstream bug report, probably not wanted
 # ruby-1.8.patch: https://bugs.webkit.org/show_bug.cgi?id=126327
 # quartz-webcore.patch: https://bugs.webkit.org/show_bug.cgi?id=126326
@@ -66,6 +67,7 @@ depends_lib         path:lib/pkgconfig/glib-2.0.pc:glib2 \
 
 patchfiles          clang-assertions.patch \
                     case-insensitive.patch \
+                    gtk-doc.patch \
                     our-icu.patch \
                     ruby-1.8.patch \
                     quartz-webcore.patch \
@@ -75,7 +77,8 @@ patchfiles          clang-assertions.patch \
                     libedit.patch \
                     remove-cf-available.patch \
                     RenderThemeGtk2-toRenderBox.patch \
-                    patch-icu_fix.diff
+                    patch-icu_fix.diff \
+                    bison-3.7.patch
 
 conflicts_build     google-test
 
@@ -100,6 +103,10 @@ configure.args      --disable-webkit2 \
                     --enable-webgl \
                     --disable-jit
 
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
+
 subport webkit-gtk3 {
     conflicts webkit-gtk3-devel webkit-gtk3-2.0
     depends_lib-append      port:gtk3
@@ -108,7 +115,7 @@ subport webkit-gtk3 {
 #
 # move gtk-docs to allow parallel install with webkit-gtk
 #
-    if {[variant_isset universal]} {
+    if {${universal_possible} && [variant_isset universal]} {
 #
 # using diff to merge derived include files sometimes
 # results in a corrupted file due to nested /* */ blocks
@@ -143,7 +150,7 @@ if {${name} eq ${subport}} {
 configure.universal_args-delete --disable-dependency-tracking
 
 # gobject-introspection uses g-ir-scanner, which uses $CC from env
-if {[variant_isset universal]} {
+if {${universal_possible} && [variant_isset universal]} {
     foreach arch ${configure.universal_archs} {
         lappend merger_build_args(${arch})     CC='${configure.cc} -arch ${arch}'
         lappend merger_destroot_args(${arch})  CC='${configure.cc} -arch ${arch}'

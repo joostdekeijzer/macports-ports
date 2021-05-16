@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-cachetools
-version             4.2.0
+version             4.2.2
 revision            0
 
 platforms           darwin
@@ -13,14 +13,14 @@ license             MIT
 maintainers         nomaintainer
 
 description         memoizing collections and decorators
-long_description    This module provides various ${description}, including variants of the \
+long_description    This module provides various {*}${description}, including variants of the \
                     Python 3 Standard Library @lru_cache function decorator.
 
 homepage            https://github.com/tkem/cachetools
 
-checksums           rmd160  0574112bf68735b88d38e04dc1bb2da32958d53c \
-                    sha256  3796e1de094f0eaca982441c92ce96c68c89cced4cd97721ab297ea4b16db90e \
-                    size    24713
+checksums           rmd160  c3221da8c64c843ba1fca4847223f36921ac7fce \
+                    sha256  61b5ed1e22a0924aed1d23b478f37e8d52549ff8a961de2909c69bf950020cff \
+                    size    23682
 
 python.versions     27 35 36 37 38 39
 

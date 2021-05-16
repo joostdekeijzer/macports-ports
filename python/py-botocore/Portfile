@@ -4,13 +4,13 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-botocore
-version             1.19.2
+version             1.20.72
 revision            0
 
 platforms           darwin
 supported_archs     noarch
 license             Apache-2
-maintainers         nomaintainer
+maintainers         {outlook.de:judaew @judaew} openmaintainer
 
 description         Low level data driven core of boto 3.
 long_description    A low-level interface to a growing number of Amazon Web \
@@ -19,13 +19,22 @@ long_description    A low-level interface to a growing number of Amazon Web \
 
 homepage            https://github.com/boto/botocore
 
-checksums           rmd160  a5b8a096354cbbf7c7ef1e9e3d376e4877f42636 \
-                    sha256  dc52d4eb5c2a4360506bdd8a99aca7ebc31c56849faf98c707e5201fcbb56957 \
-                    size    6949309
+checksums           rmd160  b58a9be152a0ebb1ad2dd8a1eae59ca3c70b8e8d \
+                    sha256  0fa93a2e2daad5791c63ee526ada66896cc483d04cb2d32bfcadfeb881203453 \
+                    size    7719833
 
 python.versions     27 35 36 37 38 39
 
 if {${name} ne ${subport}} {
+    if {${python.version} == 35 } {
+        version             1.19.63
+        revision            0
+        distname            ${python.rootname}-${version}
+        checksums           rmd160  6d806f84076204176d87ff3b96fb91c5fea04ce9 \
+                            sha256  d3694f6ef918def8082513e5ef309cd6cd83b612e9984e3a66e8adc98c650a92 \
+                            size    7437996
+    }
+
     depends_build-append \
                     port:py${python.version}-setuptools
 

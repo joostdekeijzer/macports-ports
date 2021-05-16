@@ -35,11 +35,26 @@ homepage            https://www.mamedev.org
 # Versions, Patches, and Checksums
 #------------------------------------------------------------------------------
 
+# Developer-only override for os.major, allowing rapid testing of platform-
+# specific logic.
+if {[info exists mame.override.os.major]} {
+    ui_msg "mame.override.os.major specified: ${mame.override.os.major}"
+    set g_mame_os_major \
+        ${mame.override.os.major}
+} else {
+    set g_mame_os_major \
+        ${os.major}
+}
+
 # Mame versions > 0.226 require C++ 2017, and specifically aligned allocation
 # support. That's only supported by MacOS system libc++ from 10.13 onward.
 # However, once MacPorts provides a custom libc++ for all ports, Mame will
 # support older MacOS releases.
-if {${os.major} >= 17} {
+#
+# NOTE: Due to our current MacPorts build infrastructure for macOS 10.13 -
+# which uses Xcode 9.4.1, rather than Xcode 10.1 - we must revert to 0.226.
+# Not exactly ideal, but far better than forcing users to build from source.
+if {${g_mame_os_major} >= 18} {
     set g_mame_latest yes
 } else {
     set g_mame_latest no
@@ -47,31 +62,31 @@ if {${os.major} >= 17} {
 
 if {${g_mame_latest}} {
     set g_mame_release \
-                    "0227"
+                    "0231"
 
     revision        0
 
     checksums       \
-                    rmd160  862df6a449329fe5b16e6d46a030fe157c3a8eb3 \
-                    sha256  95dbce00a4f05a35f66ef966fe9efad1e4e78ce62e0eba3f7031dfa6737829a5 \
-                    size    195226157
+                    rmd160  3729a7ccd3676969ba280204478b3f155d2f77c9 \
+                    sha256  36b7ff5865dfa4765dc5dff70484d3f9fcacf8e8771e14c692ec76b845f7da53 \
+                    size    196006489
+
 } else {
     set g_mame_release \
                     "0226"
 
-    revision        3
+    revision        5
 
-    # Patch 'language-portuguese_brazil' applies to release 0.226; fixes
-    # errors during translation build phase.
+    # Mame 0.226: Fix errors during translation build phase.
     # Merged into Mame releases from 0.227 onward. Tracked by issue:
     # https://github.com/mamedev/mame/issues/7510
-    #
-    # Patch 'src-posixfile-build-error' applies to release 0.226; fixes
-    # compilation errors for MacOS 10.8 and Xcode 5.x.
+    patchfiles-append \
+                    mame-patch-0226-language-portuguese_brazil.diff
+
+    # Mame 0.226: Fix compilation errors for MacOS 10.8 and Xcode 5.x.
     # Merged into Mame releases from 0.227 onward. Tracked by issue:
     # https://github.com/mamedev/mame/issues/7536
-    patchfiles      \
-                    mame-patch-0226-language-portuguese_brazil.diff \
+    patchfiles-append \
                     mame-patch-0226-src-posixfile-build-error.diff
 
     checksums       \
@@ -83,7 +98,11 @@ if {${g_mame_latest}} {
 # Note: For user-presentable version string, we add a period between the first
 # two characters of release. So '0227', for example, becomes '0.227'.
 set g_mame_version_string \
-                    [string index ${g_mame_release} 0].[string range ${g_mame_release} 1 end]
+    [append g_mame_version_string \
+        [string index ${g_mame_release} 0] \
+        "." \
+        [string range ${g_mame_release} 1 end] \
+    ]
 
 github.setup        mamedev mame ${g_mame_release} mame
 github.tarball_from archive
@@ -171,7 +190,7 @@ depends_build-append \
 depends_lib-append  \
                     port:expat \
                     port:flac \
-                    port:jpeg \
+                    path:include/turbojpeg.h:libjpeg-turbo \
                     port:libiconv \
                     port:libsdl2 \
                     port:libutf8proc \
@@ -190,9 +209,7 @@ depends_run-append  \
 # Build Options
 #------------------------------------------------------------------------------
 
-# Note: ARM64 support untested
-#supported_archs     ppc ppc64 i386 x86_64 arm64
-supported_archs     ppc ppc64 i386 x86_64
+supported_archs     ppc ppc64 i386 x86_64 arm64
 
 use_configure       no
 
@@ -212,9 +229,11 @@ compiler.blacklist  \
 #}
 
 if {${g_mame_latest}} {
-    compiler.cxx_standard 2017
+    compiler.cxx_standard \
+                    2017
 } else {
-    compiler.cxx_standard 2014
+    compiler.cxx_standard \
+                    2014
 }
 
 # Note: Compiler optimization level is controlled by makefile variable 'OPTIMIZE', below.
@@ -227,7 +246,7 @@ configure.cxxflags-delete \
 # 50+ minutes without it.)
 # Note: Linker dedupe support not present in version of MacPorts 'ld', for
 # macOS 10.6 and earlier.
-if {${os.major} >= 11} {
+if {${g_mame_os_major} >= 11} {
     configure.cxxflags-append \
                     -Xlinker -no_deduplicate \
                     -Wno-unused-command-line-argument
@@ -312,6 +331,7 @@ if {[info exists mame.override.build.bgfx]} {
         [string is true ${mame.override.build.bgfx}]
 }
 
+# Support for additional gmake arguments
 if {[info exists mame.override.build.gmake.args]} {
     ui_msg "mame.override.build.gmake.args specified: ${mame.override.build.gmake.args}"
 
@@ -325,12 +345,13 @@ if {[info exists mame.override.build.gmake.args]} {
 
 proc mame_arch_setup {p_arch_64} {
     global executable
+    global g_mame_latest
 
     # Architecture setup - 64-bit vs 32-bit
-    if {${p_arch_64}} {
-        set executable "mame64"
-    } else {
-        set executable "mame"
+    set executable "mame"
+    # Starting with release 0.229, executable no longer has suffix '64' for 64-bit build
+    if {${p_arch_64} && !${g_mame_latest}} {
+        set executable "${executable}64"
     }
 
     # Remember to append a 'd' suffix for debug builds
@@ -466,6 +487,47 @@ proc mame_get_tools_list {p_dir p_fn_prefix} {
         ]
 
     return ${mame_tools_list}
+}
+
+proc mame_get_dir_create_list {p_target_dir p_share_dir} {
+    set mame_dir_create_list \
+        [list \
+            ${p_target_dir} \
+            ${p_target_dir}/cfg \
+            ${p_target_dir}/cheat \
+            ${p_target_dir}/comments \
+            ${p_target_dir}/crsshair \
+            ${p_target_dir}/diff \
+            ${p_target_dir}/fonts \
+            ${p_target_dir}/inp \
+            ${p_target_dir}/nvram \
+            ${p_target_dir}/software \
+            ${p_target_dir}/snap \
+            ${p_target_dir}/sta \
+            ${p_share_dir} \
+        ]
+
+    return ${mame_dir_create_list}
+}
+
+proc mame_get_copy_list {p_release_dir p_worksrcpath p_executable} {
+    set mame_copy_list \
+        [list \
+            ${p_release_dir}/${p_executable} \
+            ${p_worksrcpath}/artwork \
+            ${p_worksrcpath}/bgfx \
+            ${p_release_dir}/ctrlr \
+            ${p_release_dir}/hash \
+            ${p_worksrcpath}/hlsl \
+            ${p_release_dir}/ini \
+            ${p_worksrcpath}/keymaps \
+            ${p_release_dir}/language \
+            ${p_worksrcpath}/plugins \
+            ${p_release_dir}/roms \
+            ${p_worksrcpath}/samples \
+        ]
+
+    return ${mame_copy_list}
 }
 
 #------------------------------------------------------------------------------
@@ -671,19 +733,23 @@ post-build {
     ui_debug "Phase post-build: mame_release_doc_dir: ${mame_release_doc_dir}"
 
     # Rename Tools-related man pages, to include defined prefix
-    set man_page_rename_list \
-        [glob -nocomplain -type f \
-            -directory ${mame_release_doc_dir} \
-            *.1]
-    ui_debug "Phase post-build: man_page_rename_list: ${man_page_rename_list}"
-    foreach tgt ${man_page_rename_list} {
-        set fn [file tail ${tgt}]
-        set fn_new "${g_mame_tools_prefix}${fn}"
-        ui_debug "Phase post-build: renaming man page: ${fn} -> ${fn_new}"
-        move ${tgt} "${mame_release_doc_dir}/${fn_new}"
+    if {[variant_isset tools]} {
+        set man_page_rename_list \
+            [glob -nocomplain -type f \
+                -directory ${mame_release_doc_dir} \
+                *.1]
+        ui_debug "Phase post-build: man_page_rename_list: ${man_page_rename_list}"
+        foreach tgt ${man_page_rename_list} {
+            set fn [file tail ${tgt}]
+            set fn_new "${g_mame_tools_prefix}${fn}"
+            ui_debug "Phase post-build: renaming man page: ${fn} -> ${fn_new}"
+            move ${tgt} "${mame_release_doc_dir}/${fn_new}"
+        }
+        unset man_page_rename_list
     }
 
     # Copy generated Mame man page, joining pre-generated files for Tools
+    ui_debug "Phase post-build: Copying man page: mame.1"
     copy "${worksrcpath}/docs/build/man/MAME.1" \
         "${mame_release_doc_dir}/mame.1"
 
@@ -698,9 +764,8 @@ post-build {
         delete ${tgt}
     }
     unset tgt
-
-    unset man_page_rename_list
     unset man_page_delete_list
+
     unset mame_release_doc_dir
     unset mame_release_dir
 }
@@ -709,24 +774,12 @@ pre-destroot {
     set mame_target_dir "${destroot}${prefix}/libexec/mame"
     set mame_share_dir "${destroot}${prefix}/share/mame"
     set mame_dir_create_list \
-        [list \
-            ${mame_target_dir} \
-            ${mame_target_dir}/cfg \
-            ${mame_target_dir}/cheat \
-            ${mame_target_dir}/comments \
-            ${mame_target_dir}/crsshair \
-            ${mame_target_dir}/diff \
-            ${mame_target_dir}/fonts \
-            ${mame_target_dir}/inp \
-            ${mame_target_dir}/nvram \
-            ${mame_target_dir}/software \
-            ${mame_target_dir}/snap \
-            ${mame_target_dir}/sta \
-            ${mame_share_dir} \
-        ]
+        [mame_get_dir_create_list ${mame_target_dir} ${mame_share_dir}]
 
     # Create directories
     foreach tgt ${mame_dir_create_list} {
+        set dn [file tail ${tgt}]
+        ui_debug "Phase pre-destroot: creating directory: ${dn}"
         xinstall -d ${tgt}
     }
     unset tgt
@@ -741,27 +794,14 @@ destroot {
     set mame_share_dir "${destroot}${prefix}/share/mame"
     set mame_release_dir \
         [mame_get_release_dir]
+    set mame_copy_list \
+        [mame_get_copy_list ${mame_release_dir} ${worksrcpath} ${executable}]
 
     ui_debug "Phase destroot: mame_release_dir: ${mame_release_dir}"
 
-    set mame_copy_list \
-        [list \
-            ${mame_release_dir}/${executable} \
-            ${worksrcpath}/artwork \
-            ${worksrcpath}/bgfx \
-            ${mame_release_dir}/ctrlr \
-            ${mame_release_dir}/hash \
-            ${worksrcpath}/hlsl \
-            ${mame_release_dir}/ini \
-            ${worksrcpath}/keymaps \
-            ${mame_release_dir}/language \
-            ${worksrcpath}/plugins \
-            ${mame_release_dir}/roms \
-            ${worksrcpath}/samples \
-        ]
-
     # Copy content
     foreach tgt ${mame_copy_list} {
+        ui_debug "Phase destroot: Copying content: ${tgt}"
         copy ${tgt} ${mame_target_dir}
     }
     # For Tools, prefix each command with defined prefix
@@ -772,6 +812,7 @@ destroot {
             set fn [file tail ${tgt}]
             set fn_dest "${mame_target_dir}/${g_mame_tools_prefix}${fn}"
             if {[file exists ${tgt}]} {
+                ui_debug "Phase destroot: Copying tool: ${fn}"
                 copy ${tgt} ${fn_dest}
             } else {
                 # Distribution doesn't copy everything, so fall back to worksrcdir
@@ -779,14 +820,15 @@ destroot {
                 copy "${worksrcpath}/${fn}" ${fn_dest}
             }
         }
+        unset mame_tools_list
     }
     unset tgt
 
     # Copy all docs
+    ui_debug "Phase destroot: Copying docs"
     copy "${mame_release_dir}/docs" \
         ${mame_share_dir}
 
-    unset mame_tools_list
     unset mame_copy_list
     unset mame_release_dir
     unset mame_share_dir
@@ -801,6 +843,7 @@ post-destroot {
     set mame_launch_link "${destroot}${prefix}/bin/mame"
 
     # Create launch wrapper script
+    ui_debug "Phase post-destroot: creating launch script"
     xinstall ${filespath}/mame-script-template-launcher.sh \
         ${mame_launch_script}
     # Substitute placeholder with real executable name
@@ -814,7 +857,6 @@ post-destroot {
     if {[variant_isset tools]} {
         set mame_tools_list \
             [mame_get_tools_list ${mame_target_dir} ${g_mame_tools_prefix}]
-
         ui_debug "Phase post-destroot: mame_tools_list: ${mame_tools_list}"
         foreach f ${mame_tools_list} {
             ui_debug "Phase post-destroot: soft linking tool: ${f}"
@@ -822,6 +864,7 @@ post-destroot {
             ln -s "${prefix}/libexec/mame/${fn}" \
                 "${destroot}${prefix}/bin/${fn}"
         }
+        unset mame_tools_list
     }
 
     set man_page_files \
@@ -839,8 +882,8 @@ post-destroot {
             "${mp_man_dest_dir}/${fn}"
     }
     unset f
-
     unset man_page_files
+
     unset mame_launch_link
     unset mame_launch_script
     unset mame_share_dir
@@ -861,6 +904,11 @@ notes {
     Examples:
         mame -video accel
         mame -video opengl
+
+    If you're new to Mame, our tutorial will quickly walk you through the\
+    process of setting up a new game:
+
+    https://trac.macports.org/wiki/howto/Mame
 }
 
 if {[variant_isset tools]} {

@@ -1,10 +1,11 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
 PortSystem          1.0
+PortGroup           cmake 1.1
 PortGroup           github 1.0
 
 epoch               1
-github.setup        google re2 2020-11-01
+github.setup        google re2 2021-04-01
 revision            0
 categories          devel textproc
 maintainers         nomaintainer
@@ -18,27 +19,36 @@ long_description    RE2 is a fast, safe, thread-friendly alternative to \
 platforms           darwin
 license             BSD
 
-checksums           rmd160  2960af20936802bd2bcc92bdca2526f0f1ac5cb0 \
-                    sha256  d47044e1b9547d4bef070d040398814b5bdd6dd4b4c302c611d97f1ccff0c074 \
-                    size    402759
-
-use_configure       no
-
-variant universal   {}
+checksums           rmd160  8ac19bc93d0dcd9b11455cdda6a80d003127db84 \
+                    sha256  5ba860cf979d57833af4e4ddff1ebbf0c6cc3adef69238c6dd2a169fc8f45093 \
+                    size    403377
 
 compiler.cxx_standard   2011
-if {[string match *clang* ${configure.cxx}]} {
-    configure.ldflags-append -stdlib=${configure.cxx_stdlib}
+
+configure.args-append \
+                    -DBUILD_SHARED_LIBS:BOOL=ON
+
+# Fix pkgconfig and shared library versioning; see:
+# https://bugs.archlinux.org/task/67739
+# https://gist.github.com/mtorromeo/1d48de16534dc8ee29cd872f94b070e5
+
+pre-configure {
+    reinplace s|@includedir@|${prefix}/include|g \
+        ${worksrcpath}/re2.pc
+    reinplace s|@libdir@|${prefix}/lib|g \
+        ${worksrcpath}/re2.pc
+    set somajor [exec /bin/sh -c "grep '^SONAME=' ${worksrcpath}/Makefile | cut -d= -f2"]
+    # append this line to CMakeLists.txt
+    reinplace "\$ a\\
+set_target_properties(re2 PROPERTIES VERSION ${somajor}.0.0 SOVERSION ${somajor})" \
+        ${worksrcpath}/CMakeLists.txt
 }
 
-build.args          CXX="${configure.cxx}" \
-                    CXXFLAGS="${configure.cxxflags} [get_canonical_archflags cxx]" \
-                    LDFLAGS="${configure.ldflags} [get_canonical_archflags cxx]" \
-                    prefix=${prefix}
-
-destroot.args       {*}${build.args}
-
 post-destroot {
+    xinstall -d ${destroot}${prefix}/lib/pkgconfig
+    xinstall -m 644 -W ${worksrcpath} \
+        re2.pc \
+        ${destroot}${prefix}/lib/pkgconfig
     # install additional documents.
     set docdir ${prefix}/share/doc/re2
     xinstall -d ${destroot}${docdir}

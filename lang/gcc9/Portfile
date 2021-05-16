@@ -6,11 +6,12 @@ PortGroup           compiler_blacklist_versions  1.0
 PortGroup           active_variants              1.1
 PortGroup           conflicts_build              1.0
 PortGroup           xcode_workaround             1.0
+PortGroup           cltversion                   1.0
 
 epoch               3
 name                gcc9
 version             9.3.0
-revision            4
+revision            5
 subport             libgcc9 { revision 3 }
 platforms           darwin
 categories          lang
@@ -122,6 +123,26 @@ configure.env-append \
                     OTOOL=${prefix}/bin/otool \
                     OTOOL64=${prefix}/bin/otool
 
+# clang (as) from Xcode 12.5 has various problems with gcc build
+if { ${os.platform} eq "darwin" && \
+         ( [ vercmp ${xcodeversion} 12.5 ] >= 0 || [ vercmp ${cltversion} 12.5 ] >= 0 ) } {
+
+    pre-configure {
+        ui_warn "Applying '--without-build-config' workaround to Xcode ${xcodeversion} / CLT ${cltversion}"
+        ui_warn "If versions > 12.5 please check if it is still required"
+    }
+    
+    # clang 11 and older have issues with macOS 11.3 (Xcode 12.5) SDK
+    # https://trac.macports.org/ticket/62770
+    compiler.blacklist-append {macports-clang-[5-9].0} {macports-clang-1[0-1]}
+
+    # gcc has build issues on macOS 11.3 with the use of Xcode clang as 'as'
+    # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100340
+    # https://trac.macports.org/ticket/62775
+    configure.args-append  --without-build-config
+
+}
+
 pre-configure {
 
     # Set package info
@@ -137,7 +158,7 @@ pre-configure {
         #
         # https://trac.macports.org/ticket/53726
         # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79885
-        configure.args-append --with-sysroot="${configure.sdkroot}"
+        configure.args-append --with-sysroot="[regsub {MacOSX1[1-9]\.[0-9]+\.sdk} ${configure.sdkroot} {MacOSX.sdk}]"
     }
 
 }
@@ -175,9 +196,6 @@ set install_dylibs {libasan.5.dylib}
 
 if {${subport} eq "libgcc9"} {
 
-    # Always provides primary runtime so always in conflict
-    conflicts libgcc-devel
-
     # Activate hack for new libgcc
     # https://trac.macports.org/wiki/PortfileRecipes#deactivatehack
     pre-activate {
@@ -211,7 +229,7 @@ if {${subport} eq "libgcc9"} {
     # version should continue to provide a subport for that and older gcc
     # versions.
 
-    depends_run path:share/doc/libgcc/README:libgcc
+    depends_run port:libgcc10
     depends_build-append {*}${depends_lib}
     depends_lib
 
@@ -253,7 +271,7 @@ if {${subport} eq "libgcc9"} {
             }
 
             move ${destroot}${prefix}/lib/libgcc/${dylib} ${destroot}${prefix}/lib/libgcc.merged
-            if {[variant_isset universal]} {
+            if {[variant_exists universal] && [variant_isset universal]} {
                 foreach archdir [glob ${destroot}${prefix}/lib/libgcc/*/] {
                     set archdir_nodestroot [string map "${destroot}/ /" ${archdir}]
                     if {[file exists ${archdir}/${dylib}]} {
@@ -308,7 +326,7 @@ if {${subport} eq "libgcc9"} {
                 delete ${destroot}${prefix}/lib/${name}/${dylib}
                 ln -s ${prefix}/lib/libgcc/${dylib} ${destroot}${prefix}/lib/${name}/${dylib}
             }
-            if {[variant_isset universal]} {
+            if {[variant_exists universal] && [variant_isset universal]} {
                 foreach archdir [glob ${destroot}${prefix}/lib/${name}/*/] {
                     if {[file exists ${archdir}/${dylib}]} {
                         delete ${archdir}/${dylib}

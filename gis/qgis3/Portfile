@@ -7,10 +7,10 @@ PortGroup           github  1.0
 PortGroup           qt5     1.0
 PortGroup           active_variants 1.1
 
-github.setup        qgis QGIS 3_16_2 final-
+github.setup        qgis QGIS 3_18_2 final-
 name                qgis3
 version             [string map {_ .} ${github.version}]
-revision            1
+revision            0
 categories          gis
 maintainers         {vince @Veence} openmaintainer
 description         QGIS 3 is a user-friendly GIS based on Qt 5
@@ -24,9 +24,9 @@ license             GPL-2+
 
 homepage            http://www.qgis.org/
 
-checksums           rmd160  f4aff75231366da6eb7cb0a3a31d70297489fdc8 \
-                    sha256  500d7d7c74555b035b3ca8f4a1ab6f17d2ad19c5cde9d3b551f4439f68c9f59c \
-                    size    135218561
+checksums           rmd160  b3ef58a5b7b16acf04f0091c5c010d13879958a3 \
+                    sha256  9520a9fc4ff91627d89b449f8c0f063f12a29952d102bcfc77837a4d315a2a4d \
+                    size    142984174
 
 compiler.cxx_standard  2011
 
@@ -39,6 +39,7 @@ depends_lib-append  port:libiconv \
                     port:proj7 \
                     port:geos \
                     port:gdal \
+                    port:PDAL \
                     port:exiv2 \
                     port:sqlite3 \
                     port:spatialite \
@@ -101,6 +102,7 @@ configure.args-append   "-DWITH_QSPATIALITE=OFF"
 
 configure.ldflags       "-Wl,-rpath,${prefix}/libexec/qt5/lib"
 configure.args-append   "-DWITH_3D=ON"
+configure.args-append   "-DWITH_PDAL=ON"
 configure.args-append   "-DLIBZIP_CONF_INCLUDE_DIR=${prefix}/lib/pkgconfig"
 configure.args-append   "-DWITH_BINDINGS=FALSE"
 configure.args-append   "-DPROJ_INCLUDE_DIR=${prefix}/lib/proj7/include"

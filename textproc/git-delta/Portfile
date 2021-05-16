@@ -4,13 +4,9 @@ PortSystem          1.0
 PortGroup           github 1.0
 PortGroup           cargo 1.0
 
-github.setup        dandavison delta 0.5.1
+github.setup        dandavison delta 0.7.1
 name                git-delta
 revision            0
-
-categories          textproc
-platforms           darwin
-license             MIT
 
 description         A syntax-highlighter for git and diff output
 
@@ -18,17 +14,29 @@ long_description    Delta provides language syntax-highlighting, within-line \
                     insertion/deletion detection, and restructured diff \
                     output for git on the command line.
 
+categories          textproc
+platforms           darwin
+license             MIT
+
 maintainers         {gmail.com:herby.gillot @herbygillot} \
                     openmaintainer
 
 checksums           ${distname}${extract.suffix} \
-                    rmd160  f126ef892b5f400cd7c9da97be46a399a28a6b97 \
-                    sha256  660a21c6ff50dcbc5f4ca0a633202e7f3b9b5b5c6dc4e17350cb5c6f2e4677fc \
-                    size    1054023
+                    rmd160  f8c4308bcafdcec248161628035792ca6bd96ad4 \
+                    sha256  c718bb569e54552adf63dc966a9e96c4c46b61751f273c081cc5c5b1f857239b \
+                    size    1064049
 
 destroot {
     xinstall -m 755 ${worksrcpath}/target/[cargo.rust_platform]/release/delta \
         ${destroot}${prefix}/bin/
+
+    # Install shell completions
+    xinstall -d ${destroot}${prefix}/share/bash-completion/completions
+	xinstall -m 644 ${worksrcpath}/etc/completion/completion.bash \
+        ${destroot}${prefix}/share/bash-completion/completions/delta
+    xinstall -d ${destroot}${prefix}/share/zsh/site-functions
+	xinstall -m 644 ${worksrcpath}/etc/completion/completion.zsh \
+        ${destroot}${prefix}/share/zsh/site-functions/_delta
 }
 
 notes "
@@ -62,7 +70,7 @@ cargo.crates \
     cfg-if                           1.0.0  baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd \
     chrono                          0.4.19  670ad68c9088c2a963aaa298cb369688cf3f9465ce5e2d4ca10e6e0098a1ce73 \
     clap                            2.33.3  37e58ac78573c40708d45522f0d80fa2f01cc4f9b4e2bf749807255454312002 \
-    console                         0.14.0  7cc80946b3480f421c2f17ed1cb841753a371c7c5104f51d507e13f532c856aa \
+    console                         0.14.1  3993e6445baa160675931ec041a5e03ca84b9c6e32a056150d3aa2bdda0a1f45 \
     crc32fast                        1.2.1  81156fece84ab6a9f2afdb109ce3ae577e42b1228441eded99bd77f627953b1a \
     dirs-next                        2.0.0  b98cf8ebf19c3d1b223e151f99a4f9f0690dca41414773390fc824184ac833e1 \
     dirs-sys-next                    0.1.1  99de365f605554ae33f115102a02057d4fc18b01f3284d6870be0938743cfe7d \
@@ -73,7 +81,7 @@ cargo.crates \
     fnv                              1.0.7  3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1 \
     form_urlencoded                  1.0.0  ece68d15c92e84fa4f19d3780f1294e5ca82a78a6d515f1efaabcc144688be00 \
     getrandom                       0.1.16  8fc3cb4d91f53b50155bdcfd23f6a4c39ae1969c2ae85982b135750cccaf5fce \
-    git2                           0.13.15  44f267c9da8a4de3c615b59e23606c75f164f84896e97f4dd6c15a4294de4359 \
+    git2                           0.13.17  1d250f5f82326884bd39c2853577e70a121775db76818ffa452ed1e80de12986 \
     hashbrown                        0.8.2  e91b62f79061a0bc2e046024cb7ba44b08419ed238ecbd9adbd787434b9e8c25 \
     heck                             0.3.2  87cbf45460356b7deeb5e3415b5563308c0a9b057c85e12b06ad551f98d0a6ac \
     hermit-abi                      0.1.17  5aca5565f760fb5b220e499d72710ed156fdb74e631659e99377d9ebfbd13ae8 \
@@ -85,7 +93,7 @@ cargo.crates \
     lazy_static                      1.4.0  e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646 \
     lazycell                         1.3.0  830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55 \
     libc                            0.2.81  1482821306169ec4d07f6aca392a4681f66c75c9918aa49641a2595db64053cb \
-    libgit2-sys              0.12.17+1.1.0  f4ebdf65ca745126df8824688637aa0535a88900b83362d8ca63893bcf4e8841 \
+    libgit2-sys              0.12.18+1.1.0  3da6a42da88fc37ee1ecda212ffa254c25713532980005d5f7c0b0fbe7e6e885 \
     libz-sys                         1.1.2  602113192b08db8f38796c4e85c39e960c145965140e918018bcde1952429655 \
     line-wrap                        0.1.1  f30344350a2a51da54c1d53be93fade8a237e545dbcc4bdbe635413f2117cab9 \
     linked-hash-map                  0.5.3  8dd5a6d5999d9907cda8ed67bbd137d3af8085216c2ac62de5be860bd41f304a \
@@ -106,8 +114,8 @@ cargo.crates \
     quote                            1.0.8  991431c3519a3f36861882da93630ce66b52918dcf1b8e2fd66b397fc96f28df \
     redox_syscall                   0.1.57  41cc0f7e4d5d4544e8861606a285bb08d3e70712ccc7d2b84d7c0ccfaf4b05ce \
     redox_users                      0.3.5  de0737333e7a9502c789a36d7c7fa6092a49895d4faa31ca5df163857ded2e9d \
-    regex                            1.4.2  38cf2c13ed4745de91a5eb834e11c00bcc3709e773173b2ce4c56c9fbde04b9c \
-    regex-syntax                    0.6.21  3b181ba2dcf07aaccad5448e8ead58db5b742cf85dfe035e2227f137a539a189 \
+    regex                            1.4.5  957056ecddbeba1b26965114e191d2e8589ce74db242b6ea25fc4062427a5c19 \
+    regex-syntax                    0.6.22  b5eb417147ba9860a96cfe72a0b93bf88fee1744b5636ec99ab20c1aa9376581 \
     ryu                              1.0.5  71d301d4193d031abdd79ff7e3dd721168a9572ef3fe51a1517aba235bd8f86e \
     safemem                          0.3.3  ef703b7cb59335eae2eb93ceb664c0eb7ea6bf567079d843e09420219668e072 \
     same-file                        1.0.6  93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502 \
@@ -122,7 +130,6 @@ cargo.crates \
     syntect                          4.5.0  2bfac2b23b4d049dc9a89353b4e06bbc85a8f42020cccbe5409a115cf19031e5 \
     terminal_size                   0.1.15  4bd2d183bd3fac5f5fe38ddbeb4dc9aec4a39a9d7d59e7491d900302da01cbe1 \
     textwrap                        0.11.0  d326610f408c7a4eb6f51c37c330e496b08506c9457c9d34287ecc38809fb060 \
-    thread_local                     1.0.1  d40c6d1b69745a6ec6fb1ca717914848da4b44ae29d9b3080cbee91d72a69b14 \
     tinyvec                          1.1.0  ccf8dbc19eb42fba10e8feaaec282fb50e2c14b2726d6301dbfeed0f73306a6f \
     tinyvec_macros                   0.1.0  cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c \
     unicode-bidi                     0.3.4  49f2bd0c6468a8230e1db229cff8029217cf623c767ea5d60bfbd42729ea54d5 \
@@ -135,7 +142,7 @@ cargo.crates \
     vcpkg                           0.2.11  b00bca6106a5e23f3eee943593759b7fcddb00554332e856d990c893966879fb \
     vec_map                          0.8.2  f1bddf1187be692e79c5ffeab891132dfb0f236ed36a43c7ed39f1165ee20191 \
     version_check                    0.9.2  b5a972e5669d67ba988ce3dc826706fb0a8b01471c088cb0b6110b805cc36aed \
-    vte                              0.9.0  6e7745610024d50ab1ebfa41f8f8ee361c567f7ab51032f93cc1cc4cbf0c547a \
+    vte                             0.10.0  2df25fed2855d2fbcbdf1016c69a6ac070fa1aabc8b5d7aedaab8703dce0d2d6 \
     vte_generate_state_changes       0.1.1  d257817081c7dffcdbab24b9e62d2def62e2ff7d00b1c20062551e6cccc145ff \
     walkdir                          2.3.1  777182bc735b6424e1a57516d35ed72cb8019d85c8c9bf536dccb3445c1a2f7d \
     wasi      0.9.0+wasi-snapshot-preview1  cccddf32554fecc6acb585f82a32a72e28b48f8c4c1883ddfeeeaa96f7d8e519 \
@@ -143,5 +150,6 @@ cargo.crates \
     winapi-i686-pc-windows-gnu       0.4.0  ac3b87c63620426dd9b991e5ce0329eff545bccbbb34f3be09ff6fb6ab51b7b6 \
     winapi-util                      0.1.5  70ec6ce85bb158151cae5e5c87f95a8e97d2c0c4b001223f33a334e3ce5de178 \
     winapi-x86_64-pc-windows-gnu     0.4.0  712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f \
+    xdg                              2.2.0  d089681aa106a86fade1b0128fb5daf07d5867a509ab036d99988dec80429a57 \
     xml-rs                           0.8.3  b07db065a5cf61a7e4ba64f29e67db906fb1787316516c4e6e5ff0fea1efcd8a \
     yaml-rust                        0.4.5  56c1936c4cc7a1c9ab21a1ebb602eb942ba868cbd44a99cb7cdc5892335e1c85

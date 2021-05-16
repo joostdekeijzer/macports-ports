@@ -4,30 +4,34 @@ PortSystem       1.0
 
 name             xorg-xorgproto
 epoch            1
-version          2020.1
+version          2021.4
+revision         0
+
+checksums        rmd160  7003602d02df7bda5da22412f6a35d4e144d4a11 \
+                 sha256  0f5157030162844b398e7ce69b8bb967c2edb8064b0a9c9bb5517eb621459fbf \
+                 size    885414
+
 categories       x11 devel
 license          X11
 maintainers      {jeremyhu @jeremyhu} {jonesc @cjones051073} openmaintainer
-description      X.org xorgproto
+
 homepage         https://www.x.org
 platforms        darwin
 supported_archs  noarch
+
+description      X.org xorgproto
 long_description X.Org combined prototype headers
+
 master_sites     xorg:individual/proto/
 
 distname         xorgproto-${version}
 
-checksums        rmd160  6fa77728e461be0cf83a1f5626a55ecee1795390 \
-                 sha256  54a153f139035a376c075845dd058049177212da94d7a9707cf9468367b699d2 \
-                 size    848072
-
 use_bzip2        yes
 
-configure.args \
-	--enable-legacy \
-	--without-xmlto \
-	--without-fop \
-	--disable-specs
+configure.args  --enable-legacy \
+	            --without-xmlto \
+                --without-fop \
+                --disable-specs
 
 post-destroot {
     # This is provided by xorg-libX11 as of 1.6.9 - it's legacy in

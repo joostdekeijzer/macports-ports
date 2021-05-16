@@ -15,37 +15,57 @@ license             MIT
 description         Installs wrapper headers to add missing functionality to legacy OSX versions.
 long_description    {*}${description}
 
+# Primary release version
+set release_ver     1.0.1
+
+# Binary compatibility version
+set compat_ver      1.0.0
+
 subport ${name} {
     conflicts           ${name}-devel
-    github.setup        macports macports-legacy-support 0.13 v
+    github.setup        macports macports-legacy-support ${release_ver} v
     revision            0
-    checksums           rmd160  8a0d07eb0cdd627a7cfea7c853248ee89e7607b3 \
-                        sha256  59719d12a4970928aaca9f09f2ecc371ea967218df169d46155135a6f9894083 \
-                        size    37130
+    checksums           rmd160  cf898f20a57c07481f756741f57e629a162a6967 \
+                        sha256  a69d927f4438ffc7515340831d1b2a2b6841afbe1df1a0c2dc1f9da08908a8a1 \
+                        size    46080
 }
 
 subport ${name}-devel {
     conflicts           ${name}
-    github.setup        macports macports-legacy-support e1c04c318066c16df8371419eada1985dad62261
-    version             20201104
+    github.setup        macports macports-legacy-support 4de7b2b365ffa5afb4ef3c5858ca3ad50b4628ac
+    version             20210503
     revision            0
     livecheck.type      none
-    checksums           rmd160  4099c92bf95f8b2e2f5122d15025fb86d354bb58 \
-                        sha256  689641b32fe87b5e02dfd6ddbd34166561f3c99ec6b7809e2e8d92ad55c8e4f5 \
-                        size    38102
+    checksums           rmd160  cf898f20a57c07481f756741f57e629a162a6967 \
+                        sha256  a69d927f4438ffc7515340831d1b2a2b6841afbe1df1a0c2dc1f9da08908a8a1 \
+                        size    46080
+    set v_split         [split ${release_ver} .]
+    set release_ver     [lindex ${v_split} 0].[lindex ${v_split} 1].99
 }
 
 use_configure       no
 
-build.env           CXX=${configure.cxx} \
+# Until this can be fixed disable parallel builds...
+# https://build.macports.org/builders/ports-10.10_x86_64-builder/builds/141962/steps/install-port/logs/stdio
+use_parallel_build  no
+
+set max_darwin_reexport 19
+
+build.env-append    CXX=${configure.cxx} \
                     CC=${configure.cc} \
                     PREFIX=${prefix} \
                     "LIPO=/usr/bin/lipo" \
-                    PLATFORM=${os.major}
+                    PLATFORM=${os.major} \
+                    MAX_DARWIN_REEXPORT=${max_darwin_reexport} \
+                    SOCURVERSION=${release_ver} \
+                    SOCOMPATVERSION=${compat_ver}
 
 destroot.env        PREFIX=${prefix}
 
-if {[variant_isset universal]} {
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
+if {${universal_possible} && [variant_isset universal]} {
     foreach arch ${universal_archs_supported} {
         lappend merger_build_env(${arch})   "CXXFLAGS=${configure.cxxflags} [muniversal_get_arch_flag ${arch}]" \
                                             "CFLAGS=${configure.cflags} [muniversal_get_arch_flag ${arch}]" \
@@ -63,14 +83,30 @@ test.env            {*}${build.env}
 test.run            yes
 test.target         test
 
-post-destroot {
-  platform darwin 8 {
-    # install Tiger-specific fixes
+platform darwin 8 {
+    post-destroot {
+        # install Tiger-specific fixes
+        # very slightly modified which command to match behaviour of 10.5+
+        copy ${worksrcpath}/tiger_only/bin/which ${destroot}${prefix}/bin/which
+    }
+}
 
-    # very slightly modified which command to match behaviour of 10.5+
-    copy ${worksrcpath}/tiger_only/bin/which \
-         ${destroot}${prefix}/bin/which
-  }
+# The legacy-support build cannot create the LegacySupportSystem library directly
+# on newer systems as the reexport link option to /usr/lib/libSystem.B.dylib
+# does not work, due to the file system library cache added in macOS11.
+# Fallback to using optool here. Optool also currently not working on arm.
+if { ${build_arch} ne "arm64" && ${os.major} > ${max_darwin_reexport} } {
+    depends_build-append port:optool
+    post-destroot {
+        set legSupp   ${prefix}/lib/libMacportsLegacySupport.dylib
+        set legSystem ${prefix}/lib/libMacportsLegacySystem.B.dylib
+        if {![file exists ${destroot}${legSystem}]} {
+            copy ${destroot}${legSupp} ${destroot}${legSystem}
+            system "${prefix}/bin/optool install -c reexport -p /usr/lib/libSystem.B.dylib -t ${destroot}${legSystem}"
+        } else {
+            ui_warn "${destroot}${legSystem} already exists."
+        }
+    }
 }
 
 if {![file exists ${prefix}/libexec/mpstats]} {

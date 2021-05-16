@@ -15,7 +15,16 @@ maintainers             {ogsite.net:sirn @sirn} @pedrohdz \
 subport helm_select {}
 
 # *NOTE* Remember to update `latestVersion` on a version upgrade.
-set latestVersion       helm-3.4
+set latestVersion       helm-3.5
+
+subport helm-3.5 {
+    set baseVersion     3.5
+    set patchNumber     4
+    revision            0
+    checksums           rmd160  bc390477253c4bc8f3fe71e62f50e883430b2792 \
+                        sha256  072c40c743d30efdb8231ca03bab55caee7935e52175e42271a0c3bc37ec0b7b \
+                        size    13052607
+}
 
 subport helm-3.4 {
     set baseVersion     3.4

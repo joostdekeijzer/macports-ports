@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-drms
-version             0.6.0
+version             0.6.2
 revision            0
 categories          python
 license             BSD
@@ -18,9 +18,9 @@ homepage            https://sunpy.org
 
 python.versions     37 38 39
 
-checksums           rmd160  c602729b41446014eb5e44ced792c93d7b1887b9 \
-                    sha256  74efb903f42647ea536de0c5aea4f9a81efe027c95055ec4e72ef62479a04c89 \
-                    size    52958
+checksums           rmd160  20fdcf61850f96080fccc56ff4e63b950f575be7 \
+                    sha256  21df2b3caf2aabbd601e7e432a7122ecba74f351856dc16d194faff3d565b7da \
+                    size    53808
 
 if {${name} ne ${subport}} {
     depends_build-append \

@@ -5,11 +5,12 @@ PortGroup               python 1.0
 PortGroup               active_variants 1.1
 PortGroup               github 1.0
 PortGroup               compilers 1.0
+PortGroup               compiler_blacklist_versions 1.0
 
-github.setup            scipy scipy 1.6.0 v
-checksums               rmd160 dd3d90f10431b64ae56d65169e19fb08c6d1692a \
-                        sha256 44030c5d2a59a89e2f977a3d3692defb75f66a308a085b834859e17b3510c8bc \
-                        size   21921044
+github.setup            scipy scipy 1.6.3 v
+checksums               rmd160  6707517e6453672754d29de617b4f97a16273af0 \
+                        sha256  df43ae5800a551a29a0ac3f12f53ae1039605dc412729c911e2558442fa48e92 \
+                        size    21924207
 revision                0
 
 name                    py-scipy
@@ -27,7 +28,7 @@ python.add_archflags    no
 universal_variant       no
 
 compilers.setup         require_fortran -clang -gcc44 -gcc45 -gcc46 \
-                        -gcc47 -gcc48 -g95 clang37
+                        -gcc47 -gcc48 -g95
 
 github.livecheck.regex {([0-9.-]+)}
 
@@ -46,6 +47,13 @@ if {${name} ne ${subport}} {
 
         # See https://trac.macports.org/ticket/60520
         compilers.allow_arguments_mismatch yes
+
+        # Fixes general build issues with implicit functions; unknown
+        # how these changes might impact functionality; since SciPy
+        # 1.2.3 is quite old, no guarantees that any of this works,
+        # and there's no point in pushing it upstream, really.
+        patchfiles-append patch-xcode12-fixes.27.diff
+        patch.pre_args -p1
 
     } elseif {${python.version} == 35} {
 
@@ -77,18 +85,23 @@ if {${name} ne ${subport}} {
 
     } else {
 
-        depends_lib-append  port:py${python.version}-pybind11
+        depends_lib-append port:py${python.version}-mypy
 
         compiler.c_standard 2011
-        compiler.cxx_standard 2011
+        compiler.cxx_standard 2014
         compiler.thread_local_storage yes
+        # Requires threads.h, missing in Xcode clang
+        # https://build.macports.org/builders/ports-10.11_x86_64-builder/builds/136856/steps/install-port/logs/stdio
+        compiler.blacklist-append {clang < 900}
 
     }
 
     depends_lib-append      port:py${python.version}-numpy \
-                            port:py${python.version}-nose
+                            port:py${python.version}-nose \
+                            port:py${python.version}-pybind11
 
-    depends_build-append    port:swig-python
+    depends_build-append    port:swig-python \
+                            port:py${python.version}-pip
 
     depends_test-append     port:py${python.version}-py \
                             port:py${python.version}-pytest

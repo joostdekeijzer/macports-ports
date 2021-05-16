@@ -8,7 +8,7 @@ PortGroup muniversal 1.0
 
 #remember to update the -doc and -server as well
 name                postgresql11
-version             11.10
+version             11.11
 revision            0
 
 categories          databases
@@ -27,9 +27,9 @@ master_sites        http://ftp3.de.postgresql.org/pub/Mirrors/ftp.postgresql.org
             postgresql:source/v${version}/
 distname            postgresql-${version}
 
-checksums           rmd160  112aaba727ec5639ab8e284d55eba2c7cd12e939 \
-                    sha256  13e6d2f80662fe463bc7718cdf0de6a9ec67fc78afcc7a3ae66b9ea19bb97899 \
-                    size    20003842
+checksums           rmd160  44d9bcd81fc6a89d8e2bcbcbc7353e37e951cfbc \
+                    sha256  40607b7fa15b7d63f5075a7277daf7b3412486aa5db3aedffdb7768b9298186c \
+                    size    20054359
 
 use_bzip2           yes
 
@@ -73,7 +73,10 @@ compilers.choose          cc cxx
 compilers.setup           -gcc -fortran -clang33 -clang34 -clang37
 notes "To use the postgresql server, install the ${name}-server port"
 
-if {[variant_isset universal]} {
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
+if {${universal_possible} && [variant_isset universal]} {
     configure.cflags-append    -DAC_APPLE_UNIVERSAL_BUILD
 }
 
@@ -102,7 +105,7 @@ post-destroot {
         ${destroot}${prefix}/lib/${name}/pgxs/src/Makefile.global
 }
 
-if {![variant_isset universal]} {
+if {!${universal_possible} || ![variant_isset universal]} {
     post-destroot {
         reinplace -E "s#-arch\[\[:space:\]\]+\[\[:alnum:\]_\]+##g" \
             ${destroot}${prefix}/lib/${name}/pgxs/src/Makefile.global

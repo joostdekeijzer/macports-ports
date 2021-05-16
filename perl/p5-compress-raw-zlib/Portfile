@@ -4,7 +4,8 @@ PortSystem          1.0
 PortGroup           perl5 1.0
 
 perl5.branches      5.26 5.28 5.30
-perl5.setup         Compress-Raw-Zlib 2.096 ../../authors/id/P/PM/PMQS
+perl5.setup         Compress-Raw-Zlib 2.101 ../../authors/id/P/PM/PMQS
+revision            0
 license             {Artistic-1 GPL}
 maintainers         nomaintainer
 description         The Compress::Raw::Zlib module provides a Perl \
@@ -13,8 +14,20 @@ long_description    ${description}
 
 platforms           darwin
 
-checksums           rmd160  48efb424dc3e8e3a08eff3b5b539425fc55f6423 \
-                    sha256  cd4cba20c159a7748b8bc91278524a7da70573d9531fde62298609a5f1c65912 \
-                    size    254784
+checksums           rmd160  012d9f4013aee9624bf1fa85c22905366a11aab2 \
+                    sha256  9d1b9515e8277c1b007e33fad1fd0f18717d56bf647e3794d61289c45b1aabb2 \
+                    size    254576
+
+if {${perl5.major} ne ""} {
+    depends_test-append \
+                    port:p${perl5.major}-test-cpan-meta \
+                    port:p${perl5.major}-test-cpan-meta-json \
+                    port:p${perl5.major}-test-pod
+
+    # run all tests
+    test.env-append COMPRESS_ZLIB_RUN_ALL=1
+
+    perl5.link_binaries no
+}
 
 # builds using embedded zlib source, no external dependency required

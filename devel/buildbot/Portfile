@@ -4,11 +4,11 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                buildbot
-version             2.8.4
+version             3.1.0
 revision            0
-checksums           rmd160  1330d1e0637b1142e012bda7c45cc3aeb919b798 \
-                    sha256  1bb314f29546b7973de0fb575868d8c2e570bdfe80463244f6627aac615f5a44 \
-                    size    3134447
+checksums           rmd160  9643828e5fe3cb5b702e9f3f90d8563a1c48ce8c \
+                    sha256  296a62a91a7b0270db4255b533092f5a827651fbe8170a709e548bbf104d35ad \
+                    size    2229027
 
 categories          devel
 platforms           darwin
@@ -26,7 +26,7 @@ long_description    Buildbot is a system to automate the compile/test \
 homepage            https://buildbot.net
 
 python.default_version \
-                    38
+                    39
 
 if {${subport} eq ${name}} {
 

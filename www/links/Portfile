@@ -31,6 +31,8 @@ depends_lib     port:bzip2 \
                 port:xz \
                 port:zlib
 
+patchfiles      implicit.patch
+
 configure.args  --disable-graphics \
                 --disable-javascript \
                 --mandir=${prefix}/share/man \
@@ -43,7 +45,7 @@ configure.args  --disable-graphics \
                 --without-x
 
 post-patch {
-    reinplace s|/etc/|${prefix}/etc/| ${workpath}/${worksrcdir}/os_dep.h
+    reinplace s|/etc/|${prefix}/etc/| ${worksrcpath}/os_dep.h
 }
 
 variant svg requires x11 description {Enable SVG support} {
@@ -57,7 +59,7 @@ variant tiff requires x11 description {Enable TIFF support} {
 }
 
 variant x11 {
-    depends_lib-append      port:jpeg port:libpng port:xorg-libXt
+    depends_lib-append      path:include/turbojpeg.h:libjpeg-turbo port:libpng port:xorg-libXt
     configure.args-replace  --disable-graphics --enable-graphics
     configure.args-replace  --without-libjpeg --with-libjpeg
     configure.args-replace  --without-libpng  --with-libpng

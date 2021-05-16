@@ -5,11 +5,11 @@ PortGroup           xcodeversion 1.0
 PortGroup           muniversal 1.0
 
 name                tiff
-version             4.2.0
+version             4.3.0
 revision            0
-checksums           rmd160  ec0786653efa76fcd30c9c7274c1c246719821de \
-                    sha256  eb0484e568ead8fa23b513e9b0041df7e327f4ee2d22db5a533929dfc19633cb \
-                    size    2809373
+checksums           rmd160  254477d12e79309cb82615eaad9946cc627a58f3 \
+                    sha256  0e46e5acb087ce7d1ac53cf4f56a09b221537fc86dfc5daaad1c2e89e1b37ac8 \
+                    size    2808254
 
 categories          graphics
 platforms           darwin
@@ -35,23 +35,24 @@ homepage            http://simplesystems.org/libtiff/
 master_sites        http://download.osgeo.org/libtiff/ \
                     freebsd
 
-depends_lib         port:jpeg \
+depends_lib         path:include/turbojpeg.h:libjpeg-turbo \
                     port:xz \
                     port:zlib \
                     port:zstd
 
+post-extract {
+    # https://gitlab.com/libtiff/libtiff/-/issues/252
+    move ${worksrcpath}/VERSION ${worksrcpath}/VERSION.txt
+}
+
 test.run            yes
 test.target         check
 
-use_autoreconf      yes
-autoreconf.args     -fvi
+compiler.c_standard 1999
 
-# first patch fixes two problems
-#     have typedefs be consistent with OSX headers (see http://trac.macports.org/ticket/41280)
-#     prevent configure script from assuming that if we don't want X11, then we don't want OpenGL either
-# prevent configure script from finding X11 OpenGL (e.g. mesa & freeglut)
-patchfiles          patch-configure.ac.diff \
-                    patch-acinclude.m4.diff
+patchfiles          allow-opengl-without-x11.patch \
+                    dont-find-x11-opengl.patch \
+                    rename-VERSION.patch
 
 configure.args      --disable-jbig \
                     --disable-webp \
@@ -70,10 +71,10 @@ use_parallel_build  yes
 
 minimum_xcodeversions {9 3.1}
 
-# tools/tiffgt.c incorrectly uses HAVE_APPLE_OPENGL_FRAMEWORK rather than HAVE_OPENGL_GL_H
-# see http://bugzilla.maptools.org/show_bug.cgi?id=2363
-configure.cppflags-append \
-                    -DHAVE_APPLE_OPENGL_FRAMEWORK
+post-destroot {
+    # https://gitlab.com/libtiff/libtiff/-/issues/252
+    move ${destroot}${prefix}/share/doc/${name}/VERSION.txt ${destroot}${prefix}/share/doc/${name}/VERSION
+}
 
 set merger_dont_diff ${prefix}/include/tiffconf.h
 
@@ -85,5 +86,5 @@ variant jbig description {Enable JBIG support} {
 }
 
 livecheck.type  regex
-livecheck.url   http://download.osgeo.org/libtiff/
+livecheck.url   [lindex ${master_sites} 0]
 livecheck.regex "${name}-(\\d+(?:\\.\\d+)*)${extract.suffix}"

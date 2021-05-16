@@ -1,0 +1,40 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           golang 1.0
+
+go.setup            github.com/noborus/ov 0.9.0 v
+revision            0
+
+description         Feature rich terminal pager
+
+long_description    ov is a feature rich terminal pager. It has an effective \
+                    function for tabular text. Previously known as oviewer.
+
+categories          textproc sysutils
+maintainers         {gmail.com:herby.gillot @herbygillot} \
+                    openmaintainer
+license             MIT
+installs_libs       no
+
+checksums           rmd160  1fccf6d9585de96d58bb1e51349f75e02db290be \
+                    sha256  2cb803fb1e888cb2fb791b638a7d10c7bc1033402a6eb04ff9ff45434d2ecfea \
+                    size    2885357
+
+# Enable fetching deps at build time
+build.env-delete    GO111MODULE=off GOPROXY=off
+build.cmd           make
+build.pre_args-append \
+                    LDFLAGS="\\\"-X main.Version=${version}\\\""
+build.args          build
+
+set ov_share_path   ${prefix}/share/${name}
+destroot {
+    xinstall -m 0755 ${worksrcpath}/${name} ${destroot}${prefix}/bin/
+    xinstall -d ${destroot}${ov_share_path}/
+    xinstall -m 0644 ${worksrcpath}/${name}.yaml ${destroot}${ov_share_path}/
+}
+
+notes "
+    You can find a sample config file for ov at: ${ov_share_path}/${name}.yaml
+"

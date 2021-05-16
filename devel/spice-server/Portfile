@@ -5,8 +5,8 @@ PortGroup           meson 1.0
 
 name                spice-server
 version             0.14.3
-revision            1
-maintainers         {danchr @danchr} openmaintainer
+revision            2
+maintainers         nomaintainer
 categories          devel
 platforms           darwin
 license             BSD
@@ -42,7 +42,7 @@ depends_lib-append \
     port:spice-protocol \
     path:lib/pkgconfig/glib-2.0.pc:glib2 \
     path:lib/pkgconfig/pixman-1.pc:libpixman \
-    port:jpeg \
+    path:include/turbojpeg.h:libjpeg-turbo \
     port:gstreamer1 port:gstreamer1-gst-plugins-base \
     port:libopus
 

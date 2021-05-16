@@ -4,9 +4,9 @@ PortSystem          1.0
 PortGroup github    1.0
 
 name                everparse
-github.setup        project-everest everparse f266a357262d0ff0ae3c291d77e280a98c3c0feb
-version             20200908-[string range ${github.version} 0 6]
-revision            4
+github.setup        project-everest everparse 538bda1a6d1320ea6ca145971a2f7875ac9b49a1
+version             20210510-[string range ${github.version} 0 6]
+revision            1
 
 categories          devel
 platforms           darwin
@@ -17,12 +17,13 @@ long_description    EverParse provides LowParse, verified-secure F*/Low* parser 
                     QuackyDucky, an untrusted compiler for generating verified secure parsers from a \
                     message format specification.
 
-checksums           rmd160  fa393a8fdedcbc6d32308f1e7f82c7772ce89527 \
-                    sha256  bd60f0796c2902256473ab1d7e7becf851bbcc2b8e0f998dc76f96d877c00440 \
-                    size    802706
+checksums           rmd160  bbabfe2ce5fef9b07253d843e345ab660fe52ad3 \
+                    sha256  dcef346a622fcf33772cb8dd791b086a54906f8021d8a373264ca614d7745880 \
+                    size    855003
 
 depends_lib         port:fstar-devel \
-                    port:kremlin-devel
+                    port:kremlin-devel \
+                    port:ocaml-hacl-star
 
 depends_build       port:ocaml \
                     port:ocaml-ocamlbuild \
@@ -47,12 +48,12 @@ pre-patch {
 }
 
 post-patch {
-    foreach {key path_var} {
-        @FSTAR_HOME@        fstar.home
-        @KREMLIN_HOME@      kremlin.home
-        @QD_HOME@           lowparse.home
+    foreach {key path_var subdir} {
+        @FSTAR_HOME@        fstar.home      "/home"
+        @KREMLIN_HOME@      kremlin.home    "/home"
+        @QD_HOME@           lowparse.home   ""
     } {
-        reinplace "s|${key}|[set ${path_var}]/home|g" \
+        reinplace "s|${key}|[set ${path_var}]${subdir}|g" \
             src/3d/ocaml/Batch.ml
     }
 }
@@ -78,6 +79,7 @@ pre-build {
         src/3d
         src/3d/prelude
         tests/lowparse
+        tests/sample0
         tests/sample
         tests/bitfields
         tests/unit
@@ -91,12 +93,13 @@ destroot {
     # Create QD_HOME layout compatible with src/package/package.sh
     set everparse_root      ${prefix}/libexec/everparse
     set everparse_bin       ${everparse_root}/bin
-    set everparse_home      ${everparse_root}/src
-    set everparse_home_3d   ${everparse_home}/3d
+    set everparse_lib       ${everparse_root}/lib
+    set everparse_lib_3d    ${everparse_root}/lib/3d
+    set everparse_src       ${everparse_root}/src
 
     xinstall -d \
-        ${destroot}${everparse_home} \
-        ${destroot}${everparse_home_3d} \
+        ${destroot}${everparse_lib}    \
+        ${destroot}${everparse_lib_3d} \
         ${destroot}${everparse_bin}
 
     xinstall \
@@ -108,17 +111,17 @@ destroot {
         ${destroot}${everparse_bin}/3d
 
     foreach {ep_src ep_dst} [list \
-        lowparse                    ${everparse_home}       \
-        3d/prelude                  ${everparse_home_3d}    \
-        3d/.clang-format            ${everparse_home_3d}    \
-        3d/copyright.txt            ${everparse_home_3d}    \
-        3d/EverParseEndianness.h    ${everparse_home_3d}    \
-        3d/noheader.txt             ${everparse_home_3d}    \
+        lowparse                    ${everparse_lib}    \
+        3d/prelude                  ${everparse_lib_3d} \
+        3d/.clang-format            ${everparse_lib_3d} \
+        3d/copyright.txt            ${everparse_lib_3d} \
+        3d/EverParseEndianness.h    ${everparse_lib_3d} \
+        3d/noheader.txt             ${everparse_lib_3d} \
     ] {
         copy ${worksrcpath}/src/${ep_src} ${destroot}${ep_dst}
     }
 
-    fs-traverse {f} ${destroot}${everparse_home} {
+    fs-traverse {f} ${destroot}${everparse_lib} {
         switch -glob -- "[file tail $f] [file type $f]" {
             {.hints link}       -
             {.gitignore file}   -
@@ -126,6 +129,9 @@ destroot {
             {Makefile file}     { delete $f }
         }
     }
+
+    # src/package/package.sh expects a 'src' directory
+    ln -sf lib                  ${destroot}/${everparse_src}
 
     # Symlink the binaries into ${prefix}/bin
     ln -sf ${everparse_bin}/qd  ${destroot}${prefix}/bin/quackyducky

@@ -29,6 +29,7 @@ if { ${subport} eq "${name}-qtwebkit-examples" } {
 
 set just_want_qt5_variables yes
 PortGroup qt5 1.0
+
 unset just_want_qt5_variables
 
 # get Qt's version numbers
@@ -157,12 +158,12 @@ array set modules {
             50179672
         }
         ""
-        "port:zlib port:libpng port:jpeg port:freetype path:bin/dbus-daemon:dbus path:lib/pkgconfig/glib-2.0.pc:glib2 port:icu port:pcre2 port:harfbuzz port:double-conversion port:zstd"
+        "port:zlib port:libpng path:include/turbojpeg.h:libjpeg-turbo port:freetype path:bin/dbus-daemon:dbus path:lib/pkgconfig/glib-2.0.pc:glib2 port:icu port:pcre2 port:harfbuzz port:double-conversion port:zstd"
         ""
         {"Qt Core" "Qt GUI" "Qt Network" "Qt SQL" "Qt Test" "Qt Widgets" "Qt Concurrent" "Qt D-Bus" "Qt OpenGL" "Qt Platform Headers" "Qt Print Support" "Qt XML"}
         ""
         "variant overrides: "
-        "revision 0"
+        "revision 2"
         "License: "
     }
     qtcharts {
@@ -387,7 +388,7 @@ array set modules {
         {"Provides a high-level API for creating 3D content or UIs based on Qt Quick."}
         "technology preview module; GPLv3 license only"
         "variant overrides: "
-        "revision 0"
+        "revision 1"
         "License: {GPL-3 OpenSSLException}"
     }
     qtquickcontrols {
@@ -652,12 +653,12 @@ array set modules {
             35301876
         }
         "port:python27 port:bison port:flex"
-        "port:fontconfig port:icu port:leveldb port:webp port:libxml2 port:libxslt port:zlib port:sqlite3"
+        "port:fontconfig port:icu port:leveldb port:webp port:libxml2 port:libxslt port:zlib port:sqlite3 path:include/turbojpeg.h:libjpeg-turbo"
         "qtbase qtdeclarative qtlocation qtmultimedia qtsensors qtwebchannel qtxmlpatterns"
         {"Qt WebKit" "Qt WebKit Widgets"}
         "community support only (use Qt WebEngine)"
         "variant overrides: "
-        "revision 0"
+        "revision 2"
         "License: "
     }
     qtwebkit-examples {
@@ -747,6 +748,14 @@ array set sql_plugins {
     }
     {psql PostgreSQL "revision 0"} {
         {
+            "postgresql13"
+            "port:postgresql13"
+            "${prefix}/include/postgresql13"
+            "${prefix}/lib/postgresql13"
+            "-lpq"
+            ""
+        }
+        {
             "postgresql12"
             "port:postgresql12"
             "${prefix}/include/postgresql12"
@@ -810,6 +819,54 @@ array set sql_plugins {
             "${prefix}/include/mariadb/mysql"
             "${prefix}/lib/mariadb/mysql"
             "-lmysqlclient_r"
+            ""
+        }
+        {
+            "mariadb10_5"
+            "port:mariadb-10.5"
+            "${prefix}/include/mariadb-10.5/mysql"
+            "${prefix}/lib/mariadb-10.5/mysql"
+            "-lmysqlclient_r"
+            ""
+        }
+        {
+            "mariadb10_4"
+            "port:mariadb-10.4"
+            "${prefix}/include/mariadb-10.4/mysql"
+            "${prefix}/lib/mariadb-10.4/mysql"
+            "-lmysqlclient_r"
+            ""
+        }
+        {
+            "mariadb10_3"
+            "port:mariadb-10.3"
+            "${prefix}/include/mariadb-10.3/mysql"
+            "${prefix}/lib/mariadb-10.3/mysql"
+            "-lmysqlclient_r"
+            ""
+        }
+        {
+            "mariadb10_2"
+            "port:mariadb-10.2"
+            "${prefix}/include/mariadb-10.2/mysql"
+            "${prefix}/lib/mariadb-10.2/mysql"
+            "-lmysqlclient_r"
+            ""
+        }
+        {
+            "mariadb10_1"
+            "port:mariadb-10.1"
+            "${prefix}/include/mariadb-10.1/mysql"
+            "${prefix}/lib/mariadb-10.1/mysql"
+            "-lmysqlclient_r"
+            ""
+        }
+        {
+            "mysql8"
+            "port:mysql8"
+            "${prefix}/include/mysql8/mysql"
+            "${prefix}/lib/mysql8/mysql"
+            "-lmysqlclient"
             ""
         }
         {
@@ -906,6 +963,7 @@ foreach {module module_info} [array get modules] {
         if { ${module} eq "qtbase" } {
             # this subport uses configure script (NOT qmake)
             PortGroup           qt5 1.0
+
             PortGroup           developerversion 1.0
 
             if { ${os.platform} ne "darwin" } {
@@ -934,6 +992,13 @@ foreach {module module_info} [array get modules] {
             # fix build where "backtrace_from_fp" is not defined
             # this patch is specific to version 5.15
             patchfiles-append patch-qt515-highsierra1.diff
+
+            # upstream patch to allow for non-x86_64 builds
+            # https://github.com/qt/qtbase/commit/9082cc8e8d5a6441dabe5e7a95bc0cd9085b95fe
+            patchfiles-append patch-qmake-dont-hard-code-x86_64-as-the-architecture-when-using-qmake.diff
+
+            # and also patch the mkspecs we are going to install as well
+            patchfiles-append patch-qmake-dont-hard-code-x86_64-as-the-architecture-when-using-qmake-installed.diff
 
             # find the Rez program
             patchfiles-append patch-find_rez.diff
@@ -970,8 +1035,8 @@ foreach {module module_info} [array get modules] {
             patchfiles-append patch-qmake_flags.diff
             post-patch {
                 if {[variant_exists universal] && [variant_isset universal]} {
-                    set arch_replace_cxx [portconfigure::configure_get_universal_cflags]
-                    set arch_replace_ld  [portconfigure::configure_get_universal_ldflags]
+                    set arch_replace_cxx [portconfigure::configure_get_universal_archflags]
+                    set arch_replace_ld  [portconfigure::configure_get_universal_archflags]
                 } else {
                     set arch_replace_cxx [portconfigure::configure_get_archflags cxx]
                     set arch_replace_ld  [portconfigure::configure_get_ld_archflags]
@@ -1437,6 +1502,9 @@ foreach {module module_info} [array get modules] {
 
             # special case
             if { ${module} eq "qtquick3d" } {
+                # see https://bugreports.qt.io/browse/QTBUG-84037
+                patchfiles-append patch-qtquick3d-assimp.diff
+
                 # see config_help.txt
                 configure.post_args-append   -- \
                                              -system-quick3d-assimp
@@ -1469,11 +1537,13 @@ foreach {module module_info} [array get modules] {
                 patchfiles-append patch-webkit_XPathGrammar.y.diff
                 patchfiles-append patch-webkit_makegrammar.pl.diff
 
-                # work around changed vm_param.h in MacOSX.sdk 11+ -- the older code in 2014-vintage qtwebkit expects 
+                # work around changed vm_param.h in MacOSX.sdk 11+ -- the older code in 2014-vintage qtwebkit expects
                 # PAGE_SHIFT to be set to I386_PAGE_SHIFT when on x86_64
                 # the 11.0 + SDK defines that only if MAC_OS_X_VERSION_MIN_REQUIRED is < 101600 (to support arm64 after that)
                 if {${os.platform} eq "darwin" && ${os.major} >= 20} {
                     patchfiles-append patch-qtwebkit-FastMalloc.diff
+                    patchfiles-append patch-qtwebkit-Platform.h.diff
+                    patchfiles-append patch-qtwebkit-MachineStackMarker.cpp.diff
                 }
 
                 # qtwebkit uses
@@ -1547,10 +1617,13 @@ foreach {module module_info} [array get modules] {
             # special case
             if { ${module} eq "qtwebengine" } {
                 PortGroup           conflicts_build 1.0
+
                 # see https://doc.qt.io/qt-5/qtwebengine-platform-notes.html
                 PortGroup           xcodeversion 1.0
+
                 minimum_xcodeversions   {16 8.3.3}
                 if { ${os.major} < 16 } {
+                    known_fail  yes
                     pre-fetch {
                         ui_error "${subport} requires macOS 10.12 or later"
                         return -code error "incompatible OS version"
@@ -1730,6 +1803,9 @@ foreach {module module_info} [array get modules] {
                     xinstall -d -m 0755 ${worksrcpath}/Source/WebCore/generated
                     touch ${worksrcpath}/Source/WebCore/generated/InspectorBackendCommands.qrc
                 }
+            } elseif { ${module} eq "qtquick3d" } {
+                # see https://bugreports.qt.io/browse/QTBUG-84037
+                patchfiles-append patch-qtquick3d-assimp.diff
             }
         }
     }
@@ -2011,11 +2087,13 @@ foreach {component component_info} [array get qt5pg::qt5_component_lib] {
     if { [vercmp ${qt_version_removed} ${qt_version}] <= 0 } {
         subport ${name}-${component}${suffix} {
             PortGroup obsolete 1.0
+
         }
 
         if { ${component} ne "qtquick1" && ${component} ne "qtwebkit-examples" && ${component} ne "qtdoc" && ${suffix} ne "-plugin" } {
             subport ${name}-${component}${suffix}-docs {
                 PortGroup obsolete 1.0
+
             }
         }
     }

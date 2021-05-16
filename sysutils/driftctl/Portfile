@@ -1,0 +1,54 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           golang 1.0
+
+go.setup            github.com/cloudskiff/driftctl 0.8.0 v
+revision            0
+
+homepage            https://driftctl.com
+
+description         Detect, track and alert on infrastructure drift
+
+long_description    {*}${description}. Measures infrastructure as code \
+                    coverage, and tracks infrastructure drift.
+
+maintainers         {gmail.com:herby.gillot @herbygillot} \
+                    openmaintainer
+
+categories          sysutils
+license             Apache-2
+platforms           darwin
+installs_libs       no
+
+checksums           rmd160  565ffcfe65835ca447aa5000f6d9977c3b4ef351 \
+                    sha256  1b87f36ca51582faadf64465b0042d5cc6e1619e7bf7d30e319aef506a5b3f42 \
+                    size    18599931
+
+depends_build-append port:gox
+
+# Allow fetching dependencies at build time
+build.env-delete    GOPROXY=off GO111MODULE=off
+
+build.env-append    OS_ARCH=${os.platform}/${goarch}
+
+build.cmd           make
+build.target        release
+
+patch {
+    # Delete all non-Darwin build targets from the build scripts
+    # reinplace -E {/(linux|windows)/ d} ${worksrcpath}/scripts/build.sh
+
+    # Disable running git commands to determine commit and version.
+    # This is not a git repo.
+    reinplace "s|GIT_COMMIT=.*|GIT_COMMIT=|g" ${worksrcpath}/scripts/build.sh
+    reinplace "s|VERSION=.*|VERSION=v${version}|g" ${worksrcpath}/scripts/build.sh
+    reinplace {s|sha256sum|shasum -a 256|} ${worksrcpath}/scripts/build.sh
+}
+
+destroot {
+    xinstall -m 755 ${worksrcpath}/bin/${name}_${os.platform}_${goarch} \
+        ${destroot}${prefix}/bin/${name}
+}
+
+github.tarball_from archive

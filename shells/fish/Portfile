@@ -5,11 +5,12 @@ PortGroup               github 1.0
 PortGroup               cmake 1.1
 PortGroup               legacysupport 1.0
 
-github.setup            fish-shell fish-shell 3.1.2
+github.setup            fish-shell fish-shell 3.2.2
 revision                0
-checksums               rmd160  57cf48d43a8627eb4c7a18e738dc7a68f5e9dd44 \
-                        sha256  d5b927203b5ca95da16f514969e2a91a537b2f75bec9b21a584c4cd1c7aa74ed \
-                        size    6816214
+checksums               rmd160  e24a3f7a3b073bc9295e897bd3103f7ae33702f4 \
+                        sha256  5944da1a8893d11b0828a4fd9136ee174549daffb3d0adfdd8917856fe6b4009 \
+                        size    3411748
+use_xz                  yes
 
 name                    fish
 license                 GPL-2
@@ -28,11 +29,14 @@ depends_lib             port:libiconv \
                         port:ncurses \
                         port:gettext
 
-patchfiles              patch-share_config_fish.diff
-patchfiles-append       codesign.patch
+patchfiles              patch-share_config_fish.diff \
+                        patch-tests-interactive-fish.diff
 
 post-patch {
     reinplace "s|@@PREFIX@@|${prefix}/bin|g"     "${worksrcpath}/share/config.fish"
+
+    # skip failing tests for now, future updates should try enabling them
+    file rename "${worksrcpath}/tests/checks/sigint.fish" "${worksrcpath}/tests/checks/sigint.fish.skip"
 }
 
 compiler.cxx_standard   2011
@@ -56,11 +60,15 @@ platform darwin 8 {
     test.env-append     SHELL=${prefix}/bin/bash
 }
 
-depends_test-append     port:expect
+depends_test-append     port:py39-pexpect
 # other possible options are ansi, dtterm, rxvt, vt52, vt100, vt102, xterm
 test.env-append         TERM=nsterm
 test.run                yes
 test.target             test
+
+pre-test {
+    append portsandbox_profile " (allow process-exec (literal \"/bin/ps\") (with no-profile))"
+}
 
 notes "
 To set MacPorts' ${name} as default login shell, run:

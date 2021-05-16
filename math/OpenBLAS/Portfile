@@ -7,6 +7,7 @@ PortGroup           compilers 1.0
 PortGroup           xcodeversion 1.0
 PortGroup           compiler_blacklist_versions 1.0
 PortGroup           xcode_workaround 1.0
+PortGroup           makefile 1.0
 
 name                OpenBLAS
 categories          math science
@@ -16,41 +17,39 @@ description         OpenBLAS is an optimized BLAS library based on GotoBLAS2
 long_description    ${description}
 platforms           darwin
 
-# block compilers that do not support thread-local storage. it would
-# be better to use the cxx11 1.1 PG, but it conflicts with the
-# compilers 1.0 PG & so just block compilers instead.
-compiler.blacklist-append cc {*gcc-3*} {*gcc-4.[0-7]} {clang < 800.0.38}
-platform darwin i386 {
-    compiler.blacklist-append {macports-clang-[3-4].*}
-}
+# block compilers that do not support thread-local storage.
+compiler.cxx_standard 2011
+compiler.c_standard   2011
+compiler.thread_local_storage yes
 
 #OS 10.7-10.11 supports down to iMac 7,1, with Intel Core 2 Duo architecture
 #OS 10.12-13 supports down to iMac 10,1, with Intel Core 2 Duo architecture
 if {${os.major} >= 11 && ${os.major} <= 17} { 
     set blas_arch "CORE2"
-}
-#OS 10.14 supports down to Mac Pro 5,1 that has Nehalem architecture
-if {${os.major} >= 18} { 
-    set blas_arch "NEHALEM"
 } 
-if {![info exists blas_arch]} {
-    #For older versions, we force native variant as there is no PPCG3 target in OpenBLAS
-    default_variants-append +native
+#OS 10.14 supports down to Mac Pro 5,1 that has Nehalem architecture
+if {${os.major} >= 18} {
+    if {${os.arch} eq "arm"} {
+        # FIXME use correct arch name
+        #set blas_arch "???"
+    } else {
+        set blas_arch "NEHALEM"
+    }
 }
-if {${build_arch} eq "arm64" } {
-    #currently require native builds for Apple Silicon
+if {![info exists blas_arch]} {
+    #For older versions, and currently arm, we force native variant as there is no PPCG3 target in OpenBLAS
     default_variants-append +native
 }
 
 subport OpenBLAS-devel {}
 if {[string first "-devel" $subport] > 0} {
 
-    github.setup    xianyi OpenBLAS 78702753f23d1a9803eb067f0305a5fe772cf939
-    version         20210102-[string range ${github.version} 0 7]
-    checksums       rmd160  b1c66825794d80bbbd3959a1cc2eb0c00c42cf7a \
-                    sha256  7e18979c4dd33bdc5e388aa68fc475d673032cbb57d340daf1f52e629335a6ea \
-                    size    12442802
-    revision        0
+    github.setup    xianyi OpenBLAS 4ecf631f95a6d21f6c5c1e54cb604264d74407b0
+    version         20210515-[string range ${github.version} 0 7]
+    checksums       rmd160  2d03e849cdd49ec6a2e35a6ad5aa4a462e850ebb \
+                    sha256  001ee0cd7a3ed43ae7c8f920b4e637f2bf0c17cb0c75c4005a2ffc860b93adde \
+                    size    12501920
+    revision        3
 
     name            ${github.project}-devel
     conflicts       OpenBLAS
@@ -65,16 +64,20 @@ if {[string first "-devel" $subport] > 0} {
 
 } else {
 
-    github.setup    xianyi OpenBLAS 0.3.13 v
-    checksums       rmd160  ac0847547d4d1ca21c1e8bb1a681a3680826907c \
-                    sha256  9223b504b90ddf854339f6fdd9e89755feeb9efbdbfbd09ae61411a5fc183d27 \
-                    size    12442494
-    revision        0
+    github.setup    xianyi OpenBLAS 0.3.15 v
+    checksums       rmd160  8803a1bf4ab61176080a129fd2e8cded8dd90ee6 \
+                    sha256  7a35dd2eb486cae48237c06de04a7794a97fc7fd65b08f60f70e1b2664829efa \
+                    size    12502058
+    revision        5
 
     conflicts       OpenBLAS-devel
 
     patchfiles      patch-libnoarch.release.diff \
                     patch-OpenBLAS-i386-Apple.diff
+
+    # https://github.com/xianyi/OpenBLAS/issues/3222
+    # https://github.com/xianyi/OpenBLAS/pull/3223
+    patchfiles-append 0001-Use-percent-instead-of-ampersand-as-placeholder-for-.patch
 
     if {![variant_isset native]} {
         notes "
@@ -84,7 +87,19 @@ if {[string first "-devel" $subport] > 0} {
     }
 }
 
+# https://build.macports.org/builders/ports-11_arm64-builder/builds/20461/steps/install-port/logs/stdio
+# Library not loaded: @rpath/libgfortran.5.dylib
+#   Referenced from: /opt/local/lib/libopenblas-r1.dylib
+#   Reason: image not found
+# Currently only affects arm builds, but in principle will affect all builds once changes in the gcc
+# branch used on arm hit the intel builds, so do this across the board.
+depends_build-append port:cctools
+post-destroot {
+    system "install_name_tool -add_rpath ${prefix}/lib/libgcc ${destroot}${prefix}/lib/libopenblas-r1.dylib"
+}
+
 compilers.choose    fc
+
 compilers.setup     default_fortran
 
 variant lapack description "Add Lapack/CLapack support to the library" { }
@@ -104,7 +119,7 @@ xcode_workaround.fixed_xcode_version 11.2
 xcode_workaround.type append_to_compiler_name
 
 pre-build {
-    if {[variant_isset universal]} {
+    if {[variant_exists universal] && [variant_isset universal]} {
         foreach arch ${universal_archs_to_use} {
             set makeINC [open ${worksrcpath}-${arch}/Makefile.rule "w"]
             puts $makeINC "VERSION = 1"
@@ -113,7 +128,7 @@ pre-build {
             puts $makeINC "CC = ${configure.cc}"
             puts $makeINC "FC = ${configure.fc}"
 
-            if {${arch} eq "x86_64" || ${arch} eq "ppc64"} {
+            if {${arch} in [list arm64 ppc64 x86_64]} {
                 puts $makeINC "BINARY = 64"
             } else {
                 puts $makeINC "BINARY = 32"
@@ -131,12 +146,14 @@ pre-build {
                 if {${build_arch} eq "ppc" || ${build_arch} eq "ppc64"} {
                     puts $makeINC "TARGET = PPCG4"
                 } else {
-                    puts $makeINC "TARGET = ${blas_arch}"
+                    if {[info exists blas_arch]} {
+                        puts $makeINC "TARGET = ${blas_arch}"
+                    }
                 }
             }
 
-            if {${build_arch} eq "ppc" || ${build_arch} eq "ppc64"} {
-                # on a PPC of some sort; just disable AVX
+            if {${build_arch} ni [list i386 x86_64]} {
+                # not on x86 of some sort; just disable AVX
                 puts $makeINC "NO_AVX = 1"
                 puts $makeINC "NO_AVX2 = 1"
                 puts $makeINC "NO_AVX512 = 1"
@@ -172,7 +189,7 @@ pre-build {
         puts $makeINC "CC = ${configure.cc}"
         puts $makeINC "FC = ${configure.fc}"
 
-        if {${build_arch} eq "x86_64" || ${build_arch} eq "ppc64"} {
+        if {${build_arch} in [list arm64 ppc64 x86_64]} {
             puts $makeINC "BINARY = 64"
         } else {
             puts $makeINC "BINARY = 32"
@@ -185,14 +202,14 @@ pre-build {
             puts $makeINC "NO_LAPACK = 1"
         }
 
-        if {![variant_isset native]} { 
-            #We set a minimal target in case native variant is not set
+        if { (![variant_isset native]) && [info exists blas_arch] } {
+            # We set a minimal target in case native variant is not set
             puts $makeINC "TARGET = ${blas_arch}"
         }
 
         #Setting up build flags
-        if {${build_arch} eq "ppc" || ${build_arch} eq "ppc64"} {
-            # on a PPC of some sort; just disable AVX
+        if {${build_arch} ni [list i386 x86_64]} {
+            # not on x86 of some sort; just disable AVX
             puts $makeINC "NO_AVX = 1"
             puts $makeINC "NO_AVX2 = 1"
             puts $makeINC "NO_AVX512 = 1"
@@ -239,7 +256,10 @@ platform darwin 8 {
 
 destroot.args       "PREFIX=${prefix}"
 
-if {[variant_isset universal]} {
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
+if {${universal_possible} && [variant_isset universal]} {
     merger-post-destroot {
         foreach arch ${universal_archs_to_use} {
             if {${arch} ne ${build_arch}} {

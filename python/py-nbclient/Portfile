@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-nbclient
-version             0.5.1
+version             0.5.3
 revision            0
 categories-append   devel
 platforms           darwin
@@ -20,9 +20,9 @@ long_description    ${description}
 
 homepage            https://jupyter.org/
 
-checksums           rmd160  f2f51887aeeaeeb2a95fdb3652d1871c27c0f401 \
-                    sha256  01e2d726d16eaf2cde6db74a87e2451453547e8832d142f73f72fddcd4fe0250 \
-                    size    69862
+checksums           rmd160  cfd462e15b90bff88987a7a24d580c8048a9728a \
+                    sha256  db17271330c68c8c88d46d72349e24c147bb6f34ec82d8481a8f025c4d26589c \
+                    size    78529
 
 if {${name} ne ${subport}} {
     depends_build-append \

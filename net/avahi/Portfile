@@ -6,7 +6,7 @@ PortGroup           github 1.0
 PortGroup           gobject_introspection 1.0
 
 github.setup        lathiat avahi 0.8 v
-revision            1
+revision            2
 categories          net devel
 maintainers         {i0ntempest @i0ntempest} openmaintainer
 license             LGPL-2.1+
@@ -90,6 +90,9 @@ configure.args      --disable-autoipd \
 
 # __APPLE_USE_RFC_2292 should be removed once avahi is updated to support RFC 3542
 configure.cppflags-append   -L${prefix}/lib -D__APPLE_USE_RFC_2292
+
+# libevent-watch.c:285: error: 'for' loop initial declaration used outside C99 mode
+configure.cflags-append     -std=c99
 
 set daemon_uniquename   org.freedesktop.avahi-daemon
 set dnsconfd_uniquename org.freedesktop.avahi-dnsconfd

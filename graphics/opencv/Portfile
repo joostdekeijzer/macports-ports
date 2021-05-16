@@ -5,14 +5,27 @@ PortGroup           cmake 1.1
 PortGroup           compiler_blacklist_versions 1.0
 PortGroup           legacysupport 1.0
 
+#==============================================================================
+# MAINTAINERS:
+#
+# This port is now considered legacy, and has been replaced by opencv3 (for
+# OpenCV 3.x) and opencv4 (for OpenCV 4.x). It will be obsoleted once
+# dependent ports have been migrated to opencv3 or opencv4.
+#
+# As such, it is recommended that it not be updated unless absolutely
+# necessary.
+#==============================================================================
+
 name                opencv
-version             3.4.13
+version             3.4.14
 revision            0
 categories          graphics science
 platforms           darwin
 license             BSD
 
-maintainers         nomaintainer
+maintainers         \
+                    {@mascguy} \
+                    openmaintainer
 
 description         Intel(R) Open Source Computer Vision Library
 
@@ -33,9 +46,10 @@ distfiles           ${distname}${extract.suffix}:opencv
 
 # don't forget to also update the checksums under the contrib variant.
 checksums           ${distname}${extract.suffix} \
-                    rmd160  39f8733cb2f58d2a955e3c74e7a52f16b1b78d9c \
-                    sha256  70230049194ae03ed8bfaab6cd1388569aa1b5c482d8b50d3af1cd2ae5a0b95d \
-                    size    87573369
+                    rmd160  ba13d3a7b4d69228e8f9309b6f9f9daee73a69aa \
+                    sha256  dfeb91c93d494be590afbe342ebb61742381f901fe2e0376987b1581f74948d1 \
+                    size    87648110
+
 
 platform macosx {
     if {${os.major} <= 10} {
@@ -53,24 +67,29 @@ platform macosx {
 
 worksrcdir          opencv-${version}
 
-conflicts           opencv4
-
 compiler.cxx_standard   2011
-compiler.blacklist-append cc *gcc* {clang < 800} {macports-clang-3.[0-9]} macports-clang-4.0
+
+compiler.blacklist-append \
+                    cc \
+                    *gcc* \
+                    {clang < 800} \
+                    {macports-clang-3.[0-9]} \
+                    macports-clang-4.0
 
 depends_build-append \
                     port:pkgconfig
 
-depends_lib-append  port:zlib \
+depends_lib-append  \
+                    port:ffmpeg \
+                    port:zlib \
                     port:bzip2 \
                     port:libpng \
-                    port:jpeg \
-                    port:jasper \
+                    path:include/turbojpeg.h:libjpeg-turbo \
+                    port:openjpeg \
                     port:tiff \
                     port:webp \
                     port:ilmbase \
-                    port:openexr \
-                    path:lib/libavcodec.dylib:ffmpeg
+                    port:openexr
 
 # only search for openexr in ${prefix}
 patchfiles-append   patch-find-openexr.diff
@@ -107,8 +126,9 @@ configure.args-append \
                     -DWITH_GSTREAMER=OFF \
                     -DWITH_GTK=OFF \
                     -DWITH_IPP=OFF \
-                    -DWITH_JASPER=ON \
+                    -DWITH_JASPER=OFF \
                     -DWITH_JPEG=ON \
+                    -DWITH_OPENJPEG=ON \
                     -DWITH_WEBP=ON \
                     -DWITH_OPENEXR=ON \
                     -DWITH_OPENGL=ON \
@@ -142,6 +162,7 @@ configure.args-append \
                     -DWITH_GDAL=OFF \
                     -DWITH_GPHOTO2=OFF \
                     \
+                    -DBUILD_WITH_DEBUG_INFO=OFF \
                     -DBUILD_SHARED_LIBS=ON \
                     -DBUILD_opencv_apps=ON \
                     -DBUILD_DOCS=OFF \
@@ -155,10 +176,12 @@ configure.args-append \
                     -DBUILD_TIFF=OFF \
                     -DBUILD_JASPER=OFF \
                     -DBUILD_JPEG=OFF \
+                    -DBUILD_OPENJPEG=OFF \
                     -DBUILD_WEBP=OFF \
                     -DBUILD_PNG=OFF \
                     -DBUILD_OPENEXR=OFF \
                     -DBUILD_TBB=OFF \
+                    -DBUILD_FFMPEG=OFF \
                     \
                     -DBUILD_opencv_java=OFF \
                     \
@@ -168,7 +191,12 @@ configure.args-append \
                     -DINSTALL_C_EXAMPLES=OFF \
                     -DINSTALL_PYTHON_EXAMPLES=OFF \
                     -DENABLE_PRECOMPILED_HEADERS=ON \
+                    -DOPENCV_ENABLE_NONFREE=OFF \
                     -DENABLE_CXX11=ON
+
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
 
 platform darwin {
     configure.args-append \
@@ -193,7 +221,8 @@ platform darwin {
                     -DWITH_AVFOUNDATION=OFF
     }
 
-    if { ${build_arch} eq "i386" || ${build_arch} eq "ppc" || [variant_isset universal] } {
+    if { ${configure.build_arch} in [list i386 ppc] || (${universal_possible} && [variant_isset universal] &&
+        ("i386" in ${configure.universal_archs} || "ppc" in ${configure.universal_archs}))} {
         #The Accelerate ABI requires 32-bit signed integers.
         #In clapack.h, __CLPK_integer is a typedef for either
         #   int (64-bit) or long int (32-bit).
@@ -226,9 +255,15 @@ if {[string match "*clang*" ${configure.compiler}]} {
 }
 
 # PCH broken when universal
-if {[variant_isset universal]} {
+if {${universal_possible} && [variant_isset universal]} {
     configure.args-replace  -DENABLE_PRECOMPILED_HEADERS=ON \
                             -DENABLE_PRECOMPILED_HEADERS=OFF
+}
+
+variant debug description {Build with debugging info} {
+    configure.args-replace \
+                            -DBUILD_WITH_DEBUG_INFO=OFF \
+                            -DBUILD_WITH_DEBUG_INFO=ON
 }
 
 variant avx conflicts avx2 description {Enable AVX (and SSE4*) support} {
@@ -241,14 +276,14 @@ variant avx2 conflicts avx description {Enable AVX, AVX2 (and SSE4*) support} {
                             -DENABLE_SSE41=ON -DENABLE_SSE42=ON
 }
 
-variant eigen description {Enable eigen support.} {
+variant eigen description {Enable eigen support} {
     depends_lib-append      port:eigen3
     configure.args-replace  -DWITH_EIGEN=OFF \
                             -DWITH_EIGEN=ON
     configure.args-append   -DEIGEN_INCLUDE_PATH=${prefix}/include/eigen3
 }
 
-variant opencl description {Enable OpenCL support.} {
+variant opencl description {Enable OpenCL support} {
     pre-configure {
         if {${os.platform} eq "darwin" && ${os.major} < 11} {
             ui_error "The OpenCL variant only works with OS X 10.7 Lion or later."
@@ -259,7 +294,15 @@ variant opencl description {Enable OpenCL support.} {
                             -DWITH_OPENCL=ON
 }
 
-variant openni description {Enable OpenNI support.} {
+variant openmp description {Include OpenMP support} {
+    compiler.openmp_version 4.0
+    configure.args-replace \
+                            -DWITH_OPENMP=OFF \
+                            -DWITH_OPENMP=ON
+
+}
+
+variant openni description {Enable OpenNI support} {
     depends_lib-append      port:openni
     patchfiles-append       patch-cmake_OpenCVFindOpenNI.cmake.diff
     configure.args-replace  -DWITH_OPENNI=OFF \
@@ -270,26 +313,26 @@ variant openni description {Enable OpenNI support.} {
     }
 }
 
-variant dc1394 description {Use libdc1394 for FireWire camera. Breaks compatibility with Apple iSight FireWire camera.} {
+variant dc1394 description {Use libdc1394 for FireWire camera; breaks compatibility with Apple iSight FireWire camera} {
     depends_lib-append      port:libdc1394
     configure.args-replace  -DWITH_1394=OFF \
                             -DWITH_1394=ON
     configure.args-append   -DHAVE_DC1394_2=ON
 }
 
-variant qt4 conflicts qt5 description {Build with Qt4 Backend support.} {
+variant qt4 conflicts qt5 description {Build with Qt4 Backend support} {
     PortGroup               qt4 1.0
     configure.args-replace  -DWITH_QT=OFF \
                             -DWITH_QT=4
 }
 
-variant qt5 conflicts qt4 description {Build with Qt5 Backend support.} {
+variant qt5 conflicts qt4 description {Build with Qt5 Backend support} {
     PortGroup               qt5 1.0
     configure.args-replace  -DWITH_QT=OFF \
                             -DWITH_QT=5
 }
 
-variant java description {Add Java bindings.} {
+variant java description {Add Java bindings} {
     PortGroup               java 1.0
     # OpenCV appears to support older Java versions,
     # and MacPorts users have requested Java 8 support:
@@ -308,7 +351,7 @@ if {[variant_isset java] && ![variant_isset python27]} {
     configure.args-delete   -DBUILD_opencv_python2=OFF
 }
 
-variant python27 description {Add Python 2.7 bindings.} {
+variant python27 description {Add Python 2.7 bindings} {
     depends_lib-append      port:python27 \
                             port:py27-numpy
     configure.args-delete   -DINSTALL_PYTHON_EXAMPLES=OFF \
@@ -358,7 +401,7 @@ foreach pdv ${pythonversions} {
     }
 }
 
-variant tbb description {Use Intel TBB.} {
+variant tbb description {Use Intel TBB} {
     depends_lib-append      port:tbb
     configure.args-replace  -DWITH_TBB=OFF \
                             -DWITH_TBB=ON
@@ -366,28 +409,32 @@ variant tbb description {Use Intel TBB.} {
                             -DTBB_INCLUDE_DIRS=${prefix}/include
 }
 
-variant vtk description {Include VTK support.} {
+variant vtk description {Include VTK support} {
     depends_lib-append      port:vtk
     configure.args-replace  -DWITH_VTK=OFF \
                             -DWITH_VTK=ON
 }
 
-variant gdal description {Include GDAL support.} {
+variant gdal description {Include GDAL support} {
     depends_lib-append      port:gdal
     configure.args-replace  -DWITH_GDAL=OFF \
                             -DWITH_GDAL=ON
 }
 
-variant contrib description {Build OpenCV with extra modules.} {
+variant contrib description {Build OpenCV with extra modules} {
     master_sites-append     https://github.com/opencv/opencv_contrib/archive:opencv_contrib
     distfiles-append        ${version}.zip:opencv_contrib
     checksums-append        ${version}.zip \
-                            rmd160  e3fe150fa131a4cf7cd9e0bf9f6a597df6e8f3f3 \
-                            sha256  4412a8b1a9d55b4bac489d79c21c567e0bf69272e6fbc7f45a68a7b72fb59066 \
-                            size    56393041
+                            rmd160  13c4602866dd64d96f7666c9910e6befe7cbdb60 \
+                            sha256  e43874c9d1922c5c1a5826855730327c793bfb8f6e4074cd2f30983d4a220a14 \
+                            size    56393741 
     configure.args-append   -DOPENCV_EXTRA_MODULES_PATH=${workpath}/opencv_contrib-${version}/modules \
                             -DBUILD_PROTOBUF=YES
-    depends_lib-append      port:protobuf3-cpp
+    depends_lib-append      \
+                            port:protobuf3-cpp \
+                            port:google-glog \
+                            port:gflags \
+                            port:ceres-solver
 
     post-extract {
         # gunzip cannot handle multi-member .zip archives
@@ -398,7 +445,7 @@ variant contrib description {Build OpenCV with extra modules.} {
     }
 
     extract.only            ${distname}${extract.suffix}
-#                            ${version}.zip
+    #                       ${version}.zip
 
     # dnn_modern:
     master_sites-append     https://github.com/tiny-dnn/tiny-dnn/archive/:tiny-dnn
@@ -494,6 +541,25 @@ variant contrib description {Build OpenCV with extra modules.} {
     configure.args-append  -DOPENCV_FACE_ALIGNMENT_URL=file://${distpath}/
 }
 
+variant nonfree description {Include nonfree algorithms} {
+    configure.args-replace \
+                            -DOPENCV_ENABLE_NONFREE=OFF \
+                            -DOPENCV_ENABLE_NONFREE=ON
+}
+
+variant tests description {Enable tests} {
+    configure.args-replace \
+                            -DBUILD_TESTS=OFF \
+                            -DBUILD_TESTS=ON
+
+    configure.args-replace \
+                            -DBUILD_PERF_TESTS=OFF \
+                            -DBUILD_PERF_TESTS=ON
+
+    test.run     yes
+    test.target  test
+}
+
 platform darwin {
     post-patch {
         if {${os.major} < 10} {
@@ -503,7 +569,8 @@ platform darwin {
 }
 
 pre-configure {
-    configure.args-append   -DOPENCV_LINKER_LIBS=\"[join ${opencv_linker_libs} " "]\"
+    configure.args-append \
+                        -DOPENCV_LINKER_LIBS=\"[join ${opencv_linker_libs} " "]\"
 }
 
 post-destroot {
@@ -512,6 +579,11 @@ post-destroot {
         reinplace "s|-L//System/Library/Frameworks ||g" ${destroot}${prefix}/lib/pkgconfig/opencv.pc
         reinplace "s|-lOpenGL.framework|-framework OpenGL|g" ${destroot}${prefix}/lib/pkgconfig/opencv.pc
     }
+}
+
+notes {
+  * This OpenCV port is obsolete, and should not be used unless absolutely necessary.
+  * Instead, use our newer OpenCV ports, such as 'opencv3' and 'opencv4'.
 }
 
 livecheck.type      regex

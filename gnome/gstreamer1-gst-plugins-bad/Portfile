@@ -11,7 +11,7 @@ name                gstreamer1-gst-plugins-bad
 set my_name         gst-plugins-bad
 # please only commit stable updates (even numbered releases)
 version             1.16.2
-revision            1
+revision            4
 description         A set of plug-ins for GStreamer that need more quality.
 long_description    GStreamer Bad Plug-ins is a set of plug-ins that aren't up to par compared \
                     to the rest. They might be close to being good quality, but they're missing \
@@ -30,7 +30,9 @@ checksums           rmd160  e42b51eee105a2c6181725ca801887ea64f3f4ce \
                     sha256  f1cb7aa2389569a5343661aae473f0a940a90b872001824bc47fa8072a041e74 \
                     size    4887812
 
-depends_build       port:pkgconfig
+depends_build       port:gtk-doc \
+                    port:pkgconfig
+
 depends_lib         port:gstreamer1-gst-plugins-base \
                     port:curl \
                     port:faad2 \
@@ -151,8 +153,12 @@ variant x11 {
 
 default_variants +x11
 
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
+
 platform macosx {
-    if {![variant_isset x11] && ![variant_isset universal] && ${os.major} >= 13} {
+    if {![variant_isset x11] && (!${universal_possible} || ![variant_isset universal]) && ${os.major} >= 13} {
         # Apple_Media requires CGL, which can only be provided on newer platforms and without X11 enabled.
         require_active_variants port:gstreamer1-gst-plugins-base {} x11
         configure.args-replace  --disable-apple_media \
@@ -160,7 +166,7 @@ platform macosx {
     }
 }
 
-if {[variant_isset universal]} {
+if {${universal_possible} && [variant_isset universal]} {
     set merger_host(x86_64) x86_64-apple-${os.platform}${os.major}
     set merger_host(i386) i686-apple-${os.platform}${os.major}
     set merger_configure_args(x86_64) --build=x86_64-apple-${os.platform}${os.major}

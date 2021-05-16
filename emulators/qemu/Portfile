@@ -208,7 +208,7 @@ variant vnc description {Support VNC server} {
                             --enable-vnc-png
     depends_lib-append      port:gnutls \
                             port:cyrus-sasl2 \
-                            path:lib/libjpeg.dylib:jpeg \
+                            path:include/turbojpeg.h:libjpeg-turbo \
                             port:libpng
 }
 
@@ -248,13 +248,6 @@ universal_variant       no
 platform darwin 8 {
     depends_build-append port:gmake
     build.cmd ${prefix}/bin/gmake
-}
-
-platform darwin {
-    if {${os.major} < 15} {
-        depends_build-append    port:coreutils
-        patchfiles-append       patch-Makefile-legacy-mktemp-to-coreutils.diff
-    }
 }
 
 livecheck.type  regex

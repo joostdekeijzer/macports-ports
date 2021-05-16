@@ -6,15 +6,14 @@ PortGroup           github           1.0
 
 name                py-scikit-hep-mplhep
 
-github.setup        scikit-hep mplhep 0.2.9 v
+github.setup        scikit-hep mplhep 0.3.6 v
 revision            0
 
-checksums           rmd160  9b6e83e2c1bebb830c1e88f41d2c43dfd276f336 \
-                    sha256  fe45799a27a67b74889af52b4d4d6055b9b008e40c9bf2d38dc857c72619d962 \
-                    size    6587550
+checksums           rmd160  35b24871136738e07417b87a26655f21c9bfe496 \
+                    sha256  2d17cf4c0e9ae3ab52d6c01083e3a4fcef524c467cd4669e4c2695b42477e420 \
+                    size    1240867
 
 platforms           darwin
-supported_archs     x86_64
 
 license             MIT
 
@@ -31,9 +30,15 @@ if {${name} ne ${subport}} {
     depends_build-append \
         port:py${python.version}-setuptools
 
+    depends_lib-append \
+        port:py${python.version}-scikit-hep-mplhep_data
+    
     depends_test-append \
         port:py${python.version}-pytest
 
     livecheck.type none 
 
 }
+
+# Only allow numbers, to avoid pre-release versions
+github.livecheck.regex  {([0-9.]+)}

@@ -3,7 +3,7 @@
 PortSystem          1.0
 
 name                drupal7
-version             7.76
+version             7.80
 revision            0
 categories          www php
 license             GPL-2
@@ -23,9 +23,9 @@ homepage            https://drupal.org
 distname            drupal-${version}
 master_sites        https://ftp.drupal.org/files/projects/
 
-checksums           rmd160  41ee1edfc3a8d9e4f0da75ccd21218321edaad59 \
-                    sha256  dc19c3436b21aee8558fc4d8b03177d7e12f66efb150ab4cb41334b1cbae7cbd \
-                    size    3335114
+checksums           rmd160  3403b29c38bc4c9ec7e1884d981ce95f18292479 \
+                    sha256  6ceb98a3dc7146ac0cd00a9dd7d6861b70c3ffec2297b3c3e8523e8e3dd9a45a \
+                    size    3342293
 
 depends_lib         port:apache2 \
                     port:php54 \

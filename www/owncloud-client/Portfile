@@ -40,13 +40,14 @@ if {${os.platform} eq "darwin"} {
         # Check https://github.com/owncloud/client/tags
         # to find the build_id in the source tarball:
         # ownCloud-${version}.${build_id}.tar.xz
-        github.setup        owncloud client 2.7.4 v
+        github.setup        owncloud client 2.7.6 v
+        set build_id        3261
+        version             ${version}.${build_id}
         revision            0
-        set build_id        2934
 
-        checksums           rmd160  82d0f86ed75155da26f3ce24dd48a1873d07f4cf \
-                            sha256  1afd1c1f204120027e4e1ae780a9b7da28d0f0047302bb7ce302f999c29038e2 \
-                            size    19232012
+        checksums           rmd160  df616953970baacf4301bd9764687efc525bfaa2 \
+                            sha256  7be321674b39e462ad0dfc2796f0b201fe3d181916824a2f6aca4456e601c60f \
+                            size    19232966
 
         depends_build-append \
                             port:kde-extra-cmake-modules
@@ -57,6 +58,9 @@ if {${os.platform} eq "darwin"} {
 
         configure.args-append \
                             -DKDE_INSTALL_BUNDLEDIR:PATH=${applications_dir}
+
+        github.livecheck.regex \
+                            (\[0-9a-z.\]+)
     }
 
     if {${os.major} < 13} {

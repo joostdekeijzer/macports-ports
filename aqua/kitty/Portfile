@@ -3,50 +3,20 @@
 PortSystem          1.0
 PortGroup           github 1.0
 PortGroup           python 1.0
+PortGroup           gpg_verify 1.0
 
-github.setup        kovidgoyal kitty 0.18.2 v
-revision            0
-checksums           rmd160  f68ce6f7f5735e72e361dfac2ad4f5ee6276cdab \
-                    sha256  b077b34f3773f698063b85ec96ff9c4598ad5ab86c8580cdda4ec551df121e09 \
-                    size    3100228
+github.setup        kovidgoyal kitty 0.20.3 v
+github.tarball_from releases
+revision            1
 
 categories          aqua
 platforms           macosx
 license             GPL-3
-maintainers         nomaintainer
+maintainers         {outlook.de:judaew @judaew} openmaintainer
+
 description         A cross-platform, fast, feature full, GPU based terminal emulator
 long_description    ${description}
-
 homepage            https://sw.kovidgoyal.net/kitty/
-
-github.tarball_from releases
-use_xz              yes
-
-python.default_version \
-                    38
-
-depends_build-append \
-                    port:librsvg \
-                    port:optipng \
-                    port:pkgconfig
-
-depends_lib-append  port:harfbuzz
-
-patchfiles-append   patch-logo-make.py.diff
-patchfiles-append   dont-require-c11.patch
-patchfiles-append   patch-kitty-no-deprecated-declarations.diff
-
-build.cmd           "${python.bin} setup.py"
-build.target        kitty.app
-build.args-append   --verbose
-
-pre-build {
-    system -W ${worksrcpath} "${python.bin} logo/make.py"
-}
-
-destroot {
-    copy "${worksrcpath}/kitty.app" ${destroot}${applications_dir}
-}
 
 if {${os.major} <= 15} {
     # https://github.com/kovidgoyal/kitty/issues/2700
@@ -55,4 +25,86 @@ if {${os.major} <= 15} {
         ui_error "${name} @${version} requires macOS 10.12 or later."
         return -code error "incompatible OS X version"
     }
+}
+
+use_xz              yes
+
+checksums           ${distfiles} \
+                    rmd160  a7cbd429a0cb1aaa2e3029338791c341d68f76b5 \
+                    sha256  b6117d436ce5997a3449fa9ca0d3ce5a577e309e2b196ed006dc33564739cc87 \
+                    size    3487500
+
+gpg_verify.use_gpg_verification \
+                    yes
+
+if {[option gpg_verify.use_gpg_verification]} {
+    extract.only    ${distfiles}
+
+    distfiles-append \
+                    ${name}-${version}${extract.suffix}.sig
+
+    checksums-append \
+                    ${name}-${version}${extract.suffix}.sig \
+                    size 566
+
+    post-checksum {
+        set gpg_keyid 06BC317B515ACE7C
+
+        gpg_verify.verify_gpg_signature \
+            ${filespath}/keyid-${name}.txt \
+            ${distpath}/${name}-${version}${extract.suffix}.sig \
+            ${distpath}/${name}-${version}${extract.suffix}
+    }
+}
+
+patchfiles-append   patch-kitty-no-deprecated-declarations.diff
+
+python.default_version \
+                    39
+
+depends_build-append \
+                    port:lcms2 \
+                    port:librsvg \
+                    port:ncurses \
+                    port:optipng \
+                    port:pkgconfig
+
+depends_lib-append  port:harfbuzz
+
+build.cmd           "${python.bin} setup.py"
+build.target        kitty.app
+build.args-append   --ignore-compiler-warnings \
+                    --update-check-interval=0 --verbose
+
+compiler.c_standard 2011
+
+pre-build {
+    system -W ${worksrcpath} "${python.bin} logo/make.py"
+}
+
+destroot {
+    copy ${worksrcpath}/kitty.app ${destroot}${applications_dir}
+
+    # Add terminfo to $prefix for is handled correctly when executing
+    # commands with sudo.
+    set terminfo_path ${prefix}/share/terminfo/78
+    xinstall -d ${destroot}${terminfo_path}
+    xinstall -m 0644 ${worksrcpath}/terminfo/x/xterm-kitty \
+        ${destroot}${terminfo_path}
+
+    # add shell completion files
+    set bash_complete ${prefix}/share/bash-completion/completions
+    xinstall -d ${destroot}${bash_complete}
+    exec ${python.bin} ${worksrcpath}/__main__.py + complete setup bash >> \
+        ${destroot}${bash_complete}/kitty
+
+    set zsh_complete ${prefix}/share/zsh/site-functions
+    xinstall -d ${destroot}${zsh_complete}
+    exec ${python.bin} ${worksrcpath}/__main__.py + complete setup zsh >> \
+        ${destroot}${zsh_complete}/_kitty
+
+    set fish_complete ${prefix}/share/fish/vendor_completions.d
+    xinstall -d ${destroot}${fish_complete}
+    exec ${python.bin} ${worksrcpath}/__main__.py + complete setup fish >> \
+        ${destroot}${fish_complete}/kitty.fish
 }

@@ -4,15 +4,15 @@ PortSystem          1.0
 PortGroup           github 1.0
 PortGroup           python 1.0
 
-github.setup        onnx onnx 1.6.0 v
-revision            4
+github.setup        onnx onnx 1.8.1 v
+revision            2
 name                py-${github.project}
 categories-append   science
 
 platforms           darwin
 supported_archs     noarch
 
-license             BSD
+license             MIT
 
 maintainers         nomaintainer
 
@@ -30,12 +30,11 @@ long_description    Open Neural Network Exchange (ONNX) is an open\
 
 homepage            https://onnx.ai/
 
-checksums           rmd160  b9490c7c76be0628a110ce08f4a589588f013b29 \
-                    sha256  d27766862b9b117a223a5e96b80f2ceb4958ee9541ac5c522e2d5383f72a43fc \
-                    size    2594363
+checksums           rmd160  a319bd2f15fbbd3964e0751bd6e90596efdc6c0f \
+                    sha256  08e5f1b0a3a0a7d3bc608c6d95f3cabcd22b23148a791418e64d8dcfe3e7a0a4 \
+                    size    4934008
 
-python.versions     36 37 38
-python.default_version 38
+python.versions     37 38 39
 
 if {${name} ne ${subport}} {
 
@@ -43,13 +42,8 @@ if {${name} ne ${subport}} {
 
     compiler.cxx_standard 2011
 
-    # https://github.com/onnx/onnx/issues/2481
-    # https://github.com/onnx/onnx/pull/2482
-    patchfiles-append patch-dllexport-not-recognised.diff
-
     depends_build-append \
         port:cctools \
-        path:bin/cmake:cmake \
         port:py${python.version}-pytest-runner
 
     depends_lib-append \

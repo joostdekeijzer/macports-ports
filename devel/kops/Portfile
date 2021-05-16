@@ -2,24 +2,43 @@
 PortSystem          1.0
 PortGroup           golang 1.0
 
+go.setup            github.com/kubernetes/kops 1.20.1 v
+revision            0
+go.package          k8s.io/kops
+
+description         Kubernetes Operations (kops)
+long_description    Production Grade K8s Installation, Upgrades, and Management
+
 categories          devel
 platforms           darwin
 license             Apache-2
-maintainers         nomaintainer
-description         Kubernetes Operations (kops)
-long_description    Production Grade K8s Installation, Upgrades, and Management
-go.setup            github.com/kubernetes/kops 1.10.0
-go.package          k8s.io/kops
+installs_libs       no
 
-# This is only necessary because the makefile insists on getting the git commit
-# hash by running git in worksrcpath.
-fetch.type          git
+maintainers         {gmail.com:herby.gillot @herbygillot} \
+                    openmaintainer
 
-depends_run         port:kubectl-1.17
+checksums           rmd160  739efbd34bbed2a1e84f3d44f44358e1b8a9056a \
+                    sha256  8aa5dcc0a07b1cbd233b84921360afc8ccd11148f82f1555d87822bdc4d3fa55 \
+                    size    24999902
+
+depends_run         port:kubectl-1.20
 
 build.cmd           make
 build.target        all
 
-destroot {
-    xinstall -m 0755 {*}[glob ${worksrcpath}/.build/local/*] ${destroot}${prefix}/bin
+# Do not build on macOS 10.11 and earlier
+if {${os.platform} eq "darwin" && ${os.major} < 16} {
+    known_fail yes
+
+    pre-fetch {
+        ui_error "${name} does not build on macOS 10.11 and earlier"
+        return -code error "unsupported platform version"
+    }
 }
+
+destroot {
+    xinstall -m 0755 \
+        {*}[glob ${worksrcpath}/.build/local/*] ${destroot}${prefix}/bin
+}
+
+github.livecheck.regex {([0-9.]+)}

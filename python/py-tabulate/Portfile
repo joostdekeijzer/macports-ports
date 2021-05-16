@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-tabulate
-version             0.8.7
+version             0.8.9
 revision            0
 
 categories-append   devel
@@ -12,7 +12,7 @@ platforms           darwin
 license             MIT
 supported_archs     noarch
 
-python.versions     27 35 36 37 38
+python.versions     27 35 36 37 38 39
 
 maintainers         {stromnov @stromnov} openmaintainer
 
@@ -21,9 +21,9 @@ long_description    ${description}
 
 homepage            https://bitbucket.org/astanin/python-tabulate
 
-checksums           rmd160  9cf3e6a3323c48e0ce236e1c5327c520358dc45f \
-                    sha256  db2723a20d04bcda8522165c73eea7c300eda74e0ce852d9022e0159d7895007 \
-                    size    50913
+checksums           rmd160  5d30a2a3762bda0efb657491ff92f260a18eedc8 \
+                    sha256  eb1d13f25760052e8931f2ef80aaf6045a6cceb47514db8beab24cded16f13a7 \
+                    size    53482
 
 if {${name} ne ${subport}} {
     depends_lib-append  port:py${python.version}-setuptools

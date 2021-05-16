@@ -5,8 +5,8 @@ PortGroup           python 1.0
 
 name                py-importlib-metadata
 python.rootname     importlib_metadata
-version             3.3.0
-revision            1
+version             3.10.1
+revision            0
 categories-append   devel
 platforms           darwin
 license             Apache-2
@@ -22,9 +22,9 @@ long_description    ${description}
 
 homepage            https://importlib-metadata.readthedocs.io/
 
-checksums           rmd160  05d6b55a097978e24efffd3fc057866c710f9fce \
-                    sha256  5c5a2720817414a6c41f0a49993908068243ae02c1635a228126519b509c8aed \
-                    size    33549
+checksums           rmd160  8db4b72b11133f233988e732988c2a759315a184 \
+                    sha256  c9356b657de65c53744046fa8f7358afe0714a1af7d570c00c3835c2d724a7c1 \
+                    size    39980
 
 if {${name} ne ${subport}} {
     depends_build-append \

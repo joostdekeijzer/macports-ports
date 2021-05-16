@@ -7,7 +7,7 @@ name                python36
 
 epoch               20170717
 # Remember to keep py36-tkinter and py36-gdbm's versions sync'd with this
-version             3.6.12
+version             3.6.13
 revision            1
 
 set major           [lindex [split $version .] 0]
@@ -26,9 +26,9 @@ master_sites        ${homepage}ftp/python/${version}/
 
 distname            Python-${version}
 use_xz              yes
-checksums           md5 9ca8ca6f206e9ac0f0726ecb4ebb6e2c \
-                    rmd160 ae27e8221f07520aa97ed706c7f50cce7d63b182 \
-                    sha256 70953a9b5d6891d92e65d184c3512126a15814bee15e1eff2ddcce04334e9a99
+checksums           md5 1c04330ffff21cd777dc38e2310fc452 \
+                    rmd160 129f0f49c2db86c17f768f320484f116bd61cf2c \
+                    sha256 a47a43a53abb42286a2c11965343ff56711b9e64e8d11bf2c6701a4fb8ce1a0f
 
 patchfiles          patch-setup.py.diff \
                     patch-Lib-cgi.py.diff \
@@ -38,7 +38,9 @@ patchfiles          patch-setup.py.diff \
                     omit-local-site-packages.patch \
                     patch-configure-xcode4bug.diff \
                     patch-_osx_support.py.diff \
-                    darwin20.diff
+                    darwin20.diff \
+                    implicit.patch \
+                    sysconfig.py.diff
 
 depends_build       port:pkgconfig
 depends_lib         port:bzip2 \
@@ -126,11 +128,9 @@ platform darwin {
         # work for dependents that incorrectly use this variable to find out
         # how to link against python (see ticket #15099); instead we mirror
         # the behavior of `python-config --ldflags` here.
-        system -W ${buildlibdir} "awk -F : \
-            \"/'LINKFORSHARED'/ {printf \\\"%s: '-L${framewdir}/lib/python${branch}/${confdir}\
-            -lpython${branch}m -ldl -framework CoreFoundation',\\n\\\", \\\$1; getline; next} {print}\"\
-            _sysconfigdata_m_darwin_darwin.py > _sysconfigdata_m_darwin_darwin.py.new"
-        file rename -force ${buildlibdir}/_sysconfigdata_m_darwin_darwin.py.new \
+        set lfs_pattern {^([[:space:]]*'LINKFORSHARED':).*}
+        set lfs_replacement "\\1 '-L${framewdir}/lib/python${branch}/${confdir} -lpython${branch}m -ldl -framework CoreFoundation',"
+        reinplace -E s|${lfs_pattern}|${lfs_replacement}| \
             ${buildlibdir}/_sysconfigdata_m_darwin_darwin.py
 
         # remove -arch flags from the config

@@ -4,9 +4,10 @@ PortSystem          1.0
 PortGroup           github 1.0
 PortGroup           cmake 1.1
 
-github.setup        rime librime 0a1573dfa717ad9e57638ccc5653b06c64ce4270
+github.setup        rime librime 99e269c8eb251deddbad9b0d2c4d965b228f8006
 name                librime-devel
-version             20200727
+version             20210211
+revision            1
 categories          devel
 platforms           darwin
 license             BSD
@@ -15,7 +16,11 @@ description         Rime Input Method Engine, the core library
 long_description    ${description}
 homepage            https://rime.im/
 
+depends_build-append \
+                    port:pkgconfig
+
 depends_lib-append  port:boost \
+                    port:capnproto \
                     port:gflags \
                     port:google-glog \
                     port:leveldb \
@@ -26,6 +31,6 @@ depends_lib-append  port:boost \
 configure.args      -DBOOST_USE_CXX11=ON \
                     -DBUILD_TEST=OFF
 
-checksums           rmd160  0ad760630360619c13473cdc948b17ae0be26322 \
-                    sha256  23d0042f9ddc1eafb9d0fd11cc1491bd8494199d3668558e28ac4dd06833b456 \
-                    size    2849491
+checksums           rmd160  f977aabe9acacec0e71f4c3bc49fdaf1159cef20 \
+                    sha256  4417a8c2a5e27c18283da1f5b13781b8d05add844ba2ea6ab899e65f5e405174 \
+                    size    2859572

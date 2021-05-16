@@ -9,16 +9,15 @@ platforms               darwin
 maintainers             {ryandesign @ryandesign} openmaintainer
 license                 PHP-3.01
 
-php.branches            5.4 5.5 5.6 7.0 7.1 7.2 7.3 7.4
+php.branches            5.4 5.5 5.6 7.0 7.1 7.2 7.3 7.4 8.0
 php.pecl                yes
 
 if {[vercmp ${php.branch} 5.4] >= 0} {
-    version             2.5.7
+    version             3.0.4
     revision            0
-    checksums           rmd160  4cfeb8c8cf236be78c70236e12a9ad3f7de9bfd9 \
-                        sha256  3512d2fab1aee8e37215c83937fbea869a8593e66adcc36400e1ad5a4b657f4a \
-                        size    141451
-
+    checksums           rmd160  bc09f56b369f1d157c3dafc64b1017dac99bef34 \
+                        sha256  3d585ec92ae7efc4a9eca0ed015ec0f73ff43d5e3c56cf15b36c904ef71fcb8f \
+                        size    198272
 }
 
 description             efficiently schedule I/O, time and signal based events

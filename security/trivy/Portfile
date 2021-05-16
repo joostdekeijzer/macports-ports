@@ -3,7 +3,8 @@
 PortSystem          1.0
 PortGroup           golang 1.0
 
-go.setup            github.com/aquasecurity/trivy 0.15.0 v
+go.setup            github.com/aquasecurity/trivy 0.18.1 v
+revision            0
 
 description         A Simple and Comprehensive Vulnerability Scanner for \
                     Containers, Suitable for CI
@@ -21,9 +22,9 @@ license             Apache-2
 maintainers         {gmail.com:herby.gillot @herbygillot} \
                     openmaintainer
 
-checksums           rmd160  d84027c8751aa02098a59e0fc323ce3d97ab846c \
-                    sha256  a250aa848702dd3d70ccbb6cc1aca464e54b3ac4125822056197a7bdc1524966 \
-                    size    21438487
+checksums           rmd160  784279a80394ddf6b97798ac97e5d39f71af5efc \
+                    sha256  0b003e05853baf94a98d1dc5906ad1e8a9f3ea8325fa7d66acdac550cc9d2dcd \
+                    size    22922995
 
 build.cmd           make
 build.args          VERSION=${version}
@@ -35,6 +36,8 @@ build.target        build
 build.env-delete    GOPROXY=off GO111MODULE=off
 
 installs_libs       no
+
+github.tarball_from archive
 
 destroot {
     xinstall -m 755 ${worksrcpath}/${name} ${destroot}${prefix}/bin/

@@ -20,27 +20,28 @@ subport hackrf-devel {}
 if {${subport} eq ${name}} {
 
     # release
-    github.setup        mossmann hackrf 2018.01.1 v
-    checksums           rmd160 97e9e7ca94f91ba898dd9a20a56aa3843688be64 \
-                        sha256 e7ee6e09c1e0d2498cfdc974047cbe42177d3d6688a106be283d67d36051a155
-    revision            0
+    github.setup    mossmann hackrf 2021.03.1 v
+    checksums       rmd160  e37aacc7333f5e2ef23c36c86b70c6bbb04283eb \
+                    sha256  26baf06e4cf86e623c37f1d76e47c71ddefc57c24c113d27ab617b812d680432 \
+                    size    13066731
+    revision        0
 
     # bump the epoch because I moved the version from 20170219 to 2017.02.1
-    epoch               1
+    epoch           1
 
-    conflicts           hackrf-devel
+    conflicts       hackrf-devel
 
 } else {
 
     # devel
-    github.setup mossmann hackrf 52851eeb0824827e3121fc3ce58aba84e6a29271
-    version   20201013-[string range ${github.version} 0 7]
-    checksums rmd160 10c91941f81ad6ba5786ec8fa4c4943f39bdc5b1 \
-              sha256 bec3cc69b7225aa4c5e88640fd03686905107565aa167155aab222ee5615ac30 \
-              size   15207622
-    revision  0
+    github.setup    mossmann hackrf 5f1536cc3631f79e6beafbd8d7bb6cf86dcf555f
+    version         20210330-[string range ${github.version} 0 7]
+    checksums       rmd160  0491b8fb47cd2d5f7db03fe564ed19674e4d950b \
+                    sha256  2ae669edd37509c1741de404f251f2fecb4d949ec2fd45aa6744661fe1303dde \
+                    size    13066837
+    revision        0
 
-    conflicts hackrf
+    conflicts       hackrf
 
 }
 

@@ -42,7 +42,8 @@ patchfiles          patch-Makefile.pre.in.diff \
                     enable-loadable-sqlite-extensions.patch \
                     patch-_osx_support.py.diff \
                     darwin20.diff \
-                    arm.patch
+                    arm.patch \
+                    implicit.patch
 
 depends_build       port:pkgconfig
 depends_lib         port:bzip2 \
@@ -80,6 +81,7 @@ subport ${name}-bootstrap {
     depends_run
     use_xz              no
     depends_extract     port:xz-bootstrap
+    depends_skip_archcheck-append   xz-bootstrap
     extract.suffix      .tar.xz
     extract.cmd         ${prefix}/bin/xz
     if {${os.platform} eq "darwin" && ${os.major} >= 18} {

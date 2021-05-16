@@ -1,11 +1,11 @@
---- setup.py.orig	2020-03-24 20:44:00.000000000 -0500
-+++ setup.py	2020-03-24 20:44:45.000000000 -0500
-@@ -256,7 +256,7 @@
-         cppflags.append('-DDEBUG_{}'.format(el.upper().replace('-', '_')))
+--- setup.py.orig
++++ setup.py
+@@ -307,7 +307,7 @@
+     march = '-march=native' if native_optimizations else ''
      cflags_ = os.environ.get(
          'OVERRIDE_CFLAGS', (
--            '-Wextra {} -Wno-missing-field-initializers -Wall -Wstrict-prototypes -std=c99'
-+            '-Wextra {} -Wno-missing-field-initializers -Wno-deprecated-declarations -Wall -Wstrict-prototypes -std=c99'
-             ' -pedantic-errors -Werror {} {} -fwrapv {} {} -pipe {} -fvisibility=hidden {}'
-         ).format(
-             float_conversion,
+-            f'-Wextra {float_conversion} -Wno-missing-field-initializers -Wall -Wstrict-prototypes {std}'
++            f'-Wextra {float_conversion} -Wno-missing-field-initializers -Wno-deprecated-declarations -Wall -Wstrict-prototypes {std}'
+             f' -pedantic-errors {werror} {optimize} {sanitize_flag} -fwrapv {stack_protector} {missing_braces}'
+             f' -pipe {march} -fvisibility=hidden {fortify_source}'
+         )

@@ -36,7 +36,8 @@ checksums           rmd160  d00da1f7f1fb620c7fac28d95858bb734db78bed \
 
 minimum_xcodeversions {9 3.1}
 
-depends_build       port:pkgconfig
+depends_build       port:gtk-doc \
+                    path:bin/pkg-config:pkgconfig
 
 depends_lib         port:atk \
                     path:lib/pkgconfig/pango.pc:pango \
@@ -70,9 +71,13 @@ if {[variant_isset quartz]} {
     compiler.blacklist  *gcc-3.* *gcc-4.* {clang < 300}
 }
 
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
+
 # gobject-introspection uses g-ir-scanner, which uses $CC from env
 
-if {[variant_isset universal]} {
+if {${universal_possible} && [variant_isset universal]} {
     foreach arch ${configure.universal_archs} {
         lappend merger_build_args(${arch})  CC='${configure.cc} -arch ${arch}'
         lappend merger_build_args(${arch})  CC_FOR_BUILD='${configure.cc} -arch ${arch}'
@@ -159,7 +164,7 @@ platform darwin {
     }
 }
 
-if {[variant_isset universal]} {
+if {${universal_possible} && [variant_isset universal]} {
     set cups /usr/bin/cups-config
     if {[info exists universal_sysroot]} {
         set cups ${universal_sysroot}${cups}
@@ -237,7 +242,6 @@ if {[variant_isset universal]} {
 variant quartz conflicts x11 {
     require_active_variants path:lib/pkgconfig/cairo.pc:cairo quartz
     require_active_variants path:lib/pkgconfig/pango.pc:pango quartz
-    require_active_variants port:gdk-pixbuf2 "" x11
 
     configure.args-append   --enable-quartz-backend
 }

@@ -3,11 +3,11 @@
 PortSystem          1.0
 PortGroup           github 1.0
 
-github.setup        jbruchon jdupes 1.19.1 v
+github.setup        jbruchon jdupes 1.20.0 v
 revision            0
-checksums           rmd160  3a29220cce0458fcfc6e2d794700898531ca9d14 \
-                    sha256  a5728d75c16b3b03aec934e0599519931270b56f8d360909d05c8fa7d984e53a \
-                    size    92693
+checksums           rmd160  b3e93916a5edae077d9db4eeeba4526b0df6f2ec \
+                    sha256  beba8f843b24659764a6a747e3fd4b3343c4b3c8fa9fdd167977e98d433b5de6 \
+                    size    93845
 
 platforms           darwin
 categories          sysutils

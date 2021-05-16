@@ -3,7 +3,7 @@
 PortSystem          1.0
 PortGroup           golang 1.0
 
-go.setup            github.com/fortio/fortio 1.11.5 v
+go.setup            github.com/fortio/fortio 1.14.2 v
 revision            0
 
 homepage            https://fortio.org
@@ -29,9 +29,16 @@ license             Apache-2
 maintainers         {gmail.com:herby.gillot @herbygillot} \
                     openmaintainer
 
-checksums           rmd160  e76b12aa7bdb15ff54998a0ddc5bb3ba138b820c \
-                    sha256  c7e4086cb1cb81fd24ccdfc388b4a81ba866a14db8c1c4fe3125319e7f6c3758 \
-                    size    256728
+checksums           rmd160  dfafa7987a3101967547c1dee14fd45b6f86b701 \
+                    sha256  3f7449af8e3bda41ad7d5537a6448714757a6d366da5b449618216fb7df1b678 \
+                    size    262917
+
+set _ft_share_dir   ${prefix}/share/${name}
+
+build.cmd           make
+build.pre_args      GIT_TAG=v${version} \
+                    LIB_DIR=${_ft_share_dir}/ui
+build.args          official-build
 
 # Allow fetching build dependencies at build time
 # See: http://trac.macports.org/ticket/61192
@@ -39,6 +46,11 @@ build.env-delete    GO111MODULE=off GOPROXY=off
 
 installs_libs       no
 
+
 destroot {
-    xinstall -m 755 ${worksrcpath}/${name} ${destroot}${prefix}/bin/${name}
+    xinstall -m 0755 ${worksrcpath}/../fortio.bin ${destroot}${prefix}/bin/${name}
+    xinstall -m 0644 ${worksrcpath}/docs/${name}.1 ${destroot}${prefix}/share/man/man1/
+
+    file mkdir ${destroot}${_ft_share_dir}
+    copy ${worksrcpath}/ui/ ${destroot}${_ft_share_dir}/
 }

@@ -10,7 +10,7 @@ name                py-pyflakes
 # Please DO NOT update without cross-checking version compatibility and
 # perform updates in a coordinated way.
 
-version             2.2.0
+version             2.3.1
 revision            0
 categories-append   devel
 platforms           darwin
@@ -29,9 +29,9 @@ long_description    Pyflakes is program to analyze Python programs and \
 
 homepage            https://github.com/pycqa/pyflakes
 
-checksums           rmd160  6407c4188cec3290f251c8f8523a647c3612431a \
-                    sha256  35b2d75ee967ea93b55750aa9edbbf72813e06a66ba54438df2cfac9e3c27fc8 \
-                    size    65307
+checksums           rmd160  5f679e5efcc429666436c88b61641891cc31cc8a \
+                    sha256  f5bc8ecabc05bb9d291eb5203d6810b49040f6ff446a756326104746cc00c1db \
+                    size    68567
 
 if {${name} ne ${subport}} {
     depends_lib-append  port:py${python.version}-setuptools

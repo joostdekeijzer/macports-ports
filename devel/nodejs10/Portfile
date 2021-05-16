@@ -2,15 +2,16 @@
 
 PortSystem              1.0
 PortGroup               compiler_blacklist_versions 1.0
+PortGroup               legacysupport 1.1
 
 # on macOS nodejs only builds against libc++
 # this force is OK as node does not link against any other c++ libs
 depends_lib-append      port:libcxx
 configure.cxx_stdlib    libc++
-compiler.cxx_standard   2011
+compiler.cxx_standard   2014
 
 name                    nodejs10
-version                 10.23.1
+version                 10.24.1
 
 categories              devel net
 platforms               darwin
@@ -24,21 +25,21 @@ long_description        Node's goal is to provide an easy way to build scalable 
                         Machine or Python's Twisted. Node takes the event model a bit further-it \
                         presents the event loop as a language construct instead of as a library.
 
-conflicts               nodejs8 nodejs12 nodejs13 nodejs14 nodejs15
+conflicts               nodejs8 nodejs12 nodejs13 nodejs14 nodejs15 nodejs16
 
 homepage                https://nodejs.org/
 master_sites            ${homepage}dist/v${version}
 use_xz                  yes
 
-checksums               rmd160  8b7d0841b2bbbfbb1ceceadcedaca00b7de4e481 \
-                        sha256  88aa16f5af79615b183ca55ed81393763169e75d1fb96013cf1831895c6cedfa \
-                        size    21647904
+checksums               rmd160  1e59704c06219ced68b1f47abd2e1e176a144f41 \
+                        sha256  d72fc2c244603b4668da94081dc4d6067d467fdfa026e06a274012f16600480c \
+                        size    21647996
 
 distname                node-v${version}
 
-depends_build           port:pkgconfig
+depends_build-append    port:pkgconfig
 
-depends_lib             port:icu \
+depends_lib-append      port:icu \
                         port:python27 \
                         path:lib/libssl.dylib:openssl
 

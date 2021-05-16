@@ -1,11 +1,16 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
 PortSystem          1.0
-PortGroup           github 1.0
+PortGroup           gitlab 1.0
 
-github.setup        vdudouyt minipro 0.0.1
+gitlab.setup        DavidGriffith minipro 0.5
+revision            0
+checksums           rmd160  99b73fa0e04c71cce43b01a050fc6db656dbdfcb \
+                    sha256  34285cd786d645b2ed8fe6dfebaa04fbb904165d7060e15231aaa3d106c7f19a \
+                    size    246205
+
 categories          devel
-maintainers         openmaintainer {gmail.com:ranauei @ranauei}
+maintainers         openmaintainer {krischik @krischik}
 platforms           darwin
 license             GPL-3
 description         Utility for the MiniPRO TL866CS and TL866A universal programmers
@@ -15,9 +20,6 @@ long_description    Opensource tool that aims to create a complete cross-platfor
                     AVRs, PICs as well as a huge number of other microcontrollers and \
                     various BIOSes.
 
-checksums           rmd160  8cc7d90a90ea4a57e7f5562699049d6bfb9d9359 \
-                    sha256  6231364e7e278b2a75889b1b9764689e9361487c152621746061a6c8e5e8a658
-
 depends_build       port:pkgconfig
 
 depends_lib         port:libusb
@@ -26,11 +28,8 @@ depends_run         port:srecord
 
 use_configure       no
 
-variant universal {}
+variant universal   {}
 
-build.args-append   CC="${configure.cc} [get_canonical_archflags cc]"
+build.args-append   PREFIX=${prefix} CC="${configure.cc} [get_canonical_archflags cc]"
 
-destroot {
-    xinstall -W ${worksrcpath} ${name} ${name}-query-db ${name}hex ${destroot}${prefix}/bin
-    xinstall -m 644 ${worksrcpath}/man/${name}.1 ${destroot}${prefix}/share/man/man1
-}
+destroot.args       PREFIX=${prefix}

@@ -3,7 +3,7 @@
 PortSystem          1.0
 
 name                xterm
-version             362
+version             367
 revision            0
 categories          x11
 license             X11
@@ -18,9 +18,9 @@ homepage            https://invisible-island.net/xterm/
 master_sites        ftp://ftp.invisible-island.net/pub/xterm/ \
                     https://invisible-mirror.net/archives/xterm/
 
-checksums           rmd160  1146ac7005bdd406efefc49bc7b67112b598ce87 \
-                    sha256  1d4ffe226fa8f021859bbc3007788ff63a46a31242d9bd9a7bd7ebe24e81aca2 \
-                    size    1436334
+checksums           rmd160  9e5fdd1d0f66e30eedfed1ffa83bbf8d429cb7af \
+                    sha256  27f1a8b1c756e269fd5684e60802b545f0be9b36b8b5d6bdbc840c6b000dc51f \
+                    size    1448562
 
 extract.suffix      .tgz
 

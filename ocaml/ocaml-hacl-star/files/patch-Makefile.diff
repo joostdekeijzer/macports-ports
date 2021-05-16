@@ -1,0 +1,11 @@
+--- Makefile.orig	2021-05-10 11:16:08.000000000 -0600
++++ Makefile	2021-05-11 12:46:03.000000000 -0600
+@@ -1126,8 +1126,6 @@
+ ###################################################################################
+ 
+ copy-kremlib:
+-	mkdir -p dist/kremlin
+-	(cd $(KREMLIN_HOME) && tar cvf - kremlib/dist/minimal include) | (cd dist/kremlin && tar xf -)
+ 
+ compile-%: dist/Makefile.tmpl dist/configure dist/%/Makefile.basic | copy-kremlib
+ 	cp $< dist/$*/Makefile

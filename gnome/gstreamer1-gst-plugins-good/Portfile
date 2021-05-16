@@ -10,6 +10,7 @@ name                gstreamer1-gst-plugins-good
 set my_name         gst-plugins-good
 # please only commit stable updates (even numbered releases)
 version             1.16.2
+revision            1
 description         A set of good-quality plug-ins for GStreamer under GStreamer's preferred \
                     license, LGPL.
 long_description    GStreamer Good Plug-ins is a set of plug-ins that GStreamer's developers \
@@ -36,7 +37,7 @@ depends_lib         port:gstreamer1-gst-plugins-base \
                     path:lib/pkgconfig/cairo.pc:cairo \
                     port:flac \
                     port:gdk-pixbuf2 \
-                    port:jpeg \
+                    path:include/turbojpeg.h:libjpeg-turbo \
                     port:lame \
                     path:lib/libcaca.dylib:libcaca \
                     port:libdv \
@@ -136,7 +137,10 @@ variant qt description {Enable QT5 MAC windowing elements } {
     configure.cxxflags-append -std=c++11
 }
 
-if {[variant_isset universal]} {
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
+if {${universal_possible} && [variant_isset universal]} {
     set merger_host(x86_64) x86_64-apple-${os.platform}${os.major}
     set merger_host(i386) i686-apple-${os.platform}${os.major}
     set merger_configure_args(x86_64) --build=x86_64-apple-${os.platform}${os.major}

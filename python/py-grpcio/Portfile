@@ -1,59 +1,17 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
 PortSystem          1.0
-PortGroup           python 1.0
+PortGroup           obsolete 1.0
 
 name                py-grpcio
-version             1.25.0
-revision            0
+version             1.35.0
+revision            1
+maintainers         nomaintainers
 platforms           darwin
-license             Apache-2
-maintainers         {emcrisostomo @emcrisostomo} openmaintainer
 
 description         HTTP/2-based RPC framework
-long_description    ${description}
+long_description    {*}${description}
 
-homepage            https://grpc.io/
-master_sites        pypi:g/grpcio
-distname            ${python.rootname}-${version}
+homepage            https://github.com/grpc/grpc
 
-checksums           rmd160  253563c73d5a3923e9428defeacf2085b44c83e5 \
-                    sha256  c948c034d8997526011960db54f512756fb0b4be1b81140a15b4ef094c6594a4 \
-                    size    15358518
-
-python.versions     27 35 36 37 38
-
-if {${name} ne ${subport}} {
-    depends_build-append    \
-        port:py${python.version}-cython \
-        port:pkgconfig \
-        port:py${python.version}-setuptools
-
-    depends_lib-append      \
-        port:c-ares \
-        path:lib/libssl.dylib:openssl \
-        port:py${python.version}-protobuf3 \
-        port:py${python.version}-six \
-        port:zlib
-
-    if {${python.version} < 34} {
-        depends_lib-append      \
-            port:py${python.version}-enum34 \
-            port:py${python.version}-futures
-    }
-
-    patch {
-        reinplace "s|/usr|${prefix}|g" ${worksrcpath}/setup.py
-    }
-
-    build.env-append \
-        GRPC_PYTHON_BUILD_SYSTEM_CARES=1 \
-        GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1 \
-        GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1 \
-        GRPC_PYTHON_BUILD_WITH_CYTHON=1
-
-    test.run            yes
-    livecheck.type      none
-} else {
-    livecheck.type      pypi
-}
+# This obsolete port can be removed after April 2021

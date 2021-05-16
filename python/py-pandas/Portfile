@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-pandas
-version             1.2.0
+version             1.2.4
 revision            0
 categories-append   science
 license             BSD
@@ -20,9 +20,9 @@ long_description    ${description}
 
 homepage            https://pandas.pydata.org
 
-checksums           rmd160  399bad4ab3fd44f787a513ba0398dc6106fb64d4 \
-                    sha256  e03386615b970b8b41da6a68afe717626741bb2431cec993640685614c0680e4 \
-                    size    5392796
+checksums           rmd160  edb56bddc6f3b1fab9db2fdf4e7f6af1a84ea7a4 \
+                    sha256  649ecab692fade3cbfcf967ff936496b0cfba0af00a55dfaacd82bdda5cb2279 \
+                    size    5469105
 
 if {${name} ne ${subport}} {
     if {${python.version} eq 27} {

@@ -7,9 +7,9 @@ PortGroup           compiler_blacklist_versions 1.0
 PortGroup           linear_algebra 1.0
 
 name                octave
-version             6.1.0
+version             6.2.0
 set package_version 6.x.x
-revision            0
+revision            1
 
 categories          math science
 platforms           darwin
@@ -25,9 +25,9 @@ homepage            https://www.gnu.org/software/octave
 
 master_sites        gnu:octave
 
-checksums           rmd160  4f2094359ae531e08a01460f6b8ac8788cc933da \
-                    sha256  6ff34e401658622c44094ecb67e497672e4337ca2d36c0702d0403ecc60b0a57 \
-                    size    32592405
+checksums           rmd160  a7d084c684f233b2c674d3cb0dc1c38e3ca16751 \
+                    sha256  457d1fda8634a839e2fd7cfc55b98bd56f36b6ae73d31bb9df43dde3012caa7c \
+                    size    32620419
 
 # see https://lists.gnu.org/archive/html/octave-maintainers/2016-05/msg00286.html
 compiler.cxx_standard \
@@ -113,6 +113,7 @@ pre-configure {
         gfortran {
             set fcv    [lindex [split ${fc_full} -] end]
             set gccdir gcc[join [split ${fcv} .] ""]
+            if {${gccdir} eq "gccdevel"} {set gccdir gcc-devel}
             if {[file exists ${prefix}/lib/${gccdir}/libquadmath.dylib]} {
                 configure.args-append FLIBS="-L${prefix}/lib/${gccdir} -lgfortran -lquadmath -lm"
             } else {
@@ -372,10 +373,15 @@ configure.args-append \
     --without-sundials_nvecserial \
     --without-sundials_ida
 variant sundials description {enable sundials support for solving ODEs} {
-    depends_lib-append  port:sundials2
+    depends_lib-append  port:sundials
     configure.args-delete \
         --without-sundials_nvecserial \
         --without-sundials_ida
+    configure.args-append \
+        --with-sundials_ida-includedir=${prefix}/include/ida \
+        --with-sundials_ida-libdir=${prefix}/lib \
+        --with-sundials_nvecserial-includedir==${prefix}/include/nvector \
+        --with-sundials_nvecserial-libdir=${prefix}/lib
 }
 default_variants-append +sundials
 
@@ -464,6 +470,10 @@ if {[variant_isset fltk] || [variant_isset qt4] || [variant_isset qt5]} {
 
 if { ([variant_isset fltk] && [variant_isset qt4]) || ([variant_isset fltk] && [variant_isset qt5]) } {
     notes-append "unless octave is run with --no-gui-libs, graphics_toolkit(\"fltk\") will cause a crash"
+}
+
+if {[variant_isset qt4]} {
+    notes-append "on-disk documentation is not building at present with qt4 variant, but online is available"
 }
 
 variant sound description {enable audio support (file I/O and playback)} {
@@ -596,7 +606,10 @@ variant docs description {build documentation files} {
 
     configure.args-replace --disable-docs --enable-docs
 }
-default_variants-append +docs
+# the documentation is not building when using qt4 at present
+if {![variant_isset qt4]} {
+    default_variants-append +docs
+}
 
 # GraphicsMagick and octave need to be built with the same C++ standard library
 # or else undefined symbols:
@@ -653,8 +666,11 @@ post-destroot {
 
 }
 
+if {![info exists universal_possible]} {
+    set universal_possible [expr {${os.universal_supported} && [llength ${configure.universal_archs}] >= 2}]
+}
 # generate default octave_packages file so that it is removed if Octave is uninstalled
-if { ![variant_isset universal] } {
+if {!${universal_possible} || ![variant_isset universal]} {
     post-destroot {
         set octave_install_share ${destroot}${prefix}/share/octave/packages
         set octave_install_lib   ${destroot}${prefix}/lib/octave/packages

@@ -6,15 +6,12 @@ PortGroup           github 1.0
 PortGroup           qt5 1.0
 PortGroup           app 1.0
 
-github.setup        miek inspectrum d6115cb458068fa64c7bbd9020bcbab3373fee0e
-version             20191102
-checksums           rmd160 d0dbbda96fe5ca060aada402d986b34c4a63b67b \
-                    sha256 5497f4357f8603634ee0a43dc4eae9997ab35436438078c4dd6b0c5f01944836 \
-                    size   109324
+github.setup        miek inspectrum 6d284ff7816d72f8164362c8c7e292ffce398e96
+version             20210325
+checksums           rmd160  1bc533c3857c4d399ea5d347e3b8471f2a4fefcb \
+                    sha256  536fdea0ff16ae6cd47c0517f84d9640bc6cd4cd4762ada70066d75a80654763 \
+                    size    110209
 revision            0
-
-# Disable livecheck as using github commit
-livecheck.type      none
 
 categories          science comms
 maintainers         {michaelld @michaelld} openmaintainer

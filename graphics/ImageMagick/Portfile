@@ -8,7 +8,7 @@ PortGroup                   obsolete 1.0
 name                        ImageMagick
 
 replaced_by                 ImageMagick-6
-version                     6.9.11-56
+version                     6.9.11-60
 revision                    1
 
 categories                  graphics devel

@@ -4,7 +4,7 @@ PortSystem              1.0
 
 name                    metapixel
 version                 1.0.2
-revision                5
+revision                6
 categories              graphics
 license                 GPL-2+
 platforms               darwin
@@ -28,7 +28,7 @@ checksums               md5     af5d77d38826756af213a08e3ada9941 \
                         sha1    f917aec91430b1bdbcc7b3dea29cb93f15a04c77 \
                         rmd160  7343c66e925e5b55cfe63624be18159717b1295e
 
-depends_lib             port:jpeg \
+depends_lib             path:include/turbojpeg.h:libjpeg-turbo \
                         port:giflib \
                         port:libpng
 
@@ -39,18 +39,13 @@ patchfiles              metapixel_1.0.2-libpng1.5.patch \
 use_configure           no
 
 variant universal {}
-if {[variant_isset universal]} {
-    set archflags       ${configure.universal_cflags}
-} else {
-    set archflags       ${configure.cc_archflags}
-}
 
 build.args              PREFIX=${prefix} \
                         CC="${configure.cc}" \
-                        MACOS_CCOPTS="${archflags}" \
-                        MACOS_LDOPTS="${archflags}"
+                        MACOS_CCOPTS="[get_canonical_archflags cc]" \
+                        MACOS_LDOPTS="[get_canonical_archflags ld]"
 
 destroot.destdir        PREFIX=${destroot}${prefix} \
                         CC="${configure.cc}" \
-                        MACOS_CCOPTS="${archflags}" \
-                        MACOS_LDOPTS="${archflags}"
+                        MACOS_CCOPTS="[get_canonical_archflags cc]" \
+                        MACOS_LDOPTS="[get_canonical_archflags ld]"

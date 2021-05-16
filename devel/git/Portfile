@@ -4,8 +4,8 @@ PortSystem          1.0
 PortGroup           perl5 1.0
 
 name                git
-version             2.30.0
-revision            0
+version             2.31.1
+revision            2
 
 description         A fast version control system
 long_description    Git is a fast, scalable, distributed open source version \
@@ -24,13 +24,13 @@ distfiles           git-${version}${extract.suffix} \
                     git-manpages-${version}${extract.suffix}
 
 checksums           git-${version}.tar.xz \
-                    rmd160  17081fb3ca73aa9aa486994a07c7e6f61c781046 \
-                    sha256  55735021109565721af805af382c45cce73c3cfaa59daad22443d1477d334d19 \
-                    size    6325652 \
+                    rmd160  98b31ed7a2d36160c99e924a4d9c9636af59c4f5 \
+                    sha256  9f61417a44d5b954a5012b6f34e526a3336dcf5dd720e2bb7ada92ad8b3d6680 \
+                    size    6413368 \
                     git-manpages-${version}.tar.xz \
-                    rmd160  a54a6b774f1b65011e1ce0a92091d2e745368334 \
-                    sha256  7b2b8405d5bdd149e3891617053de37f7e8d5a5b3834317a5af9f30ccc93cf76 \
-                    size    481792
+                    rmd160  35cac47de1c8dda0dc1c16ab65a1158015e15959 \
+                    sha256  5d0d443c57155da2f201584d4c8c5ad10a0a24ff3af3a7a77cdc8f56dddac702 \
+                    size    487784
 
 perl5.require_variant   yes
 perl5.conflict_variants yes
@@ -42,8 +42,7 @@ depends_lib-append  port:curl \
                     port:zlib \
                     path:lib/libssl.dylib:openssl \
                     port:expat \
-                    port:libiconv \
-                    port:python38
+                    port:libiconv
 
 depends_run-append  port:p${perl5.major}-authen-sasl \
                     port:p${perl5.major}-error \
@@ -76,7 +75,6 @@ build.args          CFLAGS="${CFLAGS}" \
                     OPENSSLDIR=${prefix} \
                     ICONVDIR=${prefix} \
                     PERL_PATH="${prefix}/bin/perl${perl5.major}" \
-                    PYTHON_PATH="${prefix}/bin/python3.8" \
                     NO_FINK=1 \
                     NO_DARWIN_PORTS=1 \
                     NO_R_TO_GCC_LINKER=1 \
@@ -145,9 +143,9 @@ variant pcre description {Use pcre} {
 variant doc description {Install HTML and plaintext documentation} {
     distfiles-append        git-htmldocs-${version}${extract.suffix}
     checksums-append        git-htmldocs-${version}.tar.xz \
-                            rmd160  4f78d66cde49a50787ce94b80710b5b29a2a826c \
-                            sha256  820132c62ade3df12b4178857cfc5c92276b847b2307a5f7f4d24c27774f962f \
-                            size    1340536
+                            rmd160  621b1b07a680fe8603007f90986dd5140581e867 \
+                            sha256  ae94a6b128d1972a8b4041af9fc529ece96a9f2a13952ff843262ccb7bc1642c \
+                            size    1357592
 
     patchfiles-append       patch-git-subtree.html.diff
 
@@ -170,7 +168,7 @@ variant doc description {Install HTML and plaintext documentation} {
         }
 
         fs-traverse f [list ${docdestroot}/howto ${docdestroot}/technical ${docdestroot}/RelNotes] {
-            if [file isdirectory ${f}] {
+            if {[file isdirectory ${f}]} {
                 file attribute ${f} -permissions ugo+rx
             } else {
                 file attribute ${f} -permissions ugo+r
@@ -216,7 +214,27 @@ variant credential_osxkeychain description {Install git credential-osxkeychain u
     post-destroot {
         xinstall -m 755 "${worksrcpath}/contrib/credential/osxkeychain/git-credential-osxkeychain" \
             "${destroot}${prefix}/libexec/git-core/"
+
+        # Create a global gitconfig file that sets credential.helper to
+        # osxkeychain. This can be overriden on a per-user basis in the user's
+        # own git config file
+        set f [open ${destroot}${prefix}/etc/gitconfig w 0644]
+        puts ${f} "\[credential]\n\thelper = osxkeychain"
+        close ${f}
     }
+
+    notes "
+A gitconfig file has been created at ${prefix}/etc/gitconfig to enable the
+osxkeychain credential helper. If you do not wish to use this credential
+helper, you can override this setting in your own git config file, e.g.
+
+    \[credential]
+            helper = some_other_credential_helper
+
+For more information, run
+
+    git help credentials
+"
 }
 
 variant diff_highlight description {Install git diff-highlight utility from contrib} {
@@ -236,6 +254,15 @@ variant diff_highlight description {Install git diff-highlight utility from cont
         xinstall -m 755 "${worksrcpath}/contrib/diff-highlight/diff-highlight" \
             "${destroot}${prefix}/bin/"
     }
+}
+
+# Python is only needed to enable certain tools for interacting with other
+# version control systems, such as git-p4 (for interfacing with Perforce).
+# This variant enables git to use MacPorts' Python as it builds these
+# additional tools.
+variant python description {Build with Python support} {
+    depends_lib-append  port:python39
+    build.args-append   PYTHON_PATH="${prefix}/bin/python3.9"
 }
 
 platform darwin 8 {

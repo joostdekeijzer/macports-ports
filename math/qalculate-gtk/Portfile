@@ -3,7 +3,7 @@
 PortSystem          1.0
 PortGroup           github 1.0
 
-github.setup        qalculate qalculate-gtk 3.15.0 v
+github.setup        qalculate qalculate-gtk 3.18.0 v
 revision            0
 
 categories          math
@@ -22,9 +22,13 @@ long_description    Qalculate! is a multi-purpose desktop calculator. \
 
 github.tarball_from releases
 
-checksums           rmd160  1fa97d15275f983dc538ad16867564c3718902a0 \
-                    sha256  3ecf5fc0a465e651ceb47aeea4ebb9f166771f9676c6ff78e9bccdb9d8494c6a \
-                    size    2715732
+checksums           rmd160  3972a7344395804c9c898ea98871c7abdb43840c \
+                    sha256  3e727087877c7c367c223948d8ed807fd0bbc19386dd9f6f4741c213cd6d3311 \
+                    size    2418606
+
+# This patch will no longer be relevant after the completion of the next
+# pull request: https://github.com/macports/macports-ports/pull/7399
+patchfiles          patch-gettext-version-fix.diff
 
 # autoreconf to reconfigure for intltool
 use_autoreconf      yes

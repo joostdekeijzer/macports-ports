@@ -6,7 +6,7 @@ PortGroup           python 1.0
 
 name                py-pyicu
 python.rootname     PyICU
-version             2.6
+version             2.7.3
 revision            0
 
 categories-append   textproc
@@ -17,11 +17,11 @@ maintainers         nomaintainer
 description         Python extension wrapping the ICU C++ API
 long_description    ${description}
 
-homepage            https://github.com/ovalhub/pyicu
+homepage            https://gitlab.pyicu.org/main/pyicu
 
-checksums           rmd160  eb7526087021f6fcedaca42c3e951860112a914b \
-                    sha256  a9a5bf6833360f8f69e9375b91c1a7dd6e0c9157a42aee5bb7d6891804d96371 \
-                    size    233826
+checksums           rmd160  fe4bfab58e157954c0b89a12c130c3377bc7e776 \
+                    sha256  0892f927b825e6027478f5b3cae52deecc0a1cba488da1ffb0fb299274bb61cb \
+                    size    295733
 
 python.versions     27 35 36 37 38 39
 
@@ -53,8 +53,8 @@ if {${name} ne ${subport}} {
     post-destroot {
         set docdir ${prefix}/share/doc/${subport}
         xinstall -d ${destroot}${docdir}
-        xinstall -m 0644 -W ${worksrcpath} LICENSE CREDITS \
-            README.md CHANGES ${destroot}${docdir}
+        xinstall -m 0644 -W ${worksrcpath} README.md \
+            CHANGES ${destroot}${docdir}
     }
 
     livecheck.type      none

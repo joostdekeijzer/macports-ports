@@ -1,8 +1,12 @@
-PortSystem          1.0
-PortGroup           github 1.0
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
-github.setup        prometheus prometheus 2.24.0 v
+PortSystem          1.0
+PortGroup           golang 1.0
+
+go.setup            github.com/prometheus/prometheus 2.27.0 v
 revision            0
+
+homepage            https://prometheus.io
 
 description         The Prometheus monitoring system and time series database
 
@@ -12,8 +16,6 @@ long_description    Prometheus is an open-source systems monitoring and \
                     have adopted Prometheus, and the project has a very \
                     active developer and user community.
 
-homepage            https://prometheus.io
-
 platforms           darwin
 categories          sysutils
 license             Apache-2
@@ -21,18 +23,21 @@ license             Apache-2
 maintainers         {gmail.com:herby.gillot @herbygillot} \
                     openmaintainer
 
-depends_build       port:go \
+depends_build-append \
+                    port:nodejs15 \
+                    port:npm6 \
                     port:promu \
                     port:yarn
 
-build.env           GOPATH=${workpath} \
-                    PATH=${workpath}/bin:$env(PATH)
+build.cmd           make
+build.pre_args-append \
+                    PROMU=${prefix}/bin/promu
+build.args          build
+build.env-delete    GOPROXY=off
 
-build.target        build
-
-use_configure       no
 installs_libs       no
 use_parallel_build  no
+use_xcode           yes
 
 set prom_user       ${name}
 set prom_conf_dir   ${prefix}/etc/${name}
@@ -43,9 +48,9 @@ set prom_share_dir  ${prefix}/share/${name}
 set prom_log_dir    ${prefix}/var/log/${name}
 set prom_log_file   ${prom_log_dir}/${name}.log
 
-checksums           rmd160  08000750a8d0ebeefeb85ea5ca0b2ffd49a87410 \
-                    sha256  aaf32298f7342bf01e2215c376575d22d3d35bcbb91645766eb42540b1ba3385 \
-                    size    14636697
+checksums           rmd160  d65f351727ae2f6105bf4eb6178b677a1273fd53 \
+                    sha256  38f343d7f10ac44a2b246de3ddb9401066be736065ae1ff2b3df24da04cf691c \
+                    size    5647705
 
 add_users           ${prom_user} \
                     group=${prom_user} \
@@ -61,13 +66,11 @@ if {! [info exists env(USER)]} {
 }
 
 post-extract {
-    # Link promu into the workpath
-    xinstall -d ${workpath}/bin
-    ln -s ${prefix}/bin/promu ${workpath}/bin/
-
     copy  ${filespath}/org.macports.prometheus.plist \
           ${workpath}/org.macports.prometheus.plist
+}
 
+patch {
     reinplace "s|@NAME@|${name}|g" \
         ${workpath}/org.macports.prometheus.plist
 

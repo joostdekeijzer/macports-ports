@@ -4,7 +4,7 @@ PortSystem          1.0
 PortGroup           python 1.0
 
 name                py-cx_Freeze
-version             6.4.2
+version             6.6
 revision            0
 
 categories-append   devel
@@ -21,9 +21,9 @@ long_description    cx_Freeze is a set of scripts and modules for freezing Pytho
 
 homepage            https://marcelotduarte.github.io/cx_Freeze/
 
-checksums           rmd160  35c58c0bed65fc43c5997a2f15dd1df61b811787 \
-                    sha256  fe0af7c658442402bcd209f993219a6ab98a951459495b4a141eb03b552a1c68 \
-                    size    108571
+checksums           rmd160  9d5d21aa388bf0ba262e8fe2f7115675b9b6dc24 \
+                    sha256  c4af8ad3f7e7d71e291c1dec5d0fb26bbe92df834b098ed35434c901fbd6762f \
+                    size    120239
 
 python.versions     27 36 37 38 39
 
@@ -39,7 +39,7 @@ if {${name} ne ${subport}} {
                     size    61381
         depends_run-append \
                     port:py${python.version}-setuptools
-    } elseif {${python.version} < 38} {
+    } else {
         depends_lib-append \
                     port:py${python.version}-importlib-metadata
     }

@@ -42,12 +42,11 @@ notes-append "\
 compiler.cxx_standard 2011
 
 if {${subport} eq ${name}} {
-    version         2.20.0
-    revision        4
+    version         2.22.1
     conflicts       lilypond-devel
-    checksums       rmd160  030ebe2074ad647269c7f8aca40eaee671ddb77f \
-                    sha256  595901323fbc88d3039ca4bdbc2d8c5ce46b182edcb3ea9c0940eba849bba661 \
-                    size    18100533
+    checksums       rmd160  efb911332e0b96011340d7a21ad091881aae9cd0 \
+                    sha256  72ac2d54c310c3141c0b782d4e0bef9002d5519cf46632759b1f03ef6969cc30 \
+                    size    18033161
 
     set livecheck_url "source.html"
 
@@ -56,12 +55,12 @@ if {${subport} eq ${name}} {
         configure.ldflags-append -stdlib=${configure.cxx_stdlib}
     }
 } else {
-    version         2.21.82
+    version         2.23.2
     revision        0
     conflicts       lilypond
-    checksums       rmd160  68d11ec05f973bc834a09611c18c7ef763d8cccf \
-                    sha256  f0bd17cccee771ed4a2e0db1ec81c98d9f52e47090e5dcc085de65dd8cc4bdd9 \
-                    size    18017911
+    checksums       rmd160  f7c5f01cd2a2c53eba594858453da2c6cfe3a069 \
+                    sha256  3b850b7af0322db720eafe8141f4a3e275fee6e00325da85decffbdb6ffced8c \
+                    size    17080861
 
 
     set livecheck_url "development.html"
@@ -244,12 +243,6 @@ post-patch {
     }
 
     if {${subport} eq ${name}} {
-        # Backport upstream commit 250d841a51eb to make dependency on
-        # dblatex optional.
-        reinplace -W ${worksrcpath} \
-            {s|\(DBLATEX.*\), $DOCUMENTATION_REQUIRED,|\1, OPTIONAL,|g} \
-            configure.ac
-
         # Currently, +docs only builds the info files.  For a complete
         # documentation build a texi2html 1.82 bundle is necessary, which
         # doesn't exist yet in MacPorts.
@@ -258,11 +251,6 @@ post-patch {
                 {s|\(TEXI2HTML.*\), $DOCUMENTATION_REQUIRED,|\1, OPTIONAL,|g} \
                 configure.ac
         }
-
-        reinplace -W ${worksrcpath} -E \
-            s|/usr/bin/(env\\\ )?python|${configure.python}|g \
-            scripts/auxiliar/coverage.py \
-            scripts/auxiliar/texi-skeleton-update.py
     }
 }
 

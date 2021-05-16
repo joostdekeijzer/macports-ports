@@ -9,24 +9,28 @@ PortGroup             app 1.0
 name                  SDRangel
 platforms             darwin macosx
 categories            science
-license               GPL-3.0
+license               GPL-3
 maintainers           {ra1nb0w @ra1nb0w} {michaelld @michaelld} openmaintainer
 
 description           SDRangel is an Open Source Qt5 / OpenGL 3.0+ SDR \
     and signal analyzer frontend to various hardware.
 long_description    ${description}
 
-github.setup          f4exb sdrangel 6.4.0 v
-checksums             rmd160  071dd666860f03717d226cdeea49017968b976d1 \
-                      sha256  6ce4b452d7853705759d7e45ab32acda05f0f9339ae6e6973de109e9acf5809b \
-                      size    33555285
+github.setup          f4exb sdrangel 6.10.3 v
+checksums             rmd160  83e3f73d53f3da6dce26e00eace3d6b74f7c1219 \
+                      sha256  1d60ce5e6a284da8e540a6f46bad3fe93d5c07c53a38716a44e10f4e5bfa2aab \
+                      size    47549272
 revision              0
 
 # check just the version 6 branch for now
 github.livecheck.regex (6\[0-9.]*)
 
-compiler.c_standard   2014
-compiler.cxx_standard 2014
+compiler.c_standard   2011
+# error: call to 'abs' is ambiguous
+#   float dec = std::abs(degrees) + minutes * 1.0f/60.0f + seconds * 1.0f/(60.0f*60.0f);
+# std::abs was only introduced in c++17 so whilst the port claims to only
+# require c++14 it actually needs c++17
+compiler.cxx_standard 2017
 
 # TEMPORARY
 # https://trac.macports.org/ticket/60012
@@ -35,6 +39,8 @@ patchfiles-append     disable-remotetx.patch
 
 # revert https://github.com/f4exb/sdrangel/issues/492
 patchfiles-append     revert_cm256cc.patch
+
+set opencv_ver        3
 
 depends_lib-append \
     port:boost \
@@ -46,14 +52,16 @@ depends_lib-append \
     path:lib/libusb.dylib:libusb \
     port:libiconv \
     port:libopus \
-    port:opencv \
+    port:opencv${opencv_ver} \
     port:serialDV
 
 qt5.depends_component \
     qtmultimedia \
     qttools \
     qtwebsockets \
-    qtlocation
+    qtlocation \
+    qtcharts \
+    qtspeech
 
 configure.args-append \
     -DBUILD_GUI=OFF \
@@ -70,11 +78,15 @@ configure.args-append \
     -DENABLE_PERSEUS=OFF \
     -DENABLE_RTLSDR=OFF \
     -DENABLE_SOAPYSDR=OFF \
+    -DENABLE_SDRPLAY=OFF \
     -DENABLE_XTRX=OFF \
     -DFORCE_SSE41=ON \
     -DIconv_LIBRARY=${prefix}/lib/libiconv.dylib \
     -DIconv_INCLUDE_DIR=${prefix}/include \
     -DRX_SAMPLE_24BIT=ON
+
+cmake.module_path-append \
+    ${prefix}/libexec/opencv${opencv_ver}/cmake
 
 variant debug description {Enable debug messages} {
     configure.args-append   \
@@ -153,7 +165,12 @@ variant soapysdr description {Enable SoapySDR support} {
     configure.args-replace  -DENABLE_SOAPYSDR=OFF -DENABLE_SOAPYSDR=ON
 }
 
-default_variants +soapysdr +airspy +airspyhf +limesuite +rtlsdr +funcube +server +gui
+variant sdrplay description {Enable SDRplay support} {
+    depends_lib-append      port:SDRplay3
+    configure.args-replace  -DENABLE_SDRPLAY=OFF -DENABLE_SDRPLAY=ON
+}
+
+default_variants +soapysdr +airspy +airspyhf +limesuite +rtlsdr +funcube +server +gui +sdrplay
 
 test.run     yes
 test.cmd     ./sdrangelbench
