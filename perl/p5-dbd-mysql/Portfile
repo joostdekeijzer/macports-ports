@@ -63,23 +63,23 @@ if {${perl5.major} != ""} {
 
     variant mariadb10_6 conflicts mysql8 mysql81 mysql82 \
                     mariadb10_4 mariadb10_5 mariadb10_10 mariadb10_11 \
-                    percona description {build with mariadb-10.5 port} {
+                    percona description {build with mariadb-10.6 port} {
         depends_lib-append      port:mariadb-10.6
-        configure.args-append   --mysql_config=${prefix}/lib/mariadb-10.5/bin/mysql_config
+        configure.args-append   --mysql_config=${prefix}/lib/mariadb-10.6/bin/mysql_config
     }
 
     variant mariadb10_10 conflicts mysql8 mysql81 mysql82 \
                     mariadb10_4 mariadb10_5 mariadb10_6 mariadb10_11 \
-                    percona description {build with mariadb-10.5 port} {
+                    percona description {build with mariadb-10.10 port} {
         depends_lib-append      port:mariadb-10.10
-        configure.args-append   --mysql_config=${prefix}/lib/mariadb-10.5/bin/mysql_config
+        configure.args-append   --mysql_config=${prefix}/lib/mariadb-10.10/bin/mysql_config
     }
 
     variant mariadb10_11 conflicts mysql8 mysql81 mysql82 \
                     mariadb10_4 mariadb10_5 mariadb10_6 mariadb10_10 \
-                    percona description {build with mariadb-10.5 port} {
+                    percona description {build with mariadb-10.11 port} {
         depends_lib-append      port:mariadb-10.11
-        configure.args-append   --mysql_config=${prefix}/lib/mariadb-10.5/bin/mysql_config
+        configure.args-append   --mysql_config=${prefix}/lib/mariadb-10.11/bin/mysql_config
     }
 
     variant percona conflicts mysql8 mysql81 mysql82 \
