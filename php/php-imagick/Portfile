@@ -20,7 +20,7 @@ long_description        Imagick is a native PHP extension for creating and \
 if {[vercmp ${php.branch} >= 5.4]} {
     epoch               1
     version             3.7.0
-    revision            0
+    revision            1
     checksums           rmd160  60d5c6cc154b65bdfd31be6980633ff1e659bc73 \
                         sha256  5a364354109029d224bcbb2e82e15b248be9b641227f45e63425c06531792d3e \
                         size    360138
@@ -39,10 +39,6 @@ if {${name} ne ${subport}} {
     depends_build-append \
                         path:bin/pkg-config:pkgconfig
 
-    depends_lib-append  port:ImageMagick
-
-    configure.args      --with-imagick=${prefix}
-
     use_parallel_build  yes
 
     post-destroot {
@@ -50,5 +46,19 @@ if {${name} ne ${subport}} {
         xinstall -d ${destroot}${docdir} ${destroot}${prefix}/share/examples
         xinstall -m 0644 -W ${worksrcpath} CREDITS ${destroot}${subport}
         copy ${worksrcpath}/examples ${destroot}${prefix}/share/examples/${subport}
+    }
+
+    variant imagick6 conflicts imagick7 {
+        configure.args      --with-imagick=${prefix}
+        depends_lib-append  port:ImageMagick
+    }
+
+    variant imagick7 conflicts imagick6 {
+        configure.args      --with-imagick=${prefix}/lib/ImageMagick7
+        depends_lib-append  port:ImageMagick7
+    }
+
+    if { ![variant_isset imagick7] } {
+        default_variants +imagick6
     }
 }
